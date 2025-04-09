@@ -2,14 +2,10 @@
 =========================================================
 * Soft UI Dashboard React - v4.0.1
 =========================================================
-
 * Product Page: https://www.creative-tim.com/product/soft-ui-dashboard-react
 * Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
 Coded by www.creative-tim.com
-
- =========================================================
-
+=========================================================
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
@@ -27,13 +23,13 @@ import SoftInputIconRoot from "components/SoftInput/SoftInputIconRoot";
 // Soft UI Dashboard React contexts
 import { useSoftUIController } from "context";
 
-const SoftInput = forwardRef(({ size, icon, error, success, disabled, ...rest }, ref) => {
+const SoftInput = forwardRef(({ size, icon = { component: false, direction: "none" }, error, success, disabled, ...rest }, ref) => {
   let template;
   const [controller] = useSoftUIController();
   const { direction } = controller;
-  const iconDirection = icon.direction;
+  const iconDirection = icon?.direction; // Safe access with optional chaining
 
-  if (icon.component && icon.direction === "left") {
+  if (icon?.component && icon.direction === "left") {
     template = (
       <SoftInputWithIconRoot ref={ref} ownerState={{ error, success, disabled }}>
         <SoftInputIconBoxRoot ownerState={{ size }}>
@@ -47,7 +43,7 @@ const SoftInput = forwardRef(({ size, icon, error, success, disabled, ...rest },
         />
       </SoftInputWithIconRoot>
     );
-  } else if (icon.component && icon.direction === "right") {
+  } else if (icon?.component && icon.direction === "right") {
     template = (
       <SoftInputWithIconRoot ref={ref} ownerState={{ error, success, disabled }}>
         <SoftInputRoot
