@@ -7,8 +7,7 @@
 * Copyright 2023 Creative Tim (https://www.creative-tim.com)
 
 Coded by www.creative-tim.com
-
- =========================================================
+=========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
@@ -25,11 +24,12 @@ export default styled(Avatar)(({ theme, ownerState }) => {
   const { pxToRem, linearGradient } = functions;
   const { size: fontSize, fontWeightBold } = typography;
 
-  // backgroundImage value
+  // backgroundImage value with fallback check
+  const gradient = gradients[bgColor];
   const backgroundValue =
-    bgColor === "transparent"
+    bgColor === "transparent" || !gradient
       ? transparent.main
-      : linearGradient(gradients[bgColor].main, gradients[bgColor].state);
+      : linearGradient(gradient.main, gradient.state);
 
   // size value
   let sizeValue;
@@ -82,7 +82,7 @@ export default styled(Avatar)(({ theme, ownerState }) => {
   return {
     background: backgroundValue,
     fontWeight: fontWeightBold,
-    boxShadow: boxShadows[shadow],
+    boxShadow: boxShadows[shadow] || "none",
     ...sizeValue,
   };
 });

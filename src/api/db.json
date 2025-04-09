@@ -1,0 +1,32 @@
+{
+    "staff": [
+      {
+        "id": 1,
+        "matricule": "EMP001",
+        "nom": "Dupont",
+        "adresse": "123 Rue Example, Ville",
+        "tel": "0123456789"
+      }
+    ],
+    "medecins": [
+      {
+        "id": 1,
+        "nom": "Martin",
+        "prenom": "Jean",
+        "specialite": "Cardiologie",
+        "adresse": "456 Avenue Medecin, Ville",
+        "tel": "0987654321"
+      }
+    ],
+    "patients": [
+      {
+        "id": 1,
+        "cin": "AB123456",
+        "nom": "Durand",
+        "prenom": "Marie",
+        "tel": "0654321987",
+        "dateNaissance": "1985-05-15",
+        "nationalite": "Française"
+      }
+    ]
+  }

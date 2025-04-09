@@ -8,9 +8,7 @@
 
 Coded by www.creative-tim.com
 
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+=========================================================
 */
 
 // prop-types is a library for typechecking of props
@@ -34,7 +32,7 @@ function TimelineItem({ color, icon, title, dateTime, description, badges, lastI
   const isDark = useTimeline();
 
   const renderBadges =
-    badges.length > 0
+    badges?.length > 0
       ? badges.map((badge, key) => {
           const badgeKey = `badge-${key}`;
 
@@ -80,7 +78,7 @@ function TimelineItem({ color, icon, title, dateTime, description, badges, lastI
             </SoftTypography>
           ) : null}
         </SoftBox>
-        {badges.length > 0 ? (
+        {badges?.length > 0 ? (
           <SoftBox display="flex" pb={lastItem ? 1 : 2}>
             {renderBadges}
           </SoftBox>
