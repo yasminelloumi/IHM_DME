@@ -1,7 +1,5 @@
 import { useRef, useState } from "react";
-import { toPng } from "html-to-image";
-import axios from "axios";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate, Link } from "react-router-dom";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
@@ -10,8 +8,11 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 import curved6 from "assets/images/curved-images/curved14.jpg";
 import QRCode from "react-qr-code";
 
+// Import the registerPatient function from registerService.js
+import { registerPatient } from "../../../services/registerService";
+
 function SignUp() {
-  const qrRef = useRef();
+  const qrRef = useRef(); // Ref to capture QR code as an image
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [patient, setPatient] = useState({
@@ -22,41 +23,32 @@ function SignUp() {
     dateNaissance: "",
     nationalite: "",
     password: "",
-    qrCode: "",
+    qrCode: "", // To store the QR code image or URL
   });
-  const navigate = useNavigate(); // Initialize useNavigate
 
+  const navigate = useNavigate();
+
+  // Handle changes in input fields
   const handleChange = (e) => {
     setPatient({ ...patient, [e.target.name]: e.target.value });
   };
 
+  // Handle form submission and patient registration
   const handleSignUp = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // Generate QR code data
-      const qrValue = JSON.stringify({
-        CIN: patient.CIN,
-        nom: patient.nom,
-        prenom: patient.prenom,
-        tel: patient.tel,
-        dateNaissance: patient.dateNaissance,
-        nationalite: patient.nationalite,
-      });
+      // Add role as 'patient' before registering
+      const patientWithRole = { ...patient, role: "patient" };
 
-      // Wait for QR code to render and convert to PNG
-      const dataUrl = await toPng(qrRef.current);
-      const patientWithQR = {
-        ...patient,
-        qrCode: dataUrl,
-      };
+      // Use the registerPatient function from registerService
+      const response = await registerPatient(patientWithRole); // register patient and get response with qr code
 
-      // Send to JSON Server
-      const response = await axios.post("http://localhost:3001/Patient", patientWithQR);
-
-      if (response.status >= 200 && response.status < 300) {
+      if (response) {
         alert("Patient registered and QR saved successfully!");
+
+        // Reset patient data and redirect to sign-in page
         setPatient({
           CIN: "",
           nom: "",
@@ -69,7 +61,7 @@ function SignUp() {
         });
         navigate("/authentication/sign-in"); // Redirect to login page
       } else {
-        throw new Error(`Failed to register patient: ${response.statusText}`);
+        throw new Error("Patient registration failed.");
       }
     } catch (err) {
       const errorMessage = err.message || "An error occurred during registration.";
@@ -81,7 +73,7 @@ function SignUp() {
     }
   };
 
-  // Field labels for better placeholder text
+  // Field labels for placeholders (without email)
   const fieldLabels = {
     CIN: "CIN",
     nom: "Last Name",
@@ -99,6 +91,7 @@ function SignUp() {
       image={curved6}
     >
       <SoftBox component="form" role="form" p={3}>
+        {/* Render input fields dynamically */}
         {Object.keys(fieldLabels).map((field) => (
           <SoftBox mb={2} key={field}>
             <SoftInput
@@ -111,6 +104,7 @@ function SignUp() {
           </SoftBox>
         ))}
 
+        {/* Submit button */}
         <SoftBox mt={4} mb={1}>
           <SoftButton
             variant="gradient"
@@ -126,20 +120,11 @@ function SignUp() {
         {/* Hidden QR code for image generation */}
         <div style={{ position: "absolute", top: "-9999px", left: "-9999px" }}>
           <div ref={qrRef}>
-            <QRCode
-              value={JSON.stringify({
-                CIN: patient.CIN,
-                nom: patient.nom,
-                prenom: patient.prenom,
-                tel: patient.tel,
-                dateNaissance: patient.dateNaissance,
-                nationalite: patient.nationalite,
-              })}
-              size={128}
-            />
+            <QRCode value={`http://localhost:3000/dme/${patient.CIN}`} size={128} />
           </div>
         </div>
 
+        {/* Error message */}
         {error && (
           <SoftBox mt={3} textAlign="center">
             <SoftTypography variant="body2" color="error">
@@ -148,6 +133,7 @@ function SignUp() {
           </SoftBox>
         )}
 
+        {/* Redirect to sign-in page if user already has an account */}
         <SoftBox mt={3} textAlign="center">
           <SoftTypography variant="button" color="text" fontWeight="regular">
             Already have an account?{" "}

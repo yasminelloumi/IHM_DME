@@ -1,10 +1,11 @@
-export class DME {
-    constructor(id, patientCIN, diagnostiques = [], ordonnances = []) {
-      this.id = id;
-      this.patientCIN = patientCIN;
-      this.diagnostiques = diagnostiques;
-      this.ordonnances = ordonnances;
-    }
+class DME {
+  constructor(id, patientCIN, diagnostiques, ordonnances) {
+    this.id = id;
+    this.patientCIN = patientCIN;
+    this.diagnostiques = diagnostiques;
+    this.ordonnances = ordonnances;
+  }
+
   
     consulterDME() {
       // Logic to display the DME
