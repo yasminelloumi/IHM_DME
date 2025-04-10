@@ -1,18 +1,3 @@
-/**
-=========================================================
-* Soft UI Dashboard React - v4.0.1
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/soft-ui-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useState, useEffect } from "react";
 
 // @mui material components
@@ -45,26 +30,25 @@ import curved0 from "assets/images/curved-images/curved0.jpg";
 function Header() {
   const [tabsOrientation, setTabsOrientation] = useState("horizontal");
   const [tabValue, setTabValue] = useState(0);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // A function that sets the orientation state of the tabs.
+    // Set user from localStorage
+    const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
+    setUser(connectedUser);
+
+    // Handle responsive tab orientation
     function handleTabsOrientation() {
       return window.innerWidth < breakpoints.values.sm
         ? setTabsOrientation("vertical")
         : setTabsOrientation("horizontal");
     }
 
-    /** 
-     The event listener that's calling the handleTabsOrientation function when resizing the window.
-    */
     window.addEventListener("resize", handleTabsOrientation);
-
-    // Call the handleTabsOrientation function to set the state with the initial value.
     handleTabsOrientation();
 
-    // Remove event listener on cleanup
     return () => window.removeEventListener("resize", handleTabsOrientation);
-  }, [tabsOrientation]);
+  }, []);
 
   const handleSetTabValue = (event, newValue) => setTabValue(newValue);
 
@@ -113,10 +97,10 @@ function Header() {
           <Grid item>
             <SoftBox height="100%" mt={0.5} lineHeight={1}>
               <SoftTypography variant="h5" fontWeight="medium">
-                Alex Thompson
+                {user ? `${user.nom} ${user.prenom}` : "Loading..."}
               </SoftTypography>
               <SoftTypography variant="button" color="text" fontWeight="medium">
-                CEO / Co-Founder
+                {user ? user.dateNaissance : ""}
               </SoftTypography>
             </SoftBox>
           </Grid>

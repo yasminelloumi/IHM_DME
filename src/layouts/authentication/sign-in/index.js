@@ -35,7 +35,7 @@ function SignIn() {
       // Authenticate based on userType
       if (userType === "patient") {
         const result = await authenticatePatient(identifier, password);
-        user = result.length > 0 ? result[0] : null;
+        user = result ? result : null; // Assuming authenticatePatient returns a user object or null
       } else if (userType === "staff") {
         user = await authenticateStaff(identifier, password);
       }
@@ -124,7 +124,7 @@ function SignIn() {
         <SoftBox component="form" role="form" sx={{ padding: 3, backgroundColor: "white" }}>
           <SoftBox mb={2}>
             <SoftTypography component="label" variant="caption" fontWeight="bold" sx={{ display: "block", mb: 1 }}>
-              {userType === "staff" ? "matricule" : "CIN"}
+              {userType === "staff" ? "Matricule" : "CIN"}
             </SoftTypography>
             <SoftInput
               type="text"

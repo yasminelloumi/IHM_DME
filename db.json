@@ -66,10 +66,16 @@
   ],
   "dme": [
     {
-      "id": "1",
-      "patientCIN": "12345678",
-      "diagnostiques": [],
-      "ordonnances": []
+      "id": 1,
+      "patientCIN": "444444",
+      "diagnostiques": [
+        "Hypertension",
+        "Diabète"
+      ],
+      "ordonnances": [
+        "Amlodipine",
+        "Metformine"
+      ]
     }
   ],
   "images": [
