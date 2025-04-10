@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { getDMEById } from "services/dmeService"; // Make sure this path is correct
-import { updateDMEProfile } from "services/dmeService"; // Make sure this path is correct
-import { Button, TextField } from "@mui/material";
+import { getDMEById, updateDMEProfile } from "services/dmeService";
+
 const DMEInterface = () => {
   const [dmeId, setDmeId] = useState("");
   const [dmeData, setDmeData] = useState(null);
@@ -19,17 +18,21 @@ const DMEInterface = () => {
   };
 
   const handleAddDiagnostique = () => {
-    const updated = { ...dmeData };
-    updated.diagnostiques.push(newDiagnostique);
-    setDmeData(updated);
-    setNewDiagnostique("");
+    if (dmeData && dmeData.diagnostiques) {
+      const updated = { ...dmeData };
+      updated.diagnostiques.push(newDiagnostique);
+      setDmeData(updated);
+      setNewDiagnostique("");
+    }
   };
 
   const handleAddOrdonnance = () => {
-    const updated = { ...dmeData };
-    updated.ordonnances.push(newOrdonnance);
-    setDmeData(updated);
-    setNewOrdonnance("");
+    if (dmeData && dmeData.ordonnances) {
+      const updated = { ...dmeData };
+      updated.ordonnances.push(newOrdonnance);
+      setDmeData(updated);
+      setNewOrdonnance("");
+    }
   };
 
   const handleProfileUpdate = async () => {
@@ -56,10 +59,12 @@ const DMEInterface = () => {
             <strong>Patient CIN:</strong> {dmeData.patientCIN}
           </p>
           <p>
-            <strong>Diagnostiques:</strong> {dmeData.diagnostiques.join(", ")}
+            <strong>Diagnostiques:</strong>{" "}
+            {dmeData.diagnostiques ? dmeData.diagnostiques.join(", ") : "None"}
           </p>
           <p>
-            <strong>Ordonnances:</strong> {dmeData.ordonnances.join(", ")}
+            <strong>Ordonnances:</strong>{" "}
+            {dmeData.ordonnances ? dmeData.ordonnances.join(", ") : "None"}
           </p>
 
           <h4>➕ Add Diagnostique</h4>
