@@ -54,6 +54,8 @@ import SpaceShip from "examples/Icons/SpaceShip";
 import CustomerSupport from "examples/Icons/CustomerSupport";
 import CreditCard from "examples/Icons/CreditCard";
 import Cube from "examples/Icons/Cube";
+import { Icon } from "@mui/material";
+import DMEInterface from "layouts/DME/DMEInterface";
 
 const routes = [
   {
@@ -128,6 +130,14 @@ const routes = [
     icon: <SpaceShip size="12px" />,
     component: <SignUp />,
     noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "DME Interface",
+    key: "dme-interface",
+    icon: <Icon fontSize="small">folder_open</Icon>,
+    route: "/dme-interface",
+    component: <DMEInterface />,
   },
 ];
 

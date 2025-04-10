@@ -78,10 +78,8 @@
   ],
   "dme": [
     {
-      "id": "1",
-      "patientCIN": "12345678",
-      "diagnostiques": [],
-      "ordonnances": []
+      "patientCIN": "sdwed",
+      "id": "1"
     }
   ],
   "images": [
