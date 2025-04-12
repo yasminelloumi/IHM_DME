@@ -10,7 +10,7 @@ import PatientDashboardCard from "./components/PatientDashboardCard";
 function Dashboard() {
   const patientData = {
     diseases: 3,
-    appointments: 5,
+    consultations: 5,
     laboratory: 8,
     imaging: 4
   };
@@ -32,27 +32,27 @@ function Dashboard() {
               <PatientDashboardCard
                 title="Diseases"
                 count={patientData.diseases}
-                icon="coronavirus"  // Icône pour les maladies
+                icon="coronavirus"
                 color="error"
                 path="/patient/diseases"
               />
             </Grid>
             
             <Grid item xs={12} sm={6} lg={3}>
-              <PatientDashboardCard
-                title="Appointments"
-                count={patientData.appointments}
-                icon="calendar_today"  // Icône pour les rendez-vous
-                color="info"
-                path="/patient/appointments"
-              />
+            <PatientDashboardCard
+  title="Consultations"
+  count={patientData.consultations}
+  icon="calendar_today"
+  color="info"
+  path="/patient/consultations" // Doit correspondre à la route
+/>
             </Grid>
             
             <Grid item xs={12} sm={6} lg={3}>
               <PatientDashboardCard
                 title="Laboratory"
                 count={patientData.laboratory}
-                icon="biotech"  // Icône pour les tests labo
+                icon="biotech"
                 color="success"
                 path="/patient/laboratory"
               />
@@ -60,9 +60,9 @@ function Dashboard() {
             
             <Grid item xs={12} sm={6} lg={3}>
               <PatientDashboardCard
-                title="medical imaging center results"
+                title="Medical Imaging"
                 count={patientData.imaging}
-                icon="radiology"  // Icône pour l'imagerie
+                icon="radiology"
                 color="warning"
                 path="/patient/imaging"
               />
