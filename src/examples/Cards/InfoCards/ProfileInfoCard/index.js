@@ -1,16 +1,3 @@
-/**
-=========================================================
-* Soft UI Dashboard React - v4.0.1
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/soft-ui-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
-=========================================================
-*/
-
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 
@@ -64,11 +51,15 @@ function ProfileInfoCard({ title, description, info, action }) {
         <SoftTypography variant="h6" fontWeight="medium" textTransform="capitalize">
           {title}
         </SoftTypography>
-        <SoftTypography component={Link} to={action.route} variant="body2" color="secondary">
-          <Tooltip title={action.tooltip} placement="top">
-            <Icon>edit</Icon>
-          </Tooltip>
-        </SoftTypography>
+        <Tooltip title={action.tooltip} placement="top">
+          <Icon
+            style={{ cursor: "pointer" }}
+            onClick={action.onClick}
+            color="action"
+          >
+            edit
+          </Icon>
+        </Tooltip>
       </SoftBox>
       <SoftBox p={2}>
         <SoftBox mb={2} lineHeight={1}>
@@ -93,8 +84,9 @@ ProfileInfoCard.propTypes = {
   description: PropTypes.string.isRequired,
   info: PropTypes.objectOf(PropTypes.string).isRequired,
   action: PropTypes.shape({
-    route: PropTypes.string.isRequired,
+    route: PropTypes.string,
     tooltip: PropTypes.string.isRequired,
+    onClick: PropTypes.func, // ✅ Added onClick as optional
   }).isRequired,
 };
 

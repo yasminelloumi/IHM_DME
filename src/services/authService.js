@@ -21,8 +21,6 @@ export const authenticatePatient = async (cin, password) => {
     }
   };
   
-  
-
 // Function to authenticate medical staff
 export const authenticateStaff = async (matricule, password) => {
     try {

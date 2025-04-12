@@ -1,0 +1,168 @@
+/* Base styling for the dialog container */
+.dialog-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.5); /* Overlay background */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  
+  /* Active state of the dialog */
+  .dialog-container.open {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  /* Dialog content box */
+  .dialog-content {
+    background: #fff;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    transform: translateY(-20px);
+  }
+  
+  .dialog-content.open {
+    transform: translateY(0);
+  }
+  
+  /* Dialog title */
+  .dialog-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+  }
+  
+  /* Form field labels */
+  .dialog-label {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #555;
+    display: block;
+  }
+  
+  /* Form inputs */
+  .dialog-input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: #fafafa;
+  }
+  
+  .dialog-input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+  }
+  
+  /* Button styles */
+  .dialog-button {
+    padding: 6px 12px; /* Smaller padding for the button */
+    border: none;
+    border-radius: 10px; /* Slightly rounded corners */
+    font-size: 0.9rem;  /* Smaller font size */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: auto; /* Auto width to adjust based on content */
+    margin-top: 10px; /* Smaller margin */
+  }
+  
+  /* Save button */
+  .dialog-button.save {
+    background-color: #17546e;
+    color: white;
+  }
+  
+  .dialog-button.save:hover {
+    background-color: #17546e;
+  }
+  
+  /* Cancel button */
+  .dialog-button.cancel {
+    background-color: #f1f1f1;
+    color: #333;
+    border: 1px solid #ddd;
+  }
+  
+  .dialog-button.cancel:hover {
+    background-color: #ccc;
+  }
+  
+  /* Button group: styling for cancel and save buttons */
+  .dialog-actions {
+    display: flex;
+    justify-content: center; /* Center buttons */
+    gap: 15px;
+    padding: 15px 0;
+  }
+  
+  /* Close button */
+  .dialog-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  
+  .dialog-close-btn:hover {
+    color: #ff3333;
+  }
+  
+  /* Dialog content padding */
+  .dialog-content {
+    padding: 20px;
+  }
+  
+  /* Form fields inside dialog */
+  .dialog-content input,
+  .dialog-content select,
+  .dialog-content textarea {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 100%;
+    transition: all 0.3s ease;
+  }
+  
+  .dialog-content input:focus,
+  .dialog-content select:focus,
+  .dialog-content textarea:focus {
+    border: 1px solid #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+  }
+  
+  /* Padding for Dialog Actions section */
+  .dialog-actions {
+    display: flex;
+    justify-content: center; /* Center buttons */
+    gap: 15px;
+    padding: 15px 0;
+  }
+  
+  .dialog-actions button {
+    font-weight: bold;
+    padding: 12px 20px;
+  }
+  

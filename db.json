@@ -18,7 +18,7 @@
       "CIN": "333333",
       "nom": "Bradai",
       "prenom": "Rahma",
-      "tel": "26354111",
+      "tel": "26354222",
       "dateNaissance": "2025-04-18",
       "nationalite": "tunisian",
       "password": "yasmina123@",
@@ -66,7 +66,7 @@
   ],
   "dme": [
     {
-      "id": 1,
+      "id": "1",
       "patientCIN": "444444",
       "diagnostiques": [
         "Hypertension",
@@ -94,7 +94,7 @@
   ],
   "centreImagerie": [
     {
-      "id": 3,
+      "id": "3",
       "matricule": "11223",
       "password": "imgpass",
       "nom": "Imaging Staff"
@@ -102,7 +102,7 @@
   ],
   "laboratoire": [
     {
-      "id": 2,
+      "id": "2",
       "matricule": "67890",
       "password": "labpass",
       "nom": "Lab Tech"
