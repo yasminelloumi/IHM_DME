@@ -52,7 +52,7 @@ const routes = [
     key: "tables",
     route: "/tables",
     icon: <Office size="12px" />,
-    component: <Tables />,
+    component: <PatientConsultations />,
     name: "Diseases",  // Modifié ici
     key: "patient-diseases",
     route: "/patient/diseases",
