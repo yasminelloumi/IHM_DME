@@ -55,6 +55,8 @@ import CustomerSupport from "examples/Icons/CustomerSupport";
 import CreditCard from "examples/Icons/CreditCard";
 import Cube from "examples/Icons/Cube";
 
+import PatientT from "layouts/TablePatient";
+
 const routes = [
   {
     type: "collapse",
@@ -63,6 +65,15 @@ const routes = [
     route: "/dashboard",
     icon: <Shop size="12px" />,
     component: <Dashboard />,
+    noCollapse: true,
+  },
+  {
+    type: "collapse",
+    name: "Liste Patient",
+    key: "TablePatient",
+    route: "/TablePatient",
+    icon: <Shop size="12px" />,
+    component: <PatientT />,
     noCollapse: true,
   },
   {
