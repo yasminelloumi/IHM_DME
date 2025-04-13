@@ -23,7 +23,8 @@ import {
   Close,
   QrCodeScanner,
 } from "@mui/icons-material";
-import QRCodeScanner from "./QRCodeScanner"; // <-- make sure the path is correct
+import QRCodeScanner from "./QRCodeScanner"; // make sure path is correct
+import axios from "axios";
 
 const modalStyle = {
   position: "absolute",
@@ -39,7 +40,7 @@ const modalStyle = {
   p: 3,
 };
 
-function PatientCard({ cin, nom, prenom, telephone, dateNaissance, nationalite, index }) {
+function PatientCard({ CIN, nom, prenom, telephone, dateNaissance, nationalite, index }) {
   const avatarColors = ["#0077b6", "#0096c7", "#00b4d8"];
   const avatarBgColor = avatarColors[index % avatarColors.length];
   const [open, setOpen] = useState(false);
@@ -86,7 +87,7 @@ function PatientCard({ cin, nom, prenom, telephone, dateNaissance, nationalite, 
             {nom} {prenom}
           </SoftTypography>
           <SoftTypography variant="body2" color="text.secondary" fontWeight="medium">
-            CIN: {cin}
+            CIN: {CIN}
           </SoftTypography>
 
           <SoftBox display="grid" gridTemplateColumns={{ xs: "1fr", sm: "repeat(3, 1fr)" }} gap={2} mt={1}>
@@ -120,7 +121,7 @@ function PatientCard({ cin, nom, prenom, telephone, dateNaissance, nationalite, 
             </SoftBox>
             <Divider sx={{ mb: 2 }} />
             <SoftBox display="flex" flexDirection="column" gap={2}>
-              <DetailItemModal icon={<Person />} label="CIN" value={cin} />
+              <DetailItemModal icon={<Person />} label="CIN" value={CIN} />
               <DetailItemModal icon={<Phone />} label="Téléphone" value={telephone} />
               <DetailItemModal icon={<Cake />} label="Date de Naissance" value={dateNaissance} />
               <DetailItemModal icon={<Public />} label="Nationalité" value={nationalite} />
@@ -167,7 +168,7 @@ function DetailItemModal({ label, value, icon }) {
 }
 
 PatientCard.propTypes = {
-  cin: PropTypes.string.isRequired,
+  CIN: PropTypes.string.isRequired,
   nom: PropTypes.string.isRequired,
   prenom: PropTypes.string.isRequired,
   telephone: PropTypes.string.isRequired,
@@ -188,51 +189,52 @@ DetailItemModal.propTypes = {
   icon: PropTypes.node.isRequired,
 };
 
-const patients = [
-  {
-    cin: "AB123456",
-    nom: "BENALI",
-    prenom: "AHMED",
-    telephone: "+212 6 12 34 56 78",
-    dateNaissance: "15/03/1985",
-    nationalite: "MAROCAIN",
-  },
-  {
-    cin: "CD789012",
-    nom: "EL FASSI",
-    prenom: "FATIMA",
-    telephone: "+212 6 98 76 54 32",
-    dateNaissance: "22/07/1990",
-    nationalite: "MAROCAINE",
-  },
-];
-
 function ListPatientData() {
   const [search, setSearch] = useState("");
   const [scannerOpen, setScannerOpen] = useState(false);
-
-  const filteredPatients = patients.filter(
-    (p) =>
-      p.nom.toLowerCase().includes(search.toLowerCase()) ||
-      p.prenom.toLowerCase().includes(search.toLowerCase()) ||
-      p.cin.toLowerCase().includes(search.toLowerCase())
-  );
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleClearSearch = () => setSearch("");
 
-  const handleScanSuccess = (cin) => {
-    setSearch(cin);
+  const handleScanSuccess = async (CIN) => {
+    setSearch(CIN);
     setScannerOpen(false);
+    setLoading(true);
+    try {
+      const response = await axios.get(`http://localhost:3001/patients?CIN=${CIN}`);
+      if (response.data && response.data.length > 0) {
+        const scannedPatient = response.data[0];
+        // Add to history only if not already present
+        setPatients((prev) => {
+          const alreadyExists = prev.some((p) => p.CIN === scannedPatient.CIN);
+          return alreadyExists ? prev : [...prev, scannedPatient];
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching patient data:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleScanError = (err) => {
     console.error("QR Scan Error:", err);
   };
 
+  const filteredPatients = search
+    ? patients.filter(
+        (p) =>
+          p.nom.toLowerCase().includes(search.toLowerCase()) ||
+          p.prenom.toLowerCase().includes(search.toLowerCase()) ||
+          p.CIN.toLowerCase().includes(search.toLowerCase())
+      )
+    : patients;
+
   return (
     <SoftBox width="100%" maxWidth="1200px" mx="auto" p={3}>
       <SoftTypography variant="h4" mb={2} fontWeight="bold">
-        Liste des Patients
+        Historique des Patients Scannés
       </SoftTypography>
 
       <SoftBox mb={3} display="flex" flexDirection="column" gap={2}>
@@ -296,27 +298,30 @@ function ListPatientData() {
       </SoftBox>
 
       <SoftBox display="flex" flexDirection="column" gap={2}>
-        {filteredPatients.length > 0 ? (
+        {loading ? (
+          <SoftBox textAlign="center" py={3}>
+            <SoftTypography variant="h6" color="text.secondary">
+              Chargement des données...
+            </SoftTypography>
+          </SoftBox>
+        ) : filteredPatients.length > 0 ? (
           filteredPatients.map((patient, index) => (
-            <div key={index}>
-              <PatientCard {...patient} index={index} />
-            </div>
+            <PatientCard
+              key={patient.CIN}
+              CIN={patient.CIN}
+              nom={patient.nom}
+              prenom={patient.prenom}
+              telephone={patient.tel}
+              dateNaissance={patient.dateNaissance}
+              nationalite={patient.nationalite}
+              index={index}
+            />
           ))
         ) : (
           <SoftBox textAlign="center" py={3}>
-            <SoftTypography variant="body1" color="text.secondary">
-              Aucun patient trouvé pour la recherche `{search}`.
+            <SoftTypography variant="h6" color="text.secondary">
+              Aucun patient trouvé.
             </SoftTypography>
-            {search && (
-              <SoftTypography
-                variant="body2"
-                color="info"
-                sx={{ cursor: "pointer", mt: 1, textDecoration: "underline" }}
-                onClick={handleClearSearch}
-              >
-                Réinitialiser la recherche
-              </SoftTypography>
-            )}
           </SoftBox>
         )}
       </SoftBox>
