@@ -2,6 +2,7 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
+import SoftButton from "components/SoftButton";
 import {
   Avatar,
   IconButton,
@@ -20,7 +21,9 @@ import {
   Search,
   Clear,
   Close,
+  QrCodeScanner,
 } from "@mui/icons-material";
+import { QrReader } from "react-qr-reader";
 
 // Style pour la pop-up
 const modalStyle = {
@@ -37,7 +40,7 @@ const modalStyle = {
   p: 3,
 };
 
-// Composant PatientCard (modifié pour inclure la pop-up)
+// Composant PatientCard (inchangé)
 function PatientCard({ cin, nom, prenom, telephone, dateNaissance, nationalite, index }) {
   const avatarColors = ["#0077b6", "#0096c7", "#00b4d8"];
   const avatarBgColor = avatarColors[index % avatarColors.length];
@@ -241,6 +244,8 @@ const patients = [
 
 function ListPatientData() {
   const [search, setSearch] = useState("");
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [scanError, setScanError] = useState(null);
 
   const filteredPatients = patients.filter(
     (p) =>
@@ -253,11 +258,78 @@ function ListPatientData() {
     setSearch("");
   };
 
+  const toggleScanner = () => {
+    setScannerOpen(!scannerOpen);
+    setScanError(null); // Reset error when toggling scanner
+  };
+
+  const handleScan = (data) => {
+    if (data) {
+      // Assuming the QR code contains the CIN of the patient
+      setSearch(data.text); // Populate the search bar with the scanned CIN
+      setScannerOpen(false); // Close the scanner after a successful scan
+      setScanError(null);
+    }
+  };
+
+  const handleError = (err) => {
+    console.error(err);
+    setScanError("Impossible d'accéder à la caméra. Veuillez vérifier les autorisations.");
+  };
+
   return (
     <SoftBox width="100%" maxWidth="1200px" mx="auto" p={3}>
       <SoftTypography variant="h4" mb={2} fontWeight="bold">
         Liste des Patients
       </SoftTypography>
+
+      {/* Zone de scan QR code */}
+      <SoftBox mb={3} display="flex" flexDirection="column" gap={2}>
+        <SoftBox display="flex" alignItems="center" gap={2}>
+          <SoftButton
+            variant="gradient"
+            color="info"
+            onClick={toggleScanner}
+            startIcon={<QrCodeScanner />}
+            sx={{ borderRadius: "12px", px: 3 }}
+            aria-label={scannerOpen ? "Fermer le scanner QR" : "Ouvrir le scanner QR"}
+          >
+            {scannerOpen ? "Fermer le Scanner" : "Scanner un QR Code"}
+          </SoftButton>
+        </SoftBox>
+
+        {scannerOpen && (
+          <SoftBox
+            sx={{
+              borderRadius: "16px",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+              backgroundColor: "#fff",
+              p: 2,
+              border: "2px solid #0077b6",
+              maxWidth: "400px",
+              mx: "auto",
+            }}
+          >
+            <QrReader
+              onResult={(result, error) => {
+                if (result) {
+                  handleScan(result);
+                }
+                if (error) {
+                  handleError(error);
+                }
+              }}
+              style={{ width: "100%" }}
+              constraints={{ facingMode: "environment" }} // Use rear camera by default
+            />
+            {scanError && (
+              <SoftTypography variant="body2" color="error" textAlign="center" mt={1}>
+                {scanError}
+              </SoftTypography>
+            )}
+          </SoftBox>
+        )}
+      </SoftBox>
 
       {/* Zone de recherche */}
       <SoftBox mb={3} display="flex" alignItems="center" gap={2}>
