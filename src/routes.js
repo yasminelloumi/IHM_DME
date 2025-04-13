@@ -35,7 +35,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Liste Patient",
+    name: "Patients List",
     key: "TablePatient",
     route: "/TablePatient",
     icon: <Shop size="12px" />,
