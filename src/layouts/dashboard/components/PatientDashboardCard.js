@@ -9,26 +9,30 @@ function PatientDashboardCard({ title, count, icon, color, path }) {
   const cardConfig = {
     "Diseases": {
       color: "#1976d2",
-      icon: "healing"
+      icon: "healing",
+      path: "/diseases"  // Retirer '/patient/'
     },
     "Consultations": {
       color: "#64b5f6",
-      icon: "calendar_today"
+      icon: "calendar_today",
+      path: "/consultations"
     },
     "Laboratory": {
       color: "#0288d1",
-      icon: "science"
+      icon: "science",
+      path: "/laboratory"
     },
     "Medical Imaging": {
       color: "#01579b",
-      icon: "collections"
+      icon: "collections",
+      path: "/imaging"
     }
   };
 
-  const config = cardConfig[title] || { color, icon };
+  const config = cardConfig[title] || { color, icon, path };
 
   return (
-    <Card sx={{ height: "100%", cursor: "pointer" }} component={Link} to={path}>
+    <Card sx={{ height: "100%", cursor: "pointer" }}>
       <SoftBox p={3} display="flex" flexDirection="column" height="100%">
         <SoftBox display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <SoftBox
@@ -61,13 +65,16 @@ function PatientDashboardCard({ title, count, icon, color, path }) {
         </SoftBox>
         <SoftBox mt="auto" pt={2}>
           <SoftTypography 
+            component={Link}
+            to={config.path}
             variant="button" 
             color={config.color} 
             fontWeight="medium"
             sx={{
               display: "flex",
               alignItems: "center",
-              "&:hover": { textDecoration: "underline" }
+              "&:hover": { textDecoration: "underline" },
+              textDecoration: 'none'
             }}
           >
             View Details
@@ -84,7 +91,7 @@ PatientDashboardCard.propTypes = {
   count: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   icon: PropTypes.string,
   color: PropTypes.string,
-  path: PropTypes.string.isRequired
+  path: PropTypes.string
 };
 
 export default PatientDashboardCard;

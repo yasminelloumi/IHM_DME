@@ -5,26 +5,19 @@ import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
-// Soft UI Dashboard React icons
+// Icons
 import Shop from "examples/Icons/Shop";
 import Office from "examples/Icons/Office";
-import Settings from "examples/Icons/Settings";
-import Document from "examples/Icons/Document";
-import SpaceShip from "examples/Icons/SpaceShip";
-import CustomerSupport from "examples/Icons/CustomerSupport";
-import CreditCard from "examples/Icons/CreditCard";
-import Cube from "examples/Icons/Cube";
-
-import PatientT from "layouts/TablePatient";
-
 import MedicalServices from "@mui/icons-material/MedicalServices";
 import CalendarToday from "@mui/icons-material/CalendarToday";
 import Science from "@mui/icons-material/Science";
 import Collections from "@mui/icons-material/Collections";
+
+import PatientT from "layouts/TablePatient";
 import PatientConsultations from "layouts/PatientConsultations/PatientConsultations";  
 import CentreImage from "layouts/CentreImagerie";
-
 import Labo from "layouts/Laboratoire";
+
 const routes = [
   {
     type: "collapse",
@@ -37,7 +30,7 @@ const routes = [
   },
   { 
     type: "title", 
-    title: "Patient Management",
+    title: "Patient Management", 
     key: "patient-management" 
   },
   {
@@ -51,12 +44,7 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Tables",
-    key: "tables",
-    route: "/tables",
-    icon: <Office size="12px" />,
-    component: <PatientConsultations />,
-    name: "Diseases",  // Modifié ici
+    name: "Diseases",
     key: "patient-diseases",
     route: "/diseases",
     icon: <MedicalServices size="12px" />,
@@ -69,7 +57,7 @@ const routes = [
     key: "patient-consultations",
     route: "/consultations",
     icon: <CalendarToday size="12px" />,
-    component: <PatientConsultations />, // Maintenant pointant vers le bon composant
+    component: <PatientConsultations />,
     noCollapse: true,
   },
   {
