@@ -24,25 +24,24 @@ import SoftTypography from "components/SoftTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import Table from "examples/Tables/Table";
+import ListPatientData from "./data/ListePatient";
+import ListePatient from "layouts/TablePatient/data/ListePatient";
+
 
 // Data
-import authorsTableData from "layouts/tables/data/authorsTableData";
-import projectsTableData from "layouts/tables/data/projectsTableData";
 
-function Tables() {
-  const { columns, rows } = authorsTableData;
-  const { columns: prCols, rows: prRows } = projectsTableData;
+
+function PatientT() {
+  const { columns, rows } = ListePatient;
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <SoftBox py={3}>
+        {/* Section 1 : Authors table */}
         <SoftBox mb={3}>
           <Card>
-            <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
-              <SoftTypography variant="h6">Authors table</SoftTypography>
-            </SoftBox>
+
             <SoftBox
               sx={{
                 "& .MuiTableRow-root:not(:last-child)": {
@@ -53,31 +52,16 @@ function Tables() {
                 },
               }}
             >
-              <Table columns={columns} rows={rows} />
+              <ListPatientData />
             </SoftBox>
           </Card>
         </SoftBox>
-        <Card>
-          <SoftBox display="flex" justifyContent="space-between" alignItems="center" p={3}>
-            <SoftTypography variant="h6">Projects table</SoftTypography>
-          </SoftBox>
-          <SoftBox
-            sx={{
-              "& .MuiTableRow-root:not(:last-child)": {
-                "& td": {
-                  borderBottom: ({ borders: { borderWidth, borderColor } }) =>
-                    `${borderWidth[1]} solid ${borderColor}`,
-                },
-              },
-            }}
-          >
-            <Table columns={prCols} rows={prRows} />
-          </SoftBox>
-        </Card>
+
+
       </SoftBox>
       <Footer />
     </DashboardLayout>
   );
 }
 
-export default Tables;
+export default PatientT;

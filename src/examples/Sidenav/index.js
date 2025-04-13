@@ -143,17 +143,25 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
             <Icon sx={{ fontWeight: "bold" }}>close</Icon>
           </SoftTypography>
         </SoftBox>
-        <SoftBox component={NavLink} to="/" display="flex" alignItems="center">
-          {brand && <SoftBox component="img" src={brand} alt="Soft UI Logo" width="2rem" />}
-          <SoftBox
-            width={!brandName && "100%"}
-            sx={(theme) => sidenavLogoLabel(theme, { miniSidenav })}
-          >
-            <SoftTypography component="h6" variant="button" fontWeight="medium">
-              {brandName}
-            </SoftTypography>
-          </SoftBox>
-        </SoftBox>
+        <SoftBox display="flex" flexDirection="column" alignItems="center" py={2}>
+  {/* Logo au-dessus */}
+  {brand && (
+    <SoftBox component="img" src={brand} alt="brand" width="70%" mb={1} />
+  )}
+  {/* Titre en-dessous */}
+  {brandName && (
+    <SoftBox
+      component="h6"
+      color="#38a3a5"
+      fontWeight="bold"
+      fontSize="1.1rem"
+      textAlign="center"
+    >
+      {brandName}
+    </SoftBox>
+  )}
+</SoftBox>
+
       </SoftBox>
       <Divider />
       <List>{renderRoutes}</List>
