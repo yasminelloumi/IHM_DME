@@ -123,5 +123,14 @@
       "password": "labpass",
       "nom": "Lab Tech"
     }
+  ],
+  "reports": [
+    {
+      "id": 1,
+      "patientId": "7434",
+      "fileName": "blood_test_2025_04_10.pdf",
+      "description": "Complete Blood Count (CBC) - Normal results.",
+      "timestamp": "2025-04-10T09:15:00.000Z"
+    }
   ]
 }

@@ -37,9 +37,10 @@ const patientData = {
 const initialReports = [
   {
     id: 1,
+    patientId: "7434",
     fileName: "blood_test_2025_04_10.pdf",
     description: "Complete Blood Count (CBC) - Normal results.",
-    timestamp: "2025-04-10 09:15 AM",
+    timestamp: "2025-04-10T09:15:00.000Z",
   },
 ];
 
@@ -72,8 +73,6 @@ function PatientInfoCard({ patient, darkMode }) {
       100% { transform: scale(1); }
     }
   `;
-  const birthDate = new Date("2003-04-19");
-console.log(birthDate.getFullYear()); // Should log 2003
   return (
     <Card
       sx={{
@@ -87,7 +86,7 @@ console.log(birthDate.getFullYear()); // Should log 2003
         <SoftBox display="flex" alignItems="center" gap={2} mb={2}>
           <Avatar
             sx={{
-              bgcolor: "#0077b6", // Medical blue
+              bgcolor: "#0077b6",
               width: 48,
               height: 48,
               animation: "pulse 2s infinite",
@@ -263,7 +262,7 @@ LabStatsCard.propTypes = {
 // Main Component
 function LaboratoryWorkspace({ labName }) {
   const [patient, setPatient] = useState(null);
-  const [reports, setReports] = useState(initialReports);
+  const [reports, setReports] = useState([]); // Initialize as empty, will filter from initialReports
   const [labStatsData, setLabStatsData] = useState(labStats);
   const [testTypes, setTestTypes] = useState(recentTestTypes);
   const [labTrendsData, setLabTrendsData] = useState(labTrends);
@@ -273,7 +272,7 @@ function LaboratoryWorkspace({ labName }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Set patient data from localStorage on component mount
+  // Set patient data and filter reports on component mount
   useEffect(() => {
     const fetchData = () => {
       setLoading(true);
@@ -290,17 +289,27 @@ function LaboratoryWorkspace({ labName }) {
           const age = today.getFullYear() - birthDate.getFullYear();
 
           patientDataToUse = {
-            name: `${patientInfo.prenom} ${patientInfo.nom}`, // Combine first and last name
-            id: patientInfo.id, // Use id ("7434") instead of CIN ("66666")
-            bloodType: patientData.bloodType, // Use placeholder since not available in localStorage
-            age: age, // Calculate age from dateNaissance
-            lastVisit: patientData.lastVisit, // Use placeholder since not available in localStorage
+            name: `${patientInfo.prenom} ${patientInfo.nom}`,
+            id: patientInfo.id,
+            bloodType: patientInfo.bloodType || patientData.bloodType, // Use patientInfo if available
+            age: age,
+            lastVisit: patientInfo.lastVisit || patientData.lastVisit,
           };
         } else {
           setError("Patient data not found in localStorage. Using placeholder data.");
         }
 
         setPatient(patientDataToUse);
+
+        // Filter reports by patientId
+        if (patientDataToUse.id) {
+          const filteredReports = initialReports.filter(
+            (report) => report.patientId === patientDataToUse.id
+          );
+          setReports(filteredReports);
+        } else {
+          setReports([]);
+        }
       } catch (err) {
         setError("Failed to load patient data. Using placeholder data.");
         console.error("Error processing data:", err);
@@ -324,11 +333,15 @@ function LaboratoryWorkspace({ labName }) {
     if (newReportFile && newReportDescription.trim()) {
       const newReport = {
         id: reports.length + 1,
+        patientId: patient?.id, // Associate with the logged-in patient
         fileName: newReportFile.name,
         description: newReportDescription,
         timestamp: new Date().toISOString(),
       };
-      setReports([...reports, newReport]);
+      // Only add the report if it matches the current patient's ID
+      if (newReport.patientId === patient?.id) {
+        setReports([newReport, ...reports]);
+      }
       setNewReportFile(null);
       setNewReportDescription("");
     }
@@ -590,7 +603,7 @@ function LaboratoryWorkspace({ labName }) {
                         color={darkMode ? "gray" : "text.secondary"}
                         mt={0.5}
                       >
-                        {report.timestamp}
+                        {new Date(report.timestamp).toLocaleString()}
                       </SoftTypography>
                       <SoftTypography variant="body1" color={darkMode ? "white" : "dark"} mt={0.5}>
                         {report.description}
@@ -600,7 +613,7 @@ function LaboratoryWorkspace({ labName }) {
                   ))
                 ) : (
                   <SoftTypography variant="body1" color={darkMode ? "gray" : "text.secondary"} textAlign="center">
-                    No reports available.
+                    No reports available for this patient.
                   </SoftTypography>
                 )}
               </SoftBox>
