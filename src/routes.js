@@ -22,6 +22,9 @@ import CalendarToday from "@mui/icons-material/CalendarToday";
 import Science from "@mui/icons-material/Science";
 import Collections from "@mui/icons-material/Collections";
 import PatientConsultations from "layouts/PatientConsultations/PatientConsultations";  
+import CentreImage from "layouts/CentreImagerie";
+
+import Labo from "layouts/Laboratoire";
 const routes = [
   {
     type: "collapse",
@@ -55,7 +58,7 @@ const routes = [
     component: <PatientConsultations />,
     name: "Diseases",  // Modifié ici
     key: "patient-diseases",
-    route: "/patient/diseases",
+    route: "/diseases",
     icon: <MedicalServices size="12px" />,
     component: <PatientDiseases />,
     noCollapse: true,
@@ -64,7 +67,7 @@ const routes = [
     type: "collapse",
     name: "Consultations",
     key: "patient-consultations",
-    route: "/patient/consultations",
+    route: "/consultations",
     icon: <CalendarToday size="12px" />,
     component: <PatientConsultations />, // Maintenant pointant vers le bon composant
     noCollapse: true,
@@ -73,18 +76,18 @@ const routes = [
     type: "collapse",
     name: "Laboratory",
     key: "patient-laboratory",
-    route: "/patient/laboratory",
+    route: "/laboratory",
     icon: <Science size="12px" />,
-    component: <PatientDiseases />,
+    component: <Labo />,
     noCollapse: true,
   },
   {
     type: "collapse",
     name: "Medical Imaging",
     key: "patient-imaging",
-    route: "/patient/imaging",
+    route: "/imaging",
     icon: <Collections size="12px" />,
-    component: <PatientDiseases />,
+    component: <CentreImage />,
     noCollapse: true,
   },
   { 
