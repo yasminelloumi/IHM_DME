@@ -23,9 +23,8 @@ import {
   Close,
   QrCodeScanner,
 } from "@mui/icons-material";
-import { QrReader } from "react-qr-reader";
+import QRCodeScanner from "./QRCodeScanner"; // <-- make sure the path is correct
 
-// Style pour la pop-up
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -40,11 +39,9 @@ const modalStyle = {
   p: 3,
 };
 
-// Composant PatientCard (inchangé)
 function PatientCard({ cin, nom, prenom, telephone, dateNaissance, nationalite, index }) {
   const avatarColors = ["#0077b6", "#0096c7", "#00b4d8"];
   const avatarBgColor = avatarColors[index % avatarColors.length];
-
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
@@ -110,52 +107,23 @@ function PatientCard({ cin, nom, prenom, telephone, dateNaissance, nationalite, 
         </SoftBox>
       </SoftBox>
 
-      {/* Pop-up pour les détails du patient */}
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="patient-details-title"
-        aria-describedby="patient-details-description"
-        closeAfterTransition
-      >
+      <Modal open={open} onClose={handleClose} closeAfterTransition>
         <Fade in={open}>
           <SoftBox sx={modalStyle}>
-            {/* En-tête de la pop-up */}
-            <SoftBox display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-              <SoftTypography id="patient-details-title" variant="h5" fontWeight="bold">
+            <SoftBox display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+              <SoftTypography variant="h5" fontWeight="bold">
                 Détails du Patient
               </SoftTypography>
-              <IconButton onClick={handleClose} aria-label="Fermer la fenêtre">
-                <Close sx={{ fontSize: "1.5rem", color: "text.secondary" }} />
+              <IconButton onClick={handleClose}>
+                <Close />
               </IconButton>
             </SoftBox>
-
-            {/* Contenu de la pop-up */}
-            <SoftBox id="patient-details-description">
-              <SoftBox display="flex" alignItems="center" gap={2} mb={3}>
-                <Avatar
-                  sx={{
-                    width: 56,
-                    height: 56,
-                    bgcolor: avatarBgColor,
-                    fontSize: "1.5rem",
-                  }}
-                >
-                  <Person fontSize="large" />
-                </Avatar>
-                <SoftTypography variant="h6" fontWeight="bold" color="dark">
-                  {nom} {prenom}
-                </SoftTypography>
-              </SoftBox>
-
-              <Divider sx={{ mb: 2 }} />
-
-              <SoftBox display="flex" flexDirection="column" gap={2}>
-                <DetailItemModal label="CIN" value={cin} icon={<Person />} />
-                <DetailItemModal label="Téléphone" value={telephone} icon={<Phone />} />
-                <DetailItemModal label="Date de Naissance" value={dateNaissance} icon={<Cake />} />
-                <DetailItemModal label="Nationalité" value={nationalite} icon={<Public />} />
-              </SoftBox>
+            <Divider sx={{ mb: 2 }} />
+            <SoftBox display="flex" flexDirection="column" gap={2}>
+              <DetailItemModal icon={<Person />} label="CIN" value={cin} />
+              <DetailItemModal icon={<Phone />} label="Téléphone" value={telephone} />
+              <DetailItemModal icon={<Cake />} label="Date de Naissance" value={dateNaissance} />
+              <DetailItemModal icon={<Public />} label="Nationalité" value={nationalite} />
             </SoftBox>
           </SoftBox>
         </Fade>
@@ -164,17 +132,22 @@ function PatientCard({ cin, nom, prenom, telephone, dateNaissance, nationalite, 
   );
 }
 
-PatientCard.propTypes = {
-  cin: PropTypes.string.isRequired,
-  nom: PropTypes.string.isRequired,
-  prenom: PropTypes.string.isRequired,
-  telephone: PropTypes.string.isRequired,
-  dateNaissance: PropTypes.string.isRequired,
-  nationalite: PropTypes.string.isRequired,
-  index: PropTypes.number.isRequired,
-};
+function DetailItem({ icon, label, value }) {
+  return (
+    <SoftBox display="flex" alignItems="center" gap={1.5}>
+      <SoftBox color="text.secondary">{icon}</SoftBox>
+      <SoftBox>
+        <SoftTypography variant="caption" fontWeight="medium" color="text.secondary" textTransform="uppercase">
+          {label}
+        </SoftTypography>
+        <SoftTypography variant="body2" fontWeight="medium" color="dark" mt={0.25}>
+          {value}
+        </SoftTypography>
+      </SoftBox>
+    </SoftBox>
+  );
+}
 
-// Sous-composant pour les détails dans la pop-up
 function DetailItemModal({ label, value, icon }) {
   return (
     <SoftBox display="flex" alignItems="center" gap={2}>
@@ -193,28 +166,15 @@ function DetailItemModal({ label, value, icon }) {
   );
 }
 
-DetailItemModal.propTypes = {
-  label: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
-  icon: PropTypes.node.isRequired,
+PatientCard.propTypes = {
+  cin: PropTypes.string.isRequired,
+  nom: PropTypes.string.isRequired,
+  prenom: PropTypes.string.isRequired,
+  telephone: PropTypes.string.isRequired,
+  dateNaissance: PropTypes.string.isRequired,
+  nationalite: PropTypes.string.isRequired,
+  index: PropTypes.number.isRequired,
 };
-
-// Sous-composant pour les détails dans la carte
-function DetailItem({ icon, label, value }) {
-  return (
-    <SoftBox display="flex" alignItems="center" gap={1.5}>
-      <SoftBox color="text.secondary">{icon}</SoftBox>
-      <SoftBox>
-        <SoftTypography variant="caption" fontWeight="medium" color="text.secondary" textTransform="uppercase">
-          {label}
-        </SoftTypography>
-        <SoftTypography variant="body2" fontWeight="medium" color="dark" mt={0.25}>
-          {value}
-        </SoftTypography>
-      </SoftBox>
-    </SoftBox>
-  );
-}
 
 DetailItem.propTypes = {
   icon: PropTypes.node.isRequired,
@@ -222,7 +182,12 @@ DetailItem.propTypes = {
   value: PropTypes.string.isRequired,
 };
 
-// Données statiques
+DetailItemModal.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  icon: PropTypes.node.isRequired,
+};
+
 const patients = [
   {
     cin: "AB123456",
@@ -245,7 +210,6 @@ const patients = [
 function ListPatientData() {
   const [search, setSearch] = useState("");
   const [scannerOpen, setScannerOpen] = useState(false);
-  const [scanError, setScanError] = useState(null);
 
   const filteredPatients = patients.filter(
     (p) =>
@@ -254,27 +218,15 @@ function ListPatientData() {
       p.cin.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleClearSearch = () => {
-    setSearch("");
+  const handleClearSearch = () => setSearch("");
+
+  const handleScanSuccess = (cin) => {
+    setSearch(cin);
+    setScannerOpen(false);
   };
 
-  const toggleScanner = () => {
-    setScannerOpen(!scannerOpen);
-    setScanError(null); // Reset error when toggling scanner
-  };
-
-  const handleScan = (data) => {
-    if (data) {
-      // Assuming the QR code contains the CIN of the patient
-      setSearch(data.text); // Populate the search bar with the scanned CIN
-      setScannerOpen(false); // Close the scanner after a successful scan
-      setScanError(null);
-    }
-  };
-
-  const handleError = (err) => {
-    console.error(err);
-    setScanError("Impossible d'accéder à la caméra. Veuillez vérifier les autorisations.");
+  const handleScanError = (err) => {
+    console.error("QR Scan Error:", err);
   };
 
   return (
@@ -283,16 +235,14 @@ function ListPatientData() {
         Liste des Patients
       </SoftTypography>
 
-      {/* Zone de scan QR code */}
       <SoftBox mb={3} display="flex" flexDirection="column" gap={2}>
         <SoftBox display="flex" alignItems="center" gap={2}>
           <SoftButton
             variant="gradient"
             color="info"
-            onClick={toggleScanner}
+            onClick={() => setScannerOpen(!scannerOpen)}
             startIcon={<QrCodeScanner />}
             sx={{ borderRadius: "12px", px: 3 }}
-            aria-label={scannerOpen ? "Fermer le scanner QR" : "Ouvrir le scanner QR"}
           >
             {scannerOpen ? "Fermer le Scanner" : "Scanner un QR Code"}
           </SoftButton>
@@ -302,7 +252,6 @@ function ListPatientData() {
           <SoftBox
             sx={{
               borderRadius: "16px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
               backgroundColor: "#fff",
               p: 2,
               border: "2px solid #0077b6",
@@ -310,28 +259,11 @@ function ListPatientData() {
               mx: "auto",
             }}
           >
-            <QrReader
-              onResult={(result, error) => {
-                if (result) {
-                  handleScan(result);
-                }
-                if (error) {
-                  handleError(error);
-                }
-              }}
-              style={{ width: "100%" }}
-              constraints={{ facingMode: "environment" }} // Use rear camera by default
-            />
-            {scanError && (
-              <SoftTypography variant="body2" color="error" textAlign="center" mt={1}>
-                {scanError}
-              </SoftTypography>
-            )}
+            <QRCodeScanner onScanSuccess={handleScanSuccess} onError={handleScanError} />
           </SoftBox>
         )}
       </SoftBox>
 
-      {/* Zone de recherche */}
       <SoftBox mb={3} display="flex" alignItems="center" gap={2}>
         <TextField
           variant="outlined"
@@ -344,42 +276,25 @@ function ListPatientData() {
             "& .MuiOutlinedInput-root": {
               borderRadius: "12px",
               backgroundColor: "#fff",
-              "& fieldset": {
-                borderColor: "rgba(0, 0, 0, 0.23)",
-              },
-              "&:hover fieldset": {
-                borderColor: "rgba(0, 0, 0, 0.87)",
-              },
-              "&.Mui-focused fieldset": {
-                borderColor: "#0077b6",
-              },
-            },
-            "& .MuiInputBase-input": {
-              padding: "10px 14px",
-              fontSize: "0.95rem",
             },
           }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Search sx={{ color: "text.secondary", fontSize: "1.2rem" }} />
+                <Search />
               </InputAdornment>
             ),
             endAdornment: search && (
               <InputAdornment position="end">
-                <IconButton onClick={handleClearSearch} size="small" aria-label="Effacer la recherche">
-                  <Clear sx={{ color: "text.secondary", fontSize: "1.2rem" }} />
+                <IconButton onClick={handleClearSearch}>
+                  <Clear />
                 </IconButton>
               </InputAdornment>
             ),
           }}
-          inputProps={{
-            "aria-label": "Rechercher un patient par nom, prénom ou CIN",
-          }}
         />
       </SoftBox>
 
-      {/* Liste des patients */}
       <SoftBox display="flex" flexDirection="column" gap={2}>
         {filteredPatients.length > 0 ? (
           filteredPatients.map((patient, index) => (
