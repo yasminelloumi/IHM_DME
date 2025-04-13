@@ -91,9 +91,9 @@ function PatientCard({ CIN, nom, prenom, telephone, dateNaissance, nationalite, 
           </SoftTypography>
 
           <SoftBox display="grid" gridTemplateColumns={{ xs: "1fr", sm: "repeat(3, 1fr)" }} gap={2} mt={1}>
-            <DetailItem icon={<Phone />} label="TÉLÉPHONE" value={telephone} />
-            <DetailItem icon={<Cake />} label="DATE DE NAISSANCE" value={dateNaissance} />
-            <DetailItem icon={<Public />} label="NATIONALITÉ" value={nationalite} />
+            <DetailItem icon={<Phone />} label="TELEPHONE" value={telephone} />
+            <DetailItem icon={<Cake />} label="BIRTH DATE" value={dateNaissance} />
+            <DetailItem icon={<Public />} label="NATIONALITY" value={nationalite} />
           </SoftBox>
         </SoftBox>
 
@@ -101,7 +101,7 @@ function PatientCard({ CIN, nom, prenom, telephone, dateNaissance, nationalite, 
           <IconButton
             color="info"
             onClick={handleOpen}
-            aria-label={`Voir les détails de ${nom} ${prenom}`}
+            aria-label={`View Details of ${nom} ${prenom}`}
           >
             <VisibilityOutlined sx={{ fontSize: "1.8rem" }} />
           </IconButton>
@@ -234,7 +234,7 @@ function ListPatientData() {
   return (
     <SoftBox width="100%" maxWidth="1200px" mx="auto" p={3}>
       <SoftTypography variant="h4" mb={2} fontWeight="bold">
-        Historique des Patients Scannés
+        Patients List
       </SoftTypography>
 
       <SoftBox mb={3} display="flex" flexDirection="column" gap={2}>
@@ -269,7 +269,7 @@ function ListPatientData() {
       <SoftBox mb={3} display="flex" alignItems="center" gap={2}>
         <TextField
           variant="outlined"
-          placeholder="Rechercher par nom, prénom ou CIN..."
+          placeholder="Sear By Name, CIN, Surname ......."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           fullWidth
@@ -301,7 +301,7 @@ function ListPatientData() {
         {loading ? (
           <SoftBox textAlign="center" py={3}>
             <SoftTypography variant="h6" color="text.secondary">
-              Chargement des données...
+              Loading Data
             </SoftTypography>
           </SoftBox>
         ) : filteredPatients.length > 0 ? (
@@ -320,7 +320,7 @@ function ListPatientData() {
         ) : (
           <SoftBox textAlign="center" py={3}>
             <SoftTypography variant="h6" color="text.secondary">
-              Aucun patient trouvé.
+              No Patient Found
             </SoftTypography>
           </SoftBox>
         )}
