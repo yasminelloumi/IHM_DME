@@ -23,6 +23,9 @@ import ProfileInfoCard from "examples/Cards/InfoCards/ProfileInfoCard";
 // Overview page components
 import Header from "layouts/profile/components/Header";
 
+// ✅ Import QR Code
+import { QRCodeSVG } from "qrcode.react";
+
 // ✅ Import the update function
 import { updatePatientProfile } from "services/profileService";
 
@@ -71,6 +74,7 @@ function Overview() {
       <SoftBox mt={5} mb={3}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} xl={4}></Grid>
+
           <Grid item xs={12} md={6} xl={4}>
             {profile && (
               <ProfileInfoCard
@@ -88,9 +92,29 @@ function Overview() {
                   tooltip: "Edit Profile",
                   onClick: handleEditClick,
                 }}
-              />
+              >
+                {/* ✅ QR Code inside the card */}
+                <SoftBox mt={3} display="flex" justifyContent="center">
+                  <QRCodeSVG
+                    value={profile.CIN || ""}
+                    size={150}
+                    level="H"
+                    includeMargin
+                  />
+                </SoftBox>
+                <SoftTypography
+                  variant="caption"
+                  color="text"
+                  textAlign="center"
+                  display="block"
+                  mt={1}
+                >
+                  QR Code (CIN-based)
+                </SoftTypography>
+              </ProfileInfoCard>
             )}
           </Grid>
+
           <Grid item xs={12} xl={4}></Grid>
         </Grid>
       </SoftBox>

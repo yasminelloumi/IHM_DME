@@ -14,7 +14,7 @@ import SoftTypography from "components/SoftTypography";
 // Soft UI Dashboard React base styles
 import typography from "assets/theme/base/typography";
 
-function ProfileInfoCard({ title, description, info, action }) {
+function ProfileInfoCard({ title, description, info, action, children }) {
   const labels = [];
   const values = [];
   const { size } = typography;
@@ -51,15 +51,17 @@ function ProfileInfoCard({ title, description, info, action }) {
         <SoftTypography variant="h6" fontWeight="medium" textTransform="capitalize">
           {title}
         </SoftTypography>
-        <Tooltip title={action.tooltip} placement="top">
-          <Icon
-            style={{ cursor: "pointer" }}
-            onClick={action.onClick}
-            color="action"
-          >
-            edit
-          </Icon>
-        </Tooltip>
+        {action && (
+          <Tooltip title={action.tooltip} placement="top">
+            <Icon
+              style={{ cursor: "pointer" }}
+              onClick={action.onClick}
+              color="action"
+            >
+              edit
+            </Icon>
+          </Tooltip>
+        )}
       </SoftBox>
       <SoftBox p={2}>
         <SoftBox mb={2} lineHeight={1}>
@@ -73,12 +75,19 @@ function ProfileInfoCard({ title, description, info, action }) {
         <SoftBox>
           {renderItems}
         </SoftBox>
+
+        {/* ✅ Show children like QR code inside the card */}
+        {children && (
+          <SoftBox mt={3} display="flex" flexDirection="column" alignItems="center">
+            {children}
+          </SoftBox>
+        )}
       </SoftBox>
     </Card>
   );
 }
 
-// Typechecking props
+// ✅ Updated propTypes to accept children
 ProfileInfoCard.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
@@ -86,8 +95,9 @@ ProfileInfoCard.propTypes = {
   action: PropTypes.shape({
     route: PropTypes.string,
     tooltip: PropTypes.string.isRequired,
-    onClick: PropTypes.func, // ✅ Added onClick as optional
-  }).isRequired,
+    onClick: PropTypes.func,
+  }),
+  children: PropTypes.node,
 };
 
 export default ProfileInfoCard;
