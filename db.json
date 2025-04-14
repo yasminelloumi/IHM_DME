@@ -119,5 +119,37 @@
       "password": "labpass",
       "nom": "Lab Tech"
     }
+  ],
+  "conditions": [
+    {
+      "id": 1,
+      "type": "allergy",
+      "name": "Peanut Allergy",
+      "diagnosisDate": "2020-03-15",
+      "severity": "Moderate",
+      "description": "Type I hypersensitivity reaction to peanuts",
+      "treatment": "Strict avoidance, Epinephrine auto-injector",
+      "patientId": "1a04"
+    },
+    {
+      "id": 2,
+      "type": "chronic",
+      "name": "Type 2 Diabetes",
+      "diagnosisDate": "2019-01-10",
+      "severity": "Controlled",
+      "description": "Insulin-resistant diabetes mellitus",
+      "treatment": "Metformin 850mg twice daily",
+      "patientId": "1a04"
+    },
+    {
+      "id": 2,
+      "type": "infectious",
+      "name": "Type 2 Diabetes",
+      "diagnosisDate": "2019-01-10",
+      "severity": "Controlled",
+      "description": "Insulin-resistant diabetes mellitus",
+      "treatment": "Metformin 850mg twice daily",
+      "patientId": "1a04"
+    }
   ]
 }

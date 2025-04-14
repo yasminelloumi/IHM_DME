@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// PatientDiseases.js
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   Card,
@@ -27,59 +28,29 @@ import SoftBadge from "components/SoftBadge";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import diseasesData from "./data/diseasesData";
+import { getConditionsByPatientId } from "services/conditionService";
 
-// Fonction pour rendre les badges et icônes en fonction de la gravité
+// Badge rendering by severity level
 const renderSeverityBadge = (severity) => {
-  switch (severity) {
-    case "Mild":
-      return (
-        <SoftBadge
-          color="success"
-          size="sm"
-          icon={<CheckCircle sx={{ fontSize: 16, mr: 0.5 }} />}
-          badgeContent="Mild"
-        />
-      );
-    case "Moderate":
-      return (
-        <SoftBadge
-          color="warning"
-          size="sm"
-          icon={<WarningAmber sx={{ fontSize: 16, mr: 0.5 }} />}
-          badgeContent="Moderate"
-        />
-      );
-    case "Severe":
-      return (
-        <SoftBadge
-          color="error"
-          size="sm"
-          icon={<ReportProblem sx={{ fontSize: 16, mr: 0.5 }} />}
-          badgeContent="Severe"
-        />
-      );
-    case "Controlled":
-      return (
-        <SoftBadge
-          color="info"
-          size="sm"
-          icon={<Info sx={{ fontSize: 16, mr: 0.5 }} />}
-          badgeContent="Controlled"
-        />
-      );
-    case "Stage 1":
-      return (
-        <SoftBadge
-          color="primary"
-          size="sm"
-          icon={<SignalCellularAlt sx={{ fontSize: 16, mr: 0.5 }} />}
-          badgeContent="Stage 1"
-        />
-      );
-    default:
-      return null;
-  }
+  const badgeProps = {
+    Mild: { color: "success", icon: <CheckCircle sx={{ fontSize: 16, mr: 0.5 }} /> },
+    Moderate: { color: "warning", icon: <WarningAmber sx={{ fontSize: 16, mr: 0.5 }} /> },
+    Severe: { color: "error", icon: <ReportProblem sx={{ fontSize: 16, mr: 0.5 }} /> },
+    Controlled: { color: "info", icon: <Info sx={{ fontSize: 16, mr: 0.5 }} /> },
+    "Stage 1": { color: "primary", icon: <SignalCellularAlt sx={{ fontSize: 16, mr: 0.5 }} /> },
+  };
+
+  const badge = badgeProps[severity];
+  return (
+    badge && (
+      <SoftBadge
+        color={badge.color}
+        size="sm"
+        icon={badge.icon}
+        badgeContent={severity}
+      />
+    )
+  );
 };
 
 const DiseaseItem = ({ disease, darkMode }) => (
@@ -101,7 +72,7 @@ const DiseaseItem = ({ disease, darkMode }) => (
         <Stack direction="row" alignItems="center" spacing={1}>
           <CalendarMonth sx={{ fontSize: 18, color: darkMode ? "#ccc" : "text.secondary" }} />
           <SoftTypography variant="caption" color={darkMode ? "gray" : "text.secondary"}>
-            {disease.diagnosisDate}
+            {disease.diagnosisDate || "Unknown date"}
           </SoftTypography>
         </Stack>
       </Stack>
@@ -115,7 +86,7 @@ const DiseaseItem = ({ disease, darkMode }) => (
         </SoftTypography>
       </Stack>
       <SoftTypography variant="body2" color={darkMode ? "gray" : "text"}>
-        {disease.description}
+        {disease.description || "No description available."}
       </SoftTypography>
 
       <Stack direction="row" spacing={1} alignItems="center" mt={1}>
@@ -125,7 +96,7 @@ const DiseaseItem = ({ disease, darkMode }) => (
         </SoftTypography>
       </Stack>
       <SoftTypography variant="body2" color={darkMode ? "gray" : "text"}>
-        {disease.treatment}
+        {disease.treatment || "No treatment specified."}
       </SoftTypography>
     </Stack>
   </Card>
@@ -172,11 +143,13 @@ const DiseaseCategory = ({ category, darkMode }) => {
         </Icon>
       </SoftBox>
 
-      <Collapse in={expanded}>
+      <Collapse in={expanded} timeout="auto" unmountOnExit>
         <SoftBox p={2}>
-          {category.items.map((disease, index) => (
-            <DiseaseItem key={index} disease={disease} darkMode={darkMode} />
-          ))}
+          <Stack spacing={3}>
+            {category.items.map((disease, index) => (
+              <DiseaseItem key={index} disease={disease} darkMode={darkMode} />
+            ))}
+          </Stack>
         </SoftBox>
       </Collapse>
     </Card>
@@ -190,6 +163,47 @@ DiseaseCategory.propTypes = {
 
 const PatientDiseases = () => {
   const [darkMode, setDarkMode] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchConditions = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("connectedUser"));
+        const patientId = user?.id;
+
+        if (!patientId) {
+          console.error("No patient ID found in localStorage.");
+          return;
+        }
+
+        const conditions = await getConditionsByPatientId(patientId);
+
+        const grouped = {
+          Allergy: [],
+          Chronic: [],
+          Infectious: [],
+        };
+
+        conditions.forEach((condition) => {
+          const type = condition.type?.toLowerCase();
+          if (type === "allergy") grouped.Allergy.push(condition);
+          else if (type === "chronic") grouped.Chronic.push(condition);
+          else if (type === "infectious") grouped.Infectious.push(condition);
+        });
+
+        const categorized = Object.keys(grouped).map((key) => ({
+          name: key,
+          items: grouped[key],
+        }));
+
+        setCategories(categorized);
+      } catch (error) {
+        console.error("Error loading conditions:", error);
+      }
+    };
+
+    fetchConditions();
+  }, []);
 
   return (
     <DashboardLayout>
@@ -254,9 +268,22 @@ const PatientDiseases = () => {
         </SoftBox>
 
         <SoftBox>
-          {diseasesData.categories.map((category, index) => (
-            <DiseaseCategory key={index} category={category} darkMode={darkMode} />
-          ))}
+          {categories.every((cat) => cat.items.length === 0) ? (
+            <SoftTypography
+              variant="h6"
+              color={darkMode ? "gray" : "text"}
+              textAlign="center"
+              mt={5}
+            >
+              You have no recorded medical conditions at the moment.
+            </SoftTypography>
+          ) : (
+            categories.map((category, index) => (
+              category.items.length > 0 && (
+                <DiseaseCategory key={index} category={category} darkMode={darkMode} />
+              )
+            ))
+          )}
         </SoftBox>
       </SoftBox>
       <Footer />
