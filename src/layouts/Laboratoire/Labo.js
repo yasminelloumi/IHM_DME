@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftButton from "components/SoftButton";
+import { submitReport, getReportsByPatient } from "services/reportsServices";
 import {
   Avatar,
   Switch,
@@ -24,7 +25,7 @@ import {
 } from "@mui/icons-material";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-// Placeholder patient data
+// Placeholder patient data (used as fallback)
 const patientData = {
   name: "John Doe",
   id: "PAT-67890",
@@ -33,15 +34,7 @@ const patientData = {
   lastVisit: "2025-04-10",
 };
 
-// Placeholder for lab reports
-const initialReports = [
-  {
-    id: 1,
-    fileName: "blood_test_2025_04_10.pdf",
-    description: "Complete Blood Count (CBC) - Normal results.",
-    timestamp: "2025-04-10 09:15 AM",
-  },
-];
+
 
 // Placeholder for recent test types
 const recentTestTypes = [
@@ -56,11 +49,11 @@ const labStats = {
   avgTurnaroundTime: "24 hours",
 };
 
-// Placeholder for lab result trends (for chart)
+// Placeholder for lab result trends
 const labTrends = [
   { date: "2025-04-01", value: 5.2 },
-  { date: "2025-04-05", value: 5.5 },
-  { date: "2025-04-10", value: 5.0 },
+  { date: "2025-03-05", value: 5.5 },
+  { date: "2025-02-10", value: 5.0 },
 ];
 
 // Component for displaying patient information
@@ -85,7 +78,7 @@ function PatientInfoCard({ patient, darkMode }) {
         <SoftBox display="flex" alignItems="center" gap={2} mb={2}>
           <Avatar
             sx={{
-              bgcolor: "#0077b6", // Medical blue
+              bgcolor: "#0077b6",
               width: 48,
               height: 48,
               animation: "pulse 2s infinite",
@@ -260,12 +253,64 @@ LabStatsCard.propTypes = {
 
 // Main Component
 function LaboratoryWorkspace({ labName }) {
-  const [reports, setReports] = useState(initialReports);
+  const [patient, setPatient] = useState(null);
+  const [reports, setReports] = useState([]); // Initialize as empty, will filter from initialReports
+  const [labStatsData, setLabStatsData] = useState(labStats);
+  const [testTypes, setTestTypes] = useState(recentTestTypes);
+  const [labTrendsData, setLabTrendsData] = useState(labTrends);
   const [newReportFile, setNewReportFile] = useState(null);
   const [newReportDescription, setNewReportDescription] = useState("");
   const [darkMode, setDarkMode] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Handle report file upload (simulated)
+  // Set patient data and filter reports on component mount
+  // LaboratoryWorkspace.jsx
+useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Retrieve patient data from localStorage
+      const patientInfo = JSON.parse(localStorage.getItem("connectedUser"));
+
+      let patientDataToUse = patientData; // Default to placeholder
+
+      if (patientInfo) {
+        const birthDate = new Date(patientInfo.dateNaissance);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+
+        patientDataToUse = {
+          name: `${patientInfo.prenom} ${patientInfo.nom}`,
+          id: patientInfo.id,
+          bloodType: patientInfo.bloodType || patientData.bloodType,
+          age: age,
+          lastVisit: patientInfo.lastVisit || patientData.lastVisit,
+        };
+      } else {
+        setError("Patient data not found in localStorage. Using placeholder data.");
+      }
+
+      setPatient(patientDataToUse);
+
+      // Fetch reports for the patient from the backend
+      if (patientDataToUse.id) {
+        const fetchedReports = await getReportsByPatient(patientDataToUse.id);
+        setReports(fetchedReports);
+      } else {
+        setReports([]);
+      }
+    } catch (err) {
+      setError("Failed to load data. Using placeholder data.");
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchData();
+}, []);
+
+  // Handle report file upload
   const handleReportUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -274,24 +319,96 @@ function LaboratoryWorkspace({ labName }) {
   };
 
   // Handle report submission
-  const handleReportSubmit = () => {
-    if (newReportFile && newReportDescription.trim()) {
-      const newReport = {
-        id: reports.length + 1,
-        fileName: newReportFile.name,
-        description: newReportDescription,
-        timestamp: new Date().toLocaleString(),
-      };
-      setReports([...reports, newReport]);
-      setNewReportFile(null);
-      setNewReportDescription("");
-    }
-  };
+  // LaboratoryWorkspace.jsx
+// src/components/LaboratoryWorkspace.jsx (or Labo.js)
+// Partial update for handleReportSubmit
+// Partial update for handleReportSubmit
+const handleReportSubmit = async () => {
+  if (!newReportFile || !newReportDescription.trim() || !patient?.id) {
+    setError("Please select a file and add a description.");
+    return;
+  }
 
+  try {
+    const formData = new FormData();
+    formData.append("file", newReportFile);
+    formData.append("patientId", patient.id);
+    formData.append("description", newReportDescription);
+
+    // Add content type header for FormData
+    const response = await submitReport(formData);
+
+    const newReport = {
+      id: response.id,
+      patientId: patient.id,
+      fileName: newReportFile.name,
+      description: newReportDescription,
+      timestamp: new Date().toISOString(),
+      filePath: response.filePath
+    };
+
+    setReports([newReport, ...reports]);
+    setNewReportFile(null);
+    setNewReportDescription("");
+    setError(null);
+  } catch (error) {
+    console.error("Error submitting report:", error);
+    setError(error.message || "Failed to submit report. Please try again.");
+  }
+};
   // Toggle dark/light mode
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
+
+  // Render loading or error states
+  if (loading) {
+    return (
+      <SoftBox
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          background: darkMode
+            ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
+            : "url('https://placehold.co/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          padding: { xs: 2, md: 4 },
+          color: darkMode ? "#e0e0e0" : "#1a2a3a",
+        }}
+      >
+        <SoftTypography variant="h6" color={darkMode ? "white" : "dark"}>
+          Loading...
+        </SoftTypography>
+      </SoftBox>
+    );
+  }
+
+  if (error) {
+    return (
+      <SoftBox
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          background: darkMode
+            ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
+            : "url('https://placehold.co/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          padding: { xs: 2, md: 4 },
+          color: darkMode ? "#e0e0e0" : "#1a2a3a",
+        }}
+      >
+        <SoftTypography variant="h6" color="error">
+          {error}
+        </SoftTypography>
+      </SoftBox>
+    );
+  }
 
   return (
     <SoftBox
@@ -378,7 +495,7 @@ function LaboratoryWorkspace({ labName }) {
         {/* Left Section: Patient Info, Report Upload, and Report History */}
         <SoftBox display="flex" flexDirection="column" gap={4}>
           {/* Patient Info Card */}
-          <PatientInfoCard patient={patientData} darkMode={darkMode} />
+          <PatientInfoCard patient={patient || patientData} darkMode={darkMode} />
 
           {/* Report Upload Section */}
           <Card
@@ -495,7 +612,7 @@ function LaboratoryWorkspace({ labName }) {
                         color={darkMode ? "gray" : "text.secondary"}
                         mt={0.5}
                       >
-                        {report.timestamp}
+                        {new Date(report.timestamp).toLocaleString()}
                       </SoftTypography>
                       <SoftTypography variant="body1" color={darkMode ? "white" : "dark"} mt={0.5}>
                         {report.description}
@@ -505,7 +622,7 @@ function LaboratoryWorkspace({ labName }) {
                   ))
                 ) : (
                   <SoftTypography variant="body1" color={darkMode ? "gray" : "text.secondary"} textAlign="center">
-                    No reports available.
+                    No reports available for this patient.
                   </SoftTypography>
                 )}
               </SoftBox>
@@ -515,8 +632,8 @@ function LaboratoryWorkspace({ labName }) {
 
         {/* Right Section: Lab Metrics and Stats */}
         <SoftBox display="flex" flexDirection="column" gap={4}>
-          <LabMetricsCard trends={labTrends} darkMode={darkMode} />
-          <LabStatsCard stats={labStats} testTypes={recentTestTypes} darkMode={darkMode} />
+          <LabMetricsCard trends={labTrendsData} darkMode={darkMode} />
+          <LabStatsCard stats={labStatsData} testTypes={testTypes} darkMode={darkMode} />
         </SoftBox>
       </SoftBox>
     </SoftBox>
