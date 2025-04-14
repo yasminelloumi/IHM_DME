@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftButton from "components/SoftButton";
+import { submitReport, getReportsByPatient } from "services/reportsServices";
 import {
   Avatar,
   Switch,
@@ -33,16 +34,7 @@ const patientData = {
   lastVisit: "2025-04-10",
 };
 
-// Placeholder for lab reports
-const initialReports = [
-  {
-    id: 1,
-    patientId: "7434",
-    fileName: "blood_test_2025_04_10.pdf",
-    description: "Complete Blood Count (CBC) - Normal results.",
-    timestamp: "2025-04-10T09:15:00.000Z",
-  },
-];
+
 
 // Placeholder for recent test types
 const recentTestTypes = [
@@ -60,8 +52,8 @@ const labStats = {
 // Placeholder for lab result trends
 const labTrends = [
   { date: "2025-04-01", value: 5.2 },
-  { date: "2025-04-05", value: 5.5 },
-  { date: "2025-04-10", value: 5.0 },
+  { date: "2025-03-05", value: 5.5 },
+  { date: "2025-02-10", value: 5.0 },
 ];
 
 // Component for displaying patient information
@@ -273,52 +265,50 @@ function LaboratoryWorkspace({ labName }) {
   const [error, setError] = useState(null);
 
   // Set patient data and filter reports on component mount
-  useEffect(() => {
-    const fetchData = () => {
-      setLoading(true);
-      try {
-        // Retrieve patient data from localStorage
-        const patientInfo = JSON.parse(localStorage.getItem("connectedUser"));
+  // LaboratoryWorkspace.jsx
+useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Retrieve patient data from localStorage
+      const patientInfo = JSON.parse(localStorage.getItem("connectedUser"));
 
-        let patientDataToUse = patientData; // Default to placeholder
+      let patientDataToUse = patientData; // Default to placeholder
 
-        if (patientInfo) {
-          // Construct patient data from localStorage
-          const birthDate = new Date(patientInfo.dateNaissance);
-          const today = new Date();
-          const age = today.getFullYear() - birthDate.getFullYear();
+      if (patientInfo) {
+        const birthDate = new Date(patientInfo.dateNaissance);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
 
-          patientDataToUse = {
-            name: `${patientInfo.prenom} ${patientInfo.nom}`,
-            id: patientInfo.id,
-            bloodType: patientInfo.bloodType || patientData.bloodType, // Use patientInfo if available
-            age: age,
-            lastVisit: patientInfo.lastVisit || patientData.lastVisit,
-          };
-        } else {
-          setError("Patient data not found in localStorage. Using placeholder data.");
-        }
-
-        setPatient(patientDataToUse);
-
-        // Filter reports by patientId
-        if (patientDataToUse.id) {
-          const filteredReports = initialReports.filter(
-            (report) => report.patientId === patientDataToUse.id
-          );
-          setReports(filteredReports);
-        } else {
-          setReports([]);
-        }
-      } catch (err) {
-        setError("Failed to load patient data. Using placeholder data.");
-        console.error("Error processing data:", err);
-      } finally {
-        setLoading(false);
+        patientDataToUse = {
+          name: `${patientInfo.prenom} ${patientInfo.nom}`,
+          id: patientInfo.id,
+          bloodType: patientInfo.bloodType || patientData.bloodType,
+          age: age,
+          lastVisit: patientInfo.lastVisit || patientData.lastVisit,
+        };
+      } else {
+        setError("Patient data not found in localStorage. Using placeholder data.");
       }
-    };
-    fetchData();
-  }, []);
+
+      setPatient(patientDataToUse);
+
+      // Fetch reports for the patient from the backend
+      if (patientDataToUse.id) {
+        const fetchedReports = await getReportsByPatient(patientDataToUse.id);
+        setReports(fetchedReports);
+      } else {
+        setReports([]);
+      }
+    } catch (err) {
+      setError("Failed to load data. Using placeholder data.");
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchData();
+}, []);
 
   // Handle report file upload
   const handleReportUpload = (event) => {
@@ -329,24 +319,52 @@ function LaboratoryWorkspace({ labName }) {
   };
 
   // Handle report submission
-  const handleReportSubmit = () => {
-    if (newReportFile && newReportDescription.trim()) {
+  // LaboratoryWorkspace.jsx
+// src/components/LaboratoryWorkspace.jsx (or Labo.js)
+// Partial update for handleReportSubmit
+// Partial update for handleReportSubmit
+const handleReportSubmit = async () => {
+  if (newReportFile && newReportDescription.trim() && patient?.id) {
+    try {
+      const formData = new FormData();
+      formData.append("file", newReportFile);
+      formData.append("patientId", patient.id);
+      formData.append("description", newReportDescription);
+      formData.append("timestamp", new Date().toISOString());
+
+      console.log("Preparing report submission:", {
+        patientId: patient.id,
+        description: newReportDescription,
+        fileName: newReportFile.name,
+        fileType: newReportFile.type,
+        fileSize: newReportFile.size,
+      });
+
+      const response = await submitReport(formData);
+
       const newReport = {
-        id: reports.length + 1,
-        patientId: patient?.id, // Associate with the logged-in patient
+        id: response.id,
+        patientId: patient.id,
         fileName: newReportFile.name,
         description: newReportDescription,
         timestamp: new Date().toISOString(),
       };
-      // Only add the report if it matches the current patient's ID
-      if (newReport.patientId === patient?.id) {
-        setReports([newReport, ...reports]);
-      }
+
+      setReports([newReport, ...reports]);
       setNewReportFile(null);
       setNewReportDescription("");
+      setError(null);
+    } catch (error) {
+      console.error("Error submitting report:", {
+        message: error.message,
+        stack: error.stack,
+      });
+      setError(error.message || "Failed to submit report. Please try again.");
     }
-  };
-
+  } else {
+    setError("Please select a file and add a description.");
+  }
+};
   // Toggle dark/light mode
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);

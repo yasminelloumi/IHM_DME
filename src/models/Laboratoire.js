@@ -9,7 +9,14 @@ export class Laboratoire {
   }
 
   // Optionally add methods like:
-  ajouterRapport(rapport) {
-    // logic to add a report
+  async ajouterRapport(report) {
+    try {
+      // Call the API to save the report
+      const response = await submitReport(report);
+      return response;
+    } catch (error) {
+      console.error("Error adding report:", error);
+      throw error;
+    }
   }
 }
