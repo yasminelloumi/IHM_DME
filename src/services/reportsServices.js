@@ -6,12 +6,15 @@ const API_URL = "http://localhost:3001";
 // Add a new report
 export const submitReport = async (formData) => {
   try {
-    console.log("Submitting FormData:", Array.from(formData.entries()));
-    const response = await axios.post(`${API_URL}/reports`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    // Convert FormData to a plain object
+    const reportData = {
+      patientId: formData.get('patientId'),
+      description: formData.get('description'),
+      fileName: formData.get('file').name,
+      timestamp: new Date().toISOString()
+    };
+
+    const response = await axios.post(`${API_URL}/reports`, reportData);
     return response.data;
   } catch (error) {
     console.error("Error submitting report:", {
@@ -19,7 +22,7 @@ export const submitReport = async (formData) => {
       status: error.response?.status,
       data: error.response?.data,
     });
-    throw new Error(error.response?.data?.details || "Failed to submit report. Please try again.");
+    throw new Error(error.response?.data?.message || "Failed to submit report.");
   }
 };
 

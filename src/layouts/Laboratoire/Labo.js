@@ -324,45 +324,36 @@ useEffect(() => {
 // Partial update for handleReportSubmit
 // Partial update for handleReportSubmit
 const handleReportSubmit = async () => {
-  if (newReportFile && newReportDescription.trim() && patient?.id) {
-    try {
-      const formData = new FormData();
-      formData.append("file", newReportFile);
-      formData.append("patientId", patient.id);
-      formData.append("description", newReportDescription);
-      formData.append("timestamp", new Date().toISOString());
-
-      console.log("Preparing report submission:", {
-        patientId: patient.id,
-        description: newReportDescription,
-        fileName: newReportFile.name,
-        fileType: newReportFile.type,
-        fileSize: newReportFile.size,
-      });
-
-      const response = await submitReport(formData);
-
-      const newReport = {
-        id: response.id,
-        patientId: patient.id,
-        fileName: newReportFile.name,
-        description: newReportDescription,
-        timestamp: new Date().toISOString(),
-      };
-
-      setReports([newReport, ...reports]);
-      setNewReportFile(null);
-      setNewReportDescription("");
-      setError(null);
-    } catch (error) {
-      console.error("Error submitting report:", {
-        message: error.message,
-        stack: error.stack,
-      });
-      setError(error.message || "Failed to submit report. Please try again.");
-    }
-  } else {
+  if (!newReportFile || !newReportDescription.trim() || !patient?.id) {
     setError("Please select a file and add a description.");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append("file", newReportFile);
+    formData.append("patientId", patient.id);
+    formData.append("description", newReportDescription);
+
+    // Add content type header for FormData
+    const response = await submitReport(formData);
+
+    const newReport = {
+      id: response.id,
+      patientId: patient.id,
+      fileName: newReportFile.name,
+      description: newReportDescription,
+      timestamp: new Date().toISOString(),
+      filePath: response.filePath
+    };
+
+    setReports([newReport, ...reports]);
+    setNewReportFile(null);
+    setNewReportDescription("");
+    setError(null);
+  } catch (error) {
+    console.error("Error submitting report:", error);
+    setError(error.message || "Failed to submit report. Please try again.");
   }
 };
   // Toggle dark/light mode

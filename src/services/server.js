@@ -1,87 +1,56 @@
-// src/services/server.js
-const jsonServer = require("json-server");
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const bodyParser = require('body-parser');
 
-const server = jsonServer.create();
-const router = jsonServer.router(path.join(__dirname, "../../db.json")); // Project root
-const middlewares = jsonServer.defaults();
+const app = express();
+const port = 3001;
 
-// Set up storage for file uploads
-const uploadDir = path.join(__dirname, "../../Uploads");
-const upload = multer({ dest: uploadDir });
+// Configure multer for file uploads
+const upload = multer({ dest: 'uploads/' });
 
-// Ensure uploads directory exists
-if (!fs.existsSync(uploadDir)) {
+app.use(bodyParser.json());
+
+// Enable CORS if needed
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', '*');
+  next();
+});
+
+// File upload endpoint
+app.post('/reports', upload.single('file'), (req, res) => {
   try {
-    fs.mkdirSync(uploadDir, { recursive: true });
-    console.log("Created uploads directory:", uploadDir);
-  } catch (err) {
-    console.error("Failed to create uploads directory:", err);
-  }
-}
-
-// Apply JSON Server middlewares
-server.use(middlewares);
-
-// Parse JSON and form-data bodies
-server.use(jsonServer.bodyParser);
-
-// Custom route for POST /reports
-server.post("/reports", upload.single("file"), (req, res) => {
-  try {
-    console.log("POST /reports headers:", req.headers);
-    console.log("POST /reports body:", req.body);
-    console.log("POST /reports file:", req.file);
-
-    const { patientId, description, timestamp } = req.body;
+    const { patientId, description } = req.body;
     const file = req.file;
 
-    // Validate required fields (file optional for testing)
-    if (!patientId || !description || !timestamp) {
-      console.error("Validation failed:", { patientId, description, timestamp, file });
-      return res.status(400).json({ error: "Missing required fields" });
+    if (!file || !patientId || !description) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Create report object
     const report = {
       id: Date.now(),
       patientId,
-      fileName: file ? file.originalname : "no-file-uploaded.pdf",
+      fileName: file.originalname,
       description,
-      timestamp,
-      filePath: file ? file.path : null,
+      timestamp: new Date().toISOString(),
+      filePath: file.path
     };
 
-    // Save to db.json
-    const db = router.db;
-    const reports = db.get("reports").value();
-    if (!Array.isArray(reports)) {
-      console.error("Reports collection invalid:", reports);
-      return res.status(500).json({ error: "Reports collection not initialized" });
-    }
-    reports.push(report);
-    try {
-      db.set("reports", reports).write();
-      console.log("Report saved to db.json:", report);
-    } catch (err) {
-      console.error("Failed to write to db.json:", err);
-      return res.status(500).json({ error: "Failed to save report", details: err.message });
-    }
+    // Save to your JSON database
+    const dbPath = path.join(__dirname, 'db.json');
+    const db = JSON.parse(fs.readFileSync(dbPath));
+    db.reports.push(report);
+    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
 
     res.status(201).json(report);
   } catch (error) {
-    console.error("Error in POST /reports:", error.message, error.stack);
-    res.status(500).json({ error: "Internal server error", details: error.message });
+    console.error('Error uploading file:', error);
+    res.status(500).json({ error: 'File upload failed' });
   }
 });
 
-// Use JSON Server router
-server.use(router);
-
-// Start server
-const PORT = 3001;
-server.listen(PORT, () => {
-  console.log(`JSON Server running on http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
 });
