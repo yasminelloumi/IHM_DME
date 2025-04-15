@@ -12,10 +12,6 @@ import {
   Card,
   CardMedia,
   CardContent,
-  Box,
-  CircularProgress,
-  Snackbar,
-  Alert,
 } from "@mui/material";
 import {
   AddAPhoto,
@@ -25,20 +21,17 @@ import {
   DarkMode,
   LightMode,
   LocalHospital,
-  Close,
 } from "@mui/icons-material";
+import { getImages, uploadImage } from "services/imagesService";  // Adjust path if needed
 
-// API Configuration
-const API_URL = "http://localhost:3001/images";
-
-// Patient data
+// Placeholder patient data
 const patientData = {
   name: "Sarah Connor",
   id: "PAT-12345",
   heartRate: 76,
 };
 
-// VitalsCard Component
+// Component for displaying vital stats
 function VitalsCard({ heartRate }) {
   return (
     <Card sx={{ borderRadius: "16px", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)" }}>
@@ -63,7 +56,7 @@ VitalsCard.propTypes = {
   heartRate: PropTypes.number.isRequired,
 };
 
-// HumanModelCard Component
+// Component for displaying 3D human model
 function HumanModelCard({ darkMode }) {
   return (
     <Card
@@ -75,6 +68,9 @@ function HumanModelCard({ darkMode }) {
       }}
     >
       <CardContent>
+        <SoftTypography variant="h6" fontWeight="bold" mb={2} color={darkMode ? "white" : "dark"}>
+          3D Human Model
+        </SoftTypography>
         <SoftBox
           component="img"
           src="https://png.pngtree.com/png-clipart/20240416/original/pngtree-full-human-body-x-ray-bone-png-image_14839089.png"
@@ -96,124 +92,66 @@ HumanModelCard.propTypes = {
 };
 
 // Main Component
-function CentresImageries({ centerName }) {
+function ImagingCenterWorkspace({ centerName }) {
   const [images, setImages] = useState([]);
-  const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState([
+    {
+      id: 1,
+      text: "Initial X-Ray shows no fractures.",
+      timestamp: "2025-04-13 10:30 AM",
+    },
+  ]);
   const [newComment, setNewComment] = useState("");
   const [darkMode, setDarkMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [userData, setUserData] = useState(null);
 
-  // Fetch images from API
-  const fetchImages = async () => {
-    try {
-      const response = await fetch(`${API_URL}?patientId=${patientData.id}`);
-      if (!response.ok) throw new Error('Failed to fetch images');
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching images:", error);
-      throw error;
-    }
-  };
-
-  // Upload image to API
-  const uploadImage = async (imageData) => {
-    try {
-      const formData = new FormData();
-      formData.append('image', imageData.file);
-      formData.append('patientId', patientData.id);
-      formData.append('description', imageData.description);
-  
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        body: formData,
-      });
-  
-      const result = await response.json();
-      
-      if (!response.ok || !result.success) {
-        throw new Error(result.error || 'Upload failed');
-      }
-      
-      // Transform the response to match your expected format
-      return {
-        id: result.data.id,
-        url: result.data.url,
-        description: result.data.description,
-        dateCreation: result.data.dateCreated,
-        dmeId: result.data.patientId
-      };
-    } catch (error) {
-      console.error("Upload error:", error);
-      throw new Error(error.message || 'Failed to upload image');
-    }
-  };
-  // Load images on mount
+  // Fetch images on component mount
   useEffect(() => {
-    const loadImages = async () => {
-      setIsLoading(true);
+    const fetchImages = async () => {
       try {
-        const patientImages = await fetchImages();
-        setImages(patientImages);
-      } catch (err) {
-        setError(err.message);
-        showSnackbar(err.message, "error");
-      } finally {
-        setIsLoading(false);
+        console.log("Attempting to fetch images...");
+        const fetchedImages = await getImages();
+        console.log("Fetched images:", fetchedImages);
+        setImages(fetchedImages);
+      } catch (error) {
+        console.error("Failed to load images:", error);
       }
     };
-    loadImages();
+    fetchImages();
+
+    const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
+    if (connectedUser) {
+      setUserData({
+        name: `${connectedUser.firstName} ${connectedUser.lastName}`,
+        id: connectedUser.cin || connectedUser.id || "N/A",
+        heartRate: 76,
+      });
+    }
   }, []);
 
-  // Clean up object URLs
-  useEffect(() => {
-    return () => {
-      images.forEach(img => {
-        if (img.previewUrl) URL.revokeObjectURL(img.previewUrl);
-      });
-    };
-  }, [images]);
-
-  const showSnackbar = (message, severity) => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
-  };
-
-  const handleSnackbarClose = () => {
-    setSnackbarOpen(false);
-  };
-
+  // Handle image upload
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
-    if (!file) return;
-  
-    try {
-      setIsLoading(true);
-      const previewUrl = URL.createObjectURL(file);
-      
-      const uploadedImage = await uploadImage({
-        file,
-        description: `Medical Image - ${new Date().toLocaleDateString()}`
-      });
-  
-      setImages(prev => [...prev, {
-        ...uploadedImage,
-        previewUrl // Temporary URL for immediate display
-      }]);
-      
-      showSnackbar("Image uploaded successfully!", "success");
-    } catch (err) {
-      console.error("Upload failed:", err);
-      showSnackbar(`Upload failed: ${err.message}`, "error");
-    } finally {
-      setIsLoading(false);
-      event.target.value = ''; // Reset input
+    if (file) {
+      const tempUrl = URL.createObjectURL(file); // Temporary URL for preview
+      const imageData = {
+        patientId: userData?.id || patientData.id,
+        description: `${file.name} - ${new Date().toLocaleDateString()}`,
+        url: tempUrl,
+      };
+      console.log("Uploading image data:", imageData);
+      try {
+        const uploadedImage = await uploadImage(imageData);
+        console.log("Uploaded image:", uploadedImage);
+        setImages((prevImages) => [...prevImages, uploadedImage]);
+      } catch (error) {
+        console.error("Image upload failed:", error);
+        alert("Failed to upload image: " + error.message);
+      }
     }
   };
+
+  // Handle comment submission
   const handleCommentSubmit = () => {
     if (newComment.trim()) {
       const newCommentObj = {
@@ -223,29 +161,13 @@ function CentresImageries({ centerName }) {
       };
       setComments([...comments, newCommentObj]);
       setNewComment("");
-      showSnackbar("Comment added!", "success");
     }
   };
 
+  // Toggle dark/light mode
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
-
-  if (isLoading) {
-    return (
-      <SoftBox display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <CircularProgress size={60} />
-      </SoftBox>
-    );
-  }
-
-  if (error) {
-    return (
-      <SoftBox p={4} textAlign="center">
-        <Alert severity="error">{error}</Alert>
-      </SoftBox>
-    );
-  }
 
   return (
     <SoftBox
@@ -322,8 +244,12 @@ function CentresImageries({ centerName }) {
       </SoftBox>
 
       {/* Main Content */}
-      <SoftBox display="grid" gridTemplateColumns={{ xs: "1fr", md: "2fr 1fr" }} gap={4}>
-        {/* Left Section */}
+      <SoftBox
+        display="grid"
+        gridTemplateColumns={{ xs: "1fr", md: "2fr 1fr" }}
+        gap={4}
+      >
+        {/* Left Section: Image Upload and Comments */}
         <SoftBox display="flex" flexDirection="column" gap={4}>
           {/* Patient Info Card */}
           <Card
@@ -340,10 +266,10 @@ function CentresImageries({ centerName }) {
                 </Avatar>
                 <SoftBox>
                   <SoftTypography variant="h6" fontWeight="bold" color={darkMode ? "white" : "dark"}>
-                    {patientData.name}
+                    {userData ? userData.name : "Loading..."}
                   </SoftTypography>
                   <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-                    Patient ID: {patientData.id}
+                    CIN: {userData ? userData.id : "Loading..."}
                   </SoftTypography>
                 </SoftBox>
               </SoftBox>
@@ -406,7 +332,7 @@ function CentresImageries({ centerName }) {
                     <CardMedia
                       component="img"
                       height="100"
-                      image={image.url || image.previewUrl}
+                      image={image.url}
                       alt={image.description}
                       sx={{ borderRadius: "12px 12px 0 0" }}
                     />
@@ -417,14 +343,6 @@ function CentresImageries({ centerName }) {
                         textAlign="center"
                       >
                         {image.description}
-                      </SoftTypography>
-                      <SoftTypography
-                        variant="caption"
-                        color={darkMode ? "gray" : "text.secondary"}
-                        textAlign="center"
-                        display="block"
-                      >
-                        {new Date(image.dateCreated).toLocaleDateString()}
                       </SoftTypography>
                     </CardContent>
                   </Card>
@@ -511,44 +429,18 @@ function CentresImageries({ centerName }) {
           </Card>
         </SoftBox>
 
-        {/* Right Section */}
+        {/* Right Section: Vitals and 3D Human Model */}
         <SoftBox display="flex" flexDirection="column" gap={4}>
           <VitalsCard heartRate={patientData.heartRate} />
           <HumanModelCard darkMode={darkMode} />
         </SoftBox>
       </SoftBox>
-
-      {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-          sx={{ width: '100%' }}
-          action={
-            <SoftButton
-              color="inherit"
-              size="small"
-              onClick={handleSnackbarClose}
-              endIcon={<Close fontSize="small" />}
-            >
-              Close
-            </SoftButton>
-          }
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </SoftBox>
   );
 }
 
-CentresImageries.propTypes = {
+ImagingCenterWorkspace.propTypes = {
   centerName: PropTypes.string.isRequired,
 };
 
-export default CentresImageries;
+export default ImagingCenterWorkspace;
