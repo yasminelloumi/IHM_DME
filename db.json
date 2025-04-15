@@ -99,6 +99,14 @@
       "id": "1",
       "dateCreation": "2024-01-01",
       "dmeId": 1
+    },
+    
+    {
+      "id": "1",
+      "url": "/uploads/image1.jpg",
+      "description": "X-Ray Scan",
+      "dateCreated": "2024-01-01T00:00:00.000Z",
+      "patientId": "PAT-12345"
     }
   ],
   "analyses": [
@@ -126,7 +134,7 @@
   ],
   "conditions": [
     {
-      "id": 1,
+      "id": "1",
       "type": "allergy",
       "name": "Peanut Allergy",
       "diagnosisDate": "2020-03-15",
@@ -136,7 +144,7 @@
       "patientId": "1a04"
     },
     {
-      "id": 2,
+      "id": "2",
       "type": "chronic",
       "name": "Type 2 Diabetes",
       "diagnosisDate": "2019-01-10",
@@ -146,7 +154,7 @@
       "patientId": "1a04"
     },
     {
-      "id": 2,
+      "id": "2",
       "type": "infectious",
       "name": "Type 2 Diabetes",
       "diagnosisDate": "2019-02-10",

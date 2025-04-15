@@ -8,3 +8,4 @@ export const getConditionsByPatientId = async (patientId) => {
   if (!res.ok) throw new Error("Failed to fetch conditions");
   return await res.json();
 };
+
