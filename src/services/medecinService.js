@@ -16,7 +16,7 @@ export const getById = async (id) => {
       data.adresse,
       data.password,
       data.tel,
-      data.role || 'medecins'
+      data.role
     );
   } catch (error) {
     console.error(`Error fetching doctor with ID ${id}:`, error);

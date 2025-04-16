@@ -70,7 +70,7 @@
   ],
   "medecins": [
     {
-      "id": "1",
+      "id": "2",
       "matricule": "test002",
       "nom": "Salah",
       "prenom": "Hedi",
@@ -78,7 +78,7 @@
       "adresse": "Tunis",
       "password": "med123",
       "tel": "99887766",
-      "role": "medecin"
+      "role": "medecins"
     }
   ],
   "images": [
@@ -179,11 +179,11 @@
     {
       "id": 1,
       "patientId": "1a04",
-      "medecinId": "1",
+      "medecinId": "2",
       "dateConsultation": "2023-06-15T10:30:00",
       "reason": "Chest pain evaluation",
       "diagnostiques": ["Hypertension (Stage 1)"],
-      "ordonnances": ["Amlodipine 5mg", "Blood pressure monitoring"],
+      "ordonnances": ["Amlodipine 5mg As prescribed", "Blood pressure monitoring N/A Daily"],
       "laboTest": ["ECG", "Complete blood count", "Cholesterol panel"],
       "imgTest": ["Chest X-ray"],
       "notes": "Patient advised to reduce sodium intake and exercise regularly."
@@ -195,7 +195,7 @@
       "dateConsultation": "2023-12-10T14:00:00",
       "reason": "Follow-up for hypertension",
       "diagnostiques": ["Hypertension (Stable)", "Mild hyperlipidemia"],
-      "ordonnances": ["Amlodipine 5mg", "Atorvastatin 10mg"],
+      "ordonnances": ["Amlodipine 5mg As prescribed", "Atorvastatin 10mg N/A Daily"],
       "laboTest": ["Lipid panel", "Kidney function test"],
       "imgTest": [],
       "notes": "Patient reports adherence to medication. Advised to continue low-sodium diet and schedule next visit in 3 months."

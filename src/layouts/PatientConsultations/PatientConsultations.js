@@ -13,6 +13,7 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { getDMEByPatientId } from "../../services/dmeService";
+import { getById } from "../../services/medecinService";
 import DME from '../../models/DME';
 import {
   Event as EventIcon,
@@ -49,16 +50,6 @@ const modalStyle = (darkMode) => ({
   maxHeight: '90vh',
   overflowY: 'auto'
 });
-
-// Data for trends chart
-const consultationTrends = [
-  { month: "Jan", consultations: 3 },
-  { month: "Feb", consultations: 5 },
-  { month: "Mar", consultations: 4 },
-  { month: "Apr", consultations: 7 },
-  { month: "May", consultations: 6 },
-  { month: "Jun", consultations: 2 }
-];
 
 // Custom styled card component
 const StyledCard = ({ children, icon, title, color = "primary", darkMode }) => (
@@ -103,7 +94,7 @@ const TreatmentItem = ({ treatment, darkMode }) => (
   <SoftBox display="flex" alignItems="center" mb={1} pl={2}>
     <MedicalServicesIcon color={darkMode ? "secondary" : "primary"} fontSize="small" sx={{ mr: 1 }} />
     <SoftTypography variant="button" fontWeight="regular" color={darkMode ? "white" : "dark"}>
-      {treatment.name} - {treatment.dosage} ({treatment.frequency})
+      {treatment.name}
     </SoftTypography>
   </SoftBox>
 );
@@ -111,8 +102,6 @@ const TreatmentItem = ({ treatment, darkMode }) => (
 TreatmentItem.propTypes = {
   treatment: PropTypes.shape({
     name: PropTypes.string.isRequired,
-    dosage: PropTypes.string.isRequired,
-    frequency: PropTypes.string.isRequired
   }).isRequired,
   darkMode: PropTypes.bool.isRequired
 };
@@ -401,8 +390,7 @@ ConsultationCard.propTypes = {
     treatments: PropTypes.arrayOf(
       PropTypes.shape({
         name: PropTypes.string.isRequired,
-        dosage: PropTypes.string.isRequired,
-        frequency: PropTypes.string.isRequired
+
       })
     ).isRequired,
     tests: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -416,6 +404,7 @@ const PatientConsultations = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [dmeRecords, setDmeRecords] = useState([]);
+  const [doctors, setDoctors] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statsData, setStatsData] = useState({
@@ -471,40 +460,72 @@ const PatientConsultations = () => {
           dme.notes
         ));
 
+        // Fetch doctor details for each unique medecinId
+        const uniqueMedecinIds = [...new Set(dmeInstances.map(dme => dme.medecinId))];
+        const doctorPromises = uniqueMedecinIds.map(async (id) => {
+          try {
+            const doctor = await getById(id);
+            return { id, doctor };
+          } catch (error) {
+            console.warn(`Failed to fetch doctor with ID ${id}:`, error);
+            return { id, doctor: null };
+          }
+        });
+        const doctorResults = await Promise.all(doctorPromises);
+        const doctorsMap = doctorResults.reduce((acc, { id, doctor }) => {
+          if (doctor) {
+            acc[id] = doctor;
+          }
+          return acc;
+        }, {});
+
+        setDoctors(doctorsMap);
         setDmeRecords(dmeInstances);
 
-        const consultations = dmeInstances.map(dme => ({
-          id: dme.id,
-          date: new Date(dme.dateConsultation).toLocaleDateString(),
-          time: new Date(dme.dateConsultation).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          doctor: `Dr. ${dme.medecinId}`,
-          specialty: "General Practitioner",
-          reason: dme.reason,
-          diagnosis: dme.diagnostiques.join(", "),
-          treatments: Array.isArray(dme.ordonnances)
-            ? dme.ordonnances.map(med => ({
-                name: med.name || med,
-                dosage: med.dosage || "",
-                frequency: med.frequency || ""
-              }))
-            : [],
-          tests: dme.laboTest || [],
-          images: dme.imgTest || [],
-          notes: dme.notes || ""
-        }));
+        // Map consultations with doctor details
+        const consultations = dmeInstances.map(dme => {
+          const doctor = doctorsMap[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
+          return {
+            id: dme.id,
+            date: new Date(dme.dateConsultation).toLocaleDateString(),
+            time: new Date(dme.dateConsultation).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            doctor: `Dr. ${doctor.prenom} ${doctor.nom}`,
+            specialty: doctor.specialite,
+            reason: dme.reason,
+            diagnosis: dme.diagnostiques.join(", "),
+            treatments: Array.isArray(dme.ordonnances)
+              ? dme.ordonnances.map(med => ({
+                  name: typeof med === 'string' ? med : med.name || '',
 
+                }))
+              : [],
+            tests: dme.laboTest || [],
+            images: dme.imgTest || [],
+            notes: dme.notes || ""
+          };
+        });
+
+        // Calculate stats
         const totalConsultations = dmeInstances.length;
         const lastVisit = totalConsultations > 0
           ? new Date(dmeInstances[0].dateConsultation).toLocaleDateString()
           : "No visits";
+        const specialtyCounts = consultations.reduce((acc, curr) => {
+          acc[curr.specialty] = (acc[curr.specialty] || 0) + 1;
+          return acc;
+        }, {});
+        const mostVisitedSpecialty = Object.keys(specialtyCounts).length > 0
+          ? Object.entries(specialtyCounts).sort((a, b) => b[1] - a[1])[0][0]
+          : "None";
 
         setStatsData({
           totalConsultations: totalConsultations.toString(),
           lastVisit,
           upcomingAppointments: "0",
-          mostVisitedSpecialty: "General"
+          mostVisitedSpecialty
         });
 
+        // Calculate trends
         const monthlyCounts = dmeInstances.reduce((acc, record) => {
           try {
             const month = new Date(record.dateConsultation).toLocaleString('default', { month: 'short' });
@@ -518,7 +539,7 @@ const PatientConsultations = () => {
         setConsultationTrends(
           Object.entries(monthlyCounts)
             .map(([month, count]) => ({ month, consultations: count }))
-            .sort((a, b) => new Date(`${a.month} 1, 2023`) - new Date(`${b.month} 1, 2023`))
+            .sort((a, b) => new Date(`1 ${a.month} 2023`) - new Date(`1 ${b.month} 2023`))
         );
 
       } catch (error) {
@@ -556,25 +577,27 @@ const PatientConsultations = () => {
     );
   }
 
-  const consultationsToDisplay = dmeRecords.map(dme => ({
-    id: dme.id,
-    date: new Date(dme.dateConsultation).toLocaleDateString(),
-    time: new Date(dme.dateConsultation).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    doctor: `Dr. ${dme.medecinId}`,
-    specialty: "General Practitioner",
-    reason: dme.reason,
-    diagnosis: dme.diagnostiques.join(", "),
-    treatments: Array.isArray(dme.ordonnances)
-      ? dme.ordonnances.map(med => ({
-          name: typeof med === 'string' ? med : med.name || '',
-          dosage: typeof med === 'string' ? '' : med.dosage || '',
-          frequency: typeof med === 'string' ? '' : med.frequency || ''
-        }))
-      : [],
-    tests: dme.laboTest || [],
-    images: dme.imgTest || [],
-    notes: dme.notes || ''
-  }));
+  const consultationsToDisplay = dmeRecords.map(dme => {
+    const doctor = doctors[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
+    return {
+      id: dme.id,
+      date: new Date(dme.dateConsultation).toLocaleDateString(),
+      time: new Date(dme.dateConsultation).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      doctor: `Dr. ${doctor.prenom} ${doctor.nom}`,
+      specialty: doctor.specialite,
+      reason: dme.reason,
+      diagnosis: dme.diagnostiques.join(", "),
+      treatments: Array.isArray(dme.ordonnances)
+        ? dme.ordonnances.map(med => ({
+            name: typeof med === 'string' ? med : med.name || '',
+
+          }))
+        : [],
+      tests: dme.laboTest || [],
+      images: dme.imgTest || [],
+      notes: dme.notes || ''
+    };
+  });
 
   return (
     <DashboardLayout>
