@@ -1,16 +1,26 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import Card from "@mui/material/Card";
 import Icon from "@mui/material/Icon";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import { Link } from "react-router-dom";
 
-function PatientDashboardCard({ title, count, icon, color, path }) {
+function PatientDashboardCard({ title, count }) {
+  const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
+
+  // Restrict visibility for patient role
+  const isPatient = connectedUser?.role === "patient";
+  const allowedForPatient = ["Diseases", "Consultations"];
+
+  if (isPatient && !allowedForPatient.includes(title)) {
+    return null; // Hide this card for patients if not allowed
+  }
+
   const cardConfig = {
     "Diseases": {
       color: "#1976d2",
       icon: "healing",
-      path: "/diseases"  // Retirer '/patient/'
+      path: "/diseases"
     },
     "Consultations": {
       color: "#64b5f6",
@@ -29,7 +39,11 @@ function PatientDashboardCard({ title, count, icon, color, path }) {
     }
   };
 
-  const config = cardConfig[title] || { color, icon, path };
+  const config = cardConfig[title] || {
+    color: "#607d8b",
+    icon: "info",
+    path: "#"
+  };
 
   return (
     <Card sx={{ height: "100%", cursor: "pointer" }}>
@@ -52,29 +66,31 @@ function PatientDashboardCard({ title, count, icon, color, path }) {
             {count}
           </SoftTypography>
         </SoftBox>
+
         <SoftBox mt={2}>
           <SoftTypography variant="h5" fontWeight="bold" gutterBottom>
             {title}
           </SoftTypography>
           <SoftTypography variant="body2" color="text">
             {title === "Diseases" && "View your medical conditions and diagnoses"}
-            {title === "Consultations" && "Your scheduled and past medical visits"} 
+            {title === "Consultations" && "Your scheduled and past medical visits"}
             {title === "Laboratory" && "Your lab test results and analysis reports"}
             {title === "Medical Imaging" && "Your radiology scans and medical imaging"}
           </SoftTypography>
         </SoftBox>
+
         <SoftBox mt="auto" pt={2}>
-          <SoftTypography 
+          <SoftTypography
             component={Link}
             to={config.path}
-            variant="button" 
-            color={config.color} 
+            variant="button"
+            color={config.color}
             fontWeight="medium"
             sx={{
               display: "flex",
               alignItems: "center",
               "&:hover": { textDecoration: "underline" },
-              textDecoration: 'none'
+              textDecoration: "none"
             }}
           >
             View Details
@@ -88,10 +104,7 @@ function PatientDashboardCard({ title, count, icon, color, path }) {
 
 PatientDashboardCard.propTypes = {
   title: PropTypes.string.isRequired,
-  count: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  icon: PropTypes.string,
-  color: PropTypes.string,
-  path: PropTypes.string
+  count: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
 };
 
 export default PatientDashboardCard;

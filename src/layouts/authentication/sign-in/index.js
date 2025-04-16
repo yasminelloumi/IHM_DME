@@ -49,9 +49,9 @@ function SignIn() {
         } else if (userType === "staff") {
           const role = user.role;
           if (role === "medecins") {
-            navigate("/medecin/dashboard");
+            navigate("/dashboard");
           } else if (role === "laboratoire") {
-            navigate("/laboratoire/dashboard");
+            navigate("/laboratory");
           } else if (role === "centreImagerie") {
             navigate("/centre-imagerie/dashboard");
           } else {

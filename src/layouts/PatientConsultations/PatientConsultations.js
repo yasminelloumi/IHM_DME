@@ -387,6 +387,7 @@ ConsultationCard.propTypes = {
 };
 
 const PatientConsultations = () => {
+  const user = JSON.parse(localStorage.getItem("connectedUser"));
   const [darkMode, setDarkMode] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [dmeRecords, setDmeRecords] = useState([]);
@@ -770,14 +771,16 @@ const PatientConsultations = () => {
             <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"} paragraph>
               Review your complete consultation history with detailed visit information.
             </SoftTypography>
-            <SoftButton
-              variant="outlined"
-              size="small"
-              color="info"
-              onClick={handleOpenModal}
-            >
-              Add Consultation
-            </SoftButton>
+            {user?.role !== "patient" && (
+              <SoftButton
+                variant="outlined"
+                size="small"
+                color="info"
+                onClick={handleOpenModal}
+              >
+                Add Consultation
+              </SoftButton>
+            )}
           </SoftBox>
 
           <SoftBox>
