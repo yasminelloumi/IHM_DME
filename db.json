@@ -83,9 +83,18 @@
   ],
   "images": [
     {
-      "id": "1",
-      "dateCreation": "2024-01-01",
-      "dmeId": 1
+      "id": "1744729377913",
+      "patientId": "7434",
+      "description": "see.jpg - 4/15/2025",
+      "url": "blob:http://localhost:3000/da8dfdf4-b0f5-4987-9c60-2ce03b7516ca",
+      "dateCreated": "2025-04-15T15:02:57.913Z"
+    },
+    {
+      "id": "1744729420342",
+      "patientId": "7434",
+      "description": "image.png - 4/15/2025",
+      "url": "blob:http://localhost:3000/f5734152-ae56-4bfa-99c9-db73f305948e",
+      "dateCreated": "2025-04-15T15:03:40.342Z"
     }
   ],
   "analyses": [
@@ -115,6 +124,7 @@
   ],
   "conditions": [
     {
+      
       "id": "1",
       "type": "allergy",
       "name": "Peanut Allergy",
@@ -125,6 +135,7 @@
       "patientId": "1a04"
     },
     {
+      
       "id": "2",
       "type": "chronic",
       "name": "Type 2 Diabetes",
@@ -135,7 +146,8 @@
       "patientId": "1a04"
     },
     {
-      "id": "2",
+      
+      "id": "3",
       "type": "infectious",
       "name": "Type 2 Diabetes",
       "diagnosisDate": "2019-02-10",
@@ -145,7 +157,7 @@
       "patientId": "1a04"
     },
     {
-      "id": "3",
+      "id": "4",
       "type": "allergy",
       "name": "Hypertension",
       "diagnosisDate": "2018-05-12",
@@ -155,7 +167,7 @@
       "patientId": "e3a2"
     },
     {
-      "id": "4",
+      "id": "5",
       "type": "chronic",
       "name": "Penicillin Allergy",
       "diagnosisDate": "2017-11-03",
@@ -165,7 +177,7 @@
       "patientId": "e3a2"
     },
     {
-      "id": "5",
+      "id": "6",
       "type": "infectious",
       "name": "Asthma",
       "diagnosisDate": "2015-08-20",
@@ -284,6 +296,20 @@
       "description": "mknjiuy",
       "fileName": "use case (1).pdf",
       "timestamp": "2025-04-14T13:53:34.874Z"
+    },
+    {
+      "id": "dc31",
+      "patientId": "1a04",
+      "description": "bmld;b:tmb",
+      "fileName": "DC_DME.pdf",
+      "timestamp": "2025-04-14T23:30:39.928Z"
+    },
+    {
+      "id": "b015",
+      "patientId": "7434",
+      "description": "test2",
+      "fileName": "devis_wie_ras.pdf",
+      "timestamp": "2025-04-15T15:05:08.760Z"
     },
     {
       "id": "dc31",

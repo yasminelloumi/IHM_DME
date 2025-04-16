@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
@@ -12,7 +12,6 @@ import {
   Card,
   CardMedia,
   CardContent,
-  Box,
 } from "@mui/material";
 import {
   AddAPhoto,
@@ -23,31 +22,14 @@ import {
   LightMode,
   LocalHospital,
 } from "@mui/icons-material";
+import { getImages, uploadImage } from "services/imagesService";  // Adjust path if needed
 
-// Placeholder patient data (can be fetched from an API in a real application)
+// Placeholder patient data
 const patientData = {
   name: "Sarah Connor",
   id: "PAT-12345",
   heartRate: 76,
 };
-
-// Placeholder for uploaded images (replace with real URLs or API integration)
-const initialImages = [
-  {
-    id: 1,
-    url: "https://static.wixstatic.com/media/a27d24_19be65811dff4617a9886f62ad72b147~mv2.jpg/v1/fill/w_568,h_654,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/a27d24_19be65811dff4617a9886f62ad72b147~mv2.jpg",
-    description: "Chest X-Ray - 13/04/2025",
-  },
-];
-
-// Placeholder for comments (replace with API integration)
-const initialComments = [
-  {
-    id: 1,
-    text: "Initial X-Ray shows no fractures.",
-    timestamp: "2025-04-13 10:30 AM",
-  },
-];
 
 // Component for displaying vital stats
 function VitalsCard({ heartRate }) {
@@ -87,7 +69,7 @@ function HumanModelCard({ darkMode }) {
     >
       <CardContent>
         <SoftTypography variant="h6" fontWeight="bold" mb={2} color={darkMode ? "white" : "dark"}>
-   
+          3D Human Model
         </SoftTypography>
         <SoftBox
           component="img"
@@ -111,21 +93,61 @@ HumanModelCard.propTypes = {
 
 // Main Component
 function ImagingCenterWorkspace({ centerName }) {
-  const [images, setImages] = useState(initialImages);
-  const [comments, setComments] = useState(initialComments);
+  const [images, setImages] = useState([]);
+  const [comments, setComments] = useState([
+    {
+      id: 1,
+      text: "Initial X-Ray shows no fractures.",
+      timestamp: "2025-04-13 10:30 AM",
+    },
+  ]);
   const [newComment, setNewComment] = useState("");
   const [darkMode, setDarkMode] = useState(false);
+  const [userData, setUserData] = useState(null);
 
-  // Handle image upload (simulated)
-  const handleImageUpload = (event) => {
+  // Fetch images on component mount
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        console.log("Attempting to fetch images...");
+        const fetchedImages = await getImages();
+        console.log("Fetched images:", fetchedImages);
+        setImages(fetchedImages);
+      } catch (error) {
+        console.error("Failed to load images:", error);
+      }
+    };
+    fetchImages();
+
+    const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
+    if (connectedUser) {
+      setUserData({
+        name: `${connectedUser.firstName} ${connectedUser.lastName}`,
+        id: connectedUser.cin || connectedUser.id || "N/A",
+        heartRate: 76,
+      });
+    }
+  }, []);
+
+  // Handle image upload
+  const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const newImage = {
-        id: images.length + 1,
-        url: URL.createObjectURL(file), // Simulate image preview
+      const tempUrl = URL.createObjectURL(file); // Temporary URL for preview
+      const imageData = {
+        patientId: userData?.id || patientData.id,
         description: `${file.name} - ${new Date().toLocaleDateString()}`,
+        url: tempUrl,
       };
-      setImages([...images, newImage]);
+      console.log("Uploading image data:", imageData);
+      try {
+        const uploadedImage = await uploadImage(imageData);
+        console.log("Uploaded image:", uploadedImage);
+        setImages((prevImages) => [...prevImages, uploadedImage]);
+      } catch (error) {
+        console.error("Image upload failed:", error);
+        alert("Failed to upload image: " + error.message);
+      }
     }
   };
 
@@ -153,9 +175,9 @@ function ImagingCenterWorkspace({ centerName }) {
         minHeight: "100vh",
         background: darkMode
           ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
-          : "linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)", // Adjusted for brighter light mode
+          : "linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
         padding: { xs: 2, md: 4 },
-        color: darkMode ? "#e0e0e0" : "#1a2a3a", // Increased contrast for text
+        color: darkMode ? "#e0e0e0" : "#1a2a3a",
       }}
     >
       {/* Header */}
@@ -244,10 +266,10 @@ function ImagingCenterWorkspace({ centerName }) {
                 </Avatar>
                 <SoftBox>
                   <SoftTypography variant="h6" fontWeight="bold" color={darkMode ? "white" : "dark"}>
-                    {patientData.name}
+                    {userData ? userData.name : "Loading..."}
                   </SoftTypography>
                   <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-                    Patient ID: {patientData.id}
+                    CIN: {userData ? userData.id : "Loading..."}
                   </SoftTypography>
                 </SoftBox>
               </SoftBox>

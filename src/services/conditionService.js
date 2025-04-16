@@ -9,4 +9,3 @@ export const getConditionsByPatientId = async (patientId) => {
   return await res.json();
 };
 
-
