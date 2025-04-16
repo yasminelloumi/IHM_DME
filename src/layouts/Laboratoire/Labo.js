@@ -271,7 +271,7 @@ useEffect(() => {
     setLoading(true);
     try {
       // Retrieve patient data from localStorage
-      const patientInfo = JSON.parse(localStorage.getItem("connectedUser"));
+      const patientInfo = JSON.parse(localStorage.getItem("scannedPatient"));
 
       let patientDataToUse = patientData; // Default to placeholder
 
