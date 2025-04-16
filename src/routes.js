@@ -47,7 +47,7 @@ const routes = [
     key: "ListPatientData",
     route: "/ListPatientData",
     icon: <Shop size="12px" />,
-    component: <ListPatientData />,
+    component: <PatientT />,
     noCollapse: true,
 }] : []),
   ...(getUserRole() !== 'patient' && getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
