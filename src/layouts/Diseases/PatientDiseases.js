@@ -169,42 +169,66 @@ const PatientDiseases = () => {
     const fetchConditions = async () => {
       try {
         const user = JSON.parse(localStorage.getItem("connectedUser"));
-        const patientId = user?.id;
-
-        if (!patientId) {
-          console.error("No patient ID found in localStorage.");
+  
+        if (!user) {
+          console.error("No connected user found.");
           return;
         }
-
+  
+        let patientId = null;
+        let scannedPatient = null;
+  
+        if (user.role === "patient") {
+          patientId = user.id;
+        } else if (
+          ["medecins", "laboratoire", "centreImagerie"].includes(user.role)
+        ) {
+          scannedPatient = JSON.parse(localStorage.getItem("scannedPatient"));
+          console.log("scannedPatient", scannedPatient);
+          if (!scannedPatient) {
+            console.error("No scanned patient found for medecin/lab/imagerie.");
+            return;
+          }
+          patientId = scannedPatient.id;
+        }
+  
+        if (!patientId) {
+          console.error("No patient ID found.");
+          return;
+        }
+        console.log("scannedPatient:", scannedPatient);
+        console.log("patientId:", patientId);
+  
         const conditions = await getConditionsByPatientId(patientId);
-
+        console.log("Fetched conditions:", conditions);
+  
         const grouped = {
           Allergy: [],
           Chronic: [],
           Infectious: [],
         };
-
+  
         conditions.forEach((condition) => {
           const type = condition.type?.toLowerCase();
           if (type === "allergy") grouped.Allergy.push(condition);
           else if (type === "chronic") grouped.Chronic.push(condition);
           else if (type === "infectious") grouped.Infectious.push(condition);
         });
-
+  
         const categorized = Object.keys(grouped).map((key) => ({
           name: key,
           items: grouped[key],
         }));
-
+  
         setCategories(categorized);
       } catch (error) {
         console.error("Error loading conditions:", error);
       }
     };
-
+  
     fetchConditions();
   }, []);
-
+  
   return (
     <DashboardLayout>
       <DashboardNavbar />

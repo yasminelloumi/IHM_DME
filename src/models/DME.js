@@ -1,36 +1,27 @@
-class DME {
-  constructor(id, patientCIN, diagnostiques, ordonnances) {
+export default class DME {
+  constructor(
+    id,
+    patientId,
+    medecinId,
+    dateConsultation,
+    reason,
+    diagnostiques = [],
+    ordonnances = [],
+    laboTest = [],
+    imgTest = [],
+    notes = ""
+  ) {
     this.id = id;
-    this.patientCIN = patientCIN;
-    this.diagnostiques = diagnostiques;
-    this.ordonnances = ordonnances;
+    this.patientId = patientId;
+    this.medecinId = medecinId;
+    this.dateConsultation = dateConsultation;
+    this.reason = reason;
+    this.diagnostiques = Array.isArray(diagnostiques) ? diagnostiques : [];
+    this.ordonnances = Array.isArray(ordonnances) 
+      ? ordonnances.map(med => typeof med === 'string' ? { name: med } : med)
+      : [];
+    this.laboTest = Array.isArray(laboTest) ? laboTest : [];
+    this.imgTest = Array.isArray(imgTest) ? imgTest : [];
+    this.notes = notes;
   }
-
-  
-    consulterDME() {
-      // Logic to display the DME
-    }
-  
-    consulterProfile() {
-      // Logic to show profile
-    }
-  
-    modifierProfile(newProfile) {
-      // Logic to update profile
-    }
-  
-    ajouterDiagnostique(diagnostique) {
-      this.diagnostiques.push(diagnostique);
-    }
-  
-    ajouterOrdonnance(ordonnance) {
-      this.ordonnances.push(ordonnance);
-    }
-  
-    modifierDiagnostique(index, newDiagnostique) {
-      if (index >= 0 && index < this.diagnostiques.length) {
-        this.diagnostiques[index] = newDiagnostique;
-      }
-    }
-  }
-  
+}

@@ -8,5 +8,6 @@ class Medecin {
     this.adresse = adresse;
     this.password = password;
     this.tel = tel;
+    this.role = role;
   }
 }

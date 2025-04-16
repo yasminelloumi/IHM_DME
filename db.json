@@ -77,21 +77,8 @@
       "specialite": "Cardiologie",
       "adresse": "Tunis",
       "password": "med123",
-      "tel": "99887766"
-    }
-  ],
-  "dme": [
-    {
-      "id": "1",
-      "patientCIN": "444444",
-      "diagnostiques": [
-        "Hypertension",
-        "Diabète"
-      ],
-      "ordonnances": [
-        "Amlodipine",
-        "Metformine"
-      ]
+      "tel": "99887766",
+      "role": "medecin"
     }
   ],
   "images": [
@@ -113,7 +100,8 @@
       "id": "3",
       "matricule": "11223",
       "password": "imgpass",
-      "nom": "Imaging Staff"
+      "nom": "Imaging Staff",
+      "role": "centreImagerie"
     }
   ],
   "laboratoire": [
@@ -121,12 +109,13 @@
       "id": "2",
       "matricule": "67890",
       "password": "labpass",
-      "nom": "Lab Tech"
+      "nom": "Lab Tech",
+      "role": "laboratoire"
     }
   ],
   "conditions": [
     {
-      "id": 1,
+      "id": "1",
       "type": "allergy",
       "name": "Peanut Allergy",
       "diagnosisDate": "2020-03-15",
@@ -136,7 +125,7 @@
       "patientId": "1a04"
     },
     {
-      "id": 2,
+      "id": "2",
       "type": "chronic",
       "name": "Type 2 Diabetes",
       "diagnosisDate": "2019-01-10",
@@ -146,7 +135,7 @@
       "patientId": "1a04"
     },
     {
-      "id": 2,
+      "id": "2",
       "type": "infectious",
       "name": "Type 2 Diabetes",
       "diagnosisDate": "2019-02-10",
@@ -154,6 +143,62 @@
       "description": "Insulin-resistant diabetes mellitus",
       "treatment": "Metformin 850mg twice daily",
       "patientId": "1a04"
+    },
+    {
+      "id": "3",
+      "type": "allergy",
+      "name": "Hypertension",
+      "diagnosisDate": "2018-05-12",
+      "severity": "Mild",
+      "description": "Elevated blood pressure requiring medication",
+      "treatment": "Lisinopril 10mg daily, low sodium diet",
+      "patientId": "e3a2"
+    },
+    {
+      "id": "4",
+      "type": "chronic",
+      "name": "Penicillin Allergy",
+      "diagnosisDate": "2017-11-03",
+      "severity": "Severe",
+      "description": "Anaphylactic reaction to penicillin antibiotics",
+      "treatment": "Avoid all penicillin-class antibiotics, wear medical alert bracelet",
+      "patientId": "e3a2"
+    },
+    {
+      "id": "5",
+      "type": "infectious",
+      "name": "Asthma",
+      "diagnosisDate": "2015-08-20",
+      "severity": "Moderate",
+      "description": "Chronic inflammatory disease of the airways",
+      "treatment": "Albuterol inhaler as needed, Fluticasone daily",
+      "patientId": "e3a2"
+    }
+  ],
+  "dme": [
+    {
+      "id": 1,
+      "patientId": "1a04",
+      "medecinId": "1",
+      "dateConsultation": "2023-06-15T10:30:00",
+      "reason": "Chest pain evaluation",
+      "diagnostiques": ["Hypertension (Stage 1)"],
+      "ordonnances": ["Amlodipine 5mg", "Blood pressure monitoring"],
+      "laboTest": ["ECG", "Complete blood count", "Cholesterol panel"],
+      "imgTest": ["Chest X-ray"],
+      "notes": "Patient advised to reduce sodium intake and exercise regularly."
+    },
+    {
+      "id": 2,
+      "patientId": "1a04",
+      "medecinId": "2",
+      "dateConsultation": "2023-12-10T14:00:00",
+      "reason": "Follow-up for hypertension",
+      "diagnostiques": ["Hypertension (Stable)", "Mild hyperlipidemia"],
+      "ordonnances": ["Amlodipine 5mg", "Atorvastatin 10mg"],
+      "laboTest": ["Lipid panel", "Kidney function test"],
+      "imgTest": [],
+      "notes": "Patient reports adherence to medication. Advised to continue low-sodium diet and schedule next visit in 3 months."
     }
   ],
   "reports": [
@@ -170,6 +215,13 @@
       "description": "mknjiuy",
       "fileName": "use case (1).pdf",
       "timestamp": "2025-04-14T13:53:34.874Z"
+    },
+    {
+      "id": "dc31",
+      "patientId": "1a04",
+      "description": "bmld;b:tmb",
+      "fileName": "DC_DME.pdf",
+      "timestamp": "2025-04-14T23:30:39.928Z"
     }
   ]
 }

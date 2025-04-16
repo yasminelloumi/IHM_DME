@@ -3,6 +3,7 @@ export class CentreImagerie {
       this.id = id;
       this.nom = nom;
       this.adresse = adresse;
+      this.role = this.role;
     }
   }
   

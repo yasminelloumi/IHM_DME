@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -6,7 +6,14 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
+import SoftButton from "components/SoftButton";
 import Footer from "examples/Footer";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { getDMEByPatientId } from "../../services/dmeService";
+import DME from '../../models/DME';
 import {
   Event as EventIcon,
   MedicalServices as MedicalServicesIcon,
@@ -27,38 +34,21 @@ import Avatar from "@mui/material/Avatar";
 import { FormControlLabel, Switch } from "@mui/material";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-// Demo data for consultations
-const consultationsData = [
-  {
-    id: 1,
-    date: "June 15, 2023",
-    time: "10:30 AM",
-    doctor: "Dr. Smith",
-    specialty: "Cardiologist",
-    reason: "Chest pain evaluation",
-    diagnosis: "Hypertension (Stage 1)",
-    treatments: [
-      { name: "Amlodipine", dosage: "5mg", frequency: "Once daily" },
-      { name: "Blood pressure monitoring", frequency: "Twice daily" }
-    ],
-    tests: ["ECG", "Complete blood count", "Cholesterol panel"],
-    images: ["Chest X-ray"],
-    notes: "Patient advised to reduce sodium intake and exercise regularly."
-  },
-  {
-    id: 2,
-    date: "May 10, 2023",
-    time: "2:15 PM",
-    doctor: "Dr. Johnson",
-    specialty: "General Practitioner",
-    reason: "Annual physical examination",
-    diagnosis: "Normal health status",
-    treatments: [],
-    tests: ["Complete blood count", "Urinalysis"],
-    images: [],
-    notes: "All results within normal range. Recommended follow-up in one year."
-  }
-];
+// Modal style function
+const modalStyle = (darkMode) => ({
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: { xs: '90%', md: '600px' },
+  bgcolor: darkMode ? '#2c3e50' : 'background.paper',
+  borderRadius: '16px',
+  boxShadow: 24,
+  p: 4,
+  color: darkMode ? '#e0e0e0' : '#1a2a3a',
+  maxHeight: '90vh',
+  overflowY: 'auto'
+});
 
 // Data for trends chart
 const consultationTrends = [
@@ -215,11 +205,11 @@ const TrendsCard = ({ data, darkMode }) => (
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
             }}
           />
-          <Line 
-            type="monotone" 
-            dataKey="consultations" 
-            stroke="#0077b6" 
-            strokeWidth={2} 
+          <Line
+            type="monotone"
+            dataKey="consultations"
+            stroke="#0077b6"
+            strokeWidth={2}
             dot={{ fill: darkMode ? "#e0e0e0" : "#0077b6" }}
           />
         </LineChart>
@@ -241,20 +231,19 @@ TrendsCard.propTypes = {
 // Consultation card component
 const ConsultationCard = ({ consultation, darkMode }) => {
   return (
-    <Card sx={{ 
+    <Card sx={{
       mb: 4,
       borderRadius: "16px",
       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
       overflow: "hidden",
-      background: "#ffffff"  // Fond blanc
+      background: "#ffffff"
     }}>
-      {/* Header section - Bleu foncé */}
-      <SoftBox 
-        p={3} 
-        bgcolor="#005F73"  // Bleu médical foncé
+      <SoftBox
+        p={3}
+        bgcolor="#005F73"
         color="white"
-        display="flex" 
-        justifyContent="space-between" 
+        display="flex"
+        justifyContent="space-between"
         alignItems="center"
         flexWrap="wrap"
       >
@@ -274,16 +263,15 @@ const ConsultationCard = ({ consultation, darkMode }) => {
 
       <SoftBox p={3}>
         <Grid container spacing={3}>
-          {/* Reason and Diagnosis */}
           <Grid item xs={12} md={6}>
-            <StyledCard 
-              icon={<DescriptionIcon sx={{ color: '#005F73' }} />}  // Icône bleu foncé
+            <StyledCard
+              icon={<DescriptionIcon sx={{ color: '#005F73' }} />}
               title="Reason for Visit"
               color="info"
               darkMode={darkMode}
               sx={{
-                backgroundColor: "#ffffff", // Fond blanc
-                border: '2px solid #e0e0e0', // Bordure grise légère
+                backgroundColor: "#ffffff",
+                border: '2px solid #e0e0e0',
               }}
             >
               <SoftTypography variant="button" fontWeight="regular" color="text.secondary">
@@ -293,8 +281,8 @@ const ConsultationCard = ({ consultation, darkMode }) => {
           </Grid>
 
           <Grid item xs={12} md={6}>
-            <StyledCard 
-              icon={<DiagnosesIcon sx={{ color: '#005F73' }} />}  // Icône bleu foncé
+            <StyledCard
+              icon={<DiagnosesIcon sx={{ color: '#005F73' }} />}
               title="Diagnosis"
               color="info"
               darkMode={darkMode}
@@ -309,11 +297,10 @@ const ConsultationCard = ({ consultation, darkMode }) => {
             </StyledCard>
           </Grid>
 
-          {/* Treatments */}
           {consultation.treatments.length > 0 && (
             <Grid item xs={12}>
-              <StyledCard 
-                icon={<MedicalServicesIcon sx={{ color: '#005F73' }} />}  // Icône bleu foncé
+              <StyledCard
+                icon={<MedicalServicesIcon sx={{ color: '#005F73' }} />}
                 title="Prescribed Treatments"
                 color="info"
                 darkMode={darkMode}
@@ -329,11 +316,10 @@ const ConsultationCard = ({ consultation, darkMode }) => {
             </Grid>
           )}
 
-          {/* Tests and Images */}
           {(consultation.tests.length > 0 || consultation.images.length > 0) && (
             <Grid item xs={12}>
-              <StyledCard 
-                icon={<ScienceIcon sx={{ color: '#005F73' }} />}  // Icône bleu foncé
+              <StyledCard
+                icon={<ScienceIcon sx={{ color: '#005F73' }} />}
                 title="Requested Exams"
                 color="info"
                 darkMode={darkMode}
@@ -344,12 +330,12 @@ const ConsultationCard = ({ consultation, darkMode }) => {
               >
                 {consultation.tests.length > 0 && (
                   <SoftBox mb={2}>
-                    <SoftTypography 
-                      variant="caption" 
-                      fontWeight="bold" 
-                      display="block" 
+                    <SoftTypography
+                      variant="caption"
+                      fontWeight="bold"
+                      display="block"
                       gutterBottom
-                      color="#005F73"  // Texte bleu foncé
+                      color="#005F73"
                     >
                       LABORATORY TESTS
                     </SoftTypography>
@@ -361,12 +347,12 @@ const ConsultationCard = ({ consultation, darkMode }) => {
 
                 {consultation.images.length > 0 && (
                   <SoftBox>
-                    <SoftTypography 
-                      variant="caption" 
-                      fontWeight="bold" 
-                      display="block" 
+                    <SoftTypography
+                      variant="caption"
+                      fontWeight="bold"
+                      display="block"
                       gutterBottom
-                      color="#005F73"  // Texte bleu foncé
+                      color="#005F73"
                     >
                       IMAGING STUDIES
                     </SoftTypography>
@@ -379,11 +365,10 @@ const ConsultationCard = ({ consultation, darkMode }) => {
             </Grid>
           )}
 
-          {/* Doctor's Notes */}
           {consultation.notes && (
             <Grid item xs={12}>
-              <StyledCard 
-                icon={<NotesIcon sx={{ color: '#005F73' }} />}  // Icône bleu foncé
+              <StyledCard
+                icon={<NotesIcon sx={{ color: '#005F73' }} />}
                 title="Doctor's Notes"
                 color="info"
                 darkMode={darkMode}
@@ -428,24 +413,173 @@ ConsultationCard.propTypes = {
 };
 
 const PatientConsultations = () => {
-  const [darkMode, setDarkMode] = React.useState(false);
-  
-  // Stats data
-  const statsData = {
-    totalConsultations: "12",
-    lastVisit: "June 15, 2023",
-    upcomingAppointments: "2",
-    mostVisitedSpecialty: "Cardiology"
-  };
+  const [darkMode, setDarkMode] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [dmeRecords, setDmeRecords] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [statsData, setStatsData] = useState({
+    totalConsultations: "0",
+    lastVisit: "No visits",
+    upcomingAppointments: "0",
+    mostVisitedSpecialty: "None"
+  });
+  const [consultationTrends, setConsultationTrends] = useState([]);
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
+  const toggleDarkMode = () => setDarkMode(!darkMode);
+  const handleOpenModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
+  useEffect(() => {
+    const fetchDME = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("connectedUser"));
+        if (!user) {
+          throw new Error("No connected user found");
+        }
+
+        let patientId = null;
+        if (user.role === "patient") {
+          patientId = user.id;
+        } else if (["medecins", "laboratoire", "centreImagerie"].includes(user.role)) {
+          const scannedPatient = JSON.parse(localStorage.getItem("scannedPatient"));
+          if (!scannedPatient) {
+            throw new Error("No scanned patient found");
+          }
+          patientId = scannedPatient.id;
+        }
+
+        if (!patientId) {
+          throw new Error("No patient ID found");
+        }
+
+        const response = await getDMEByPatientId(patientId);
+        if (!response) {
+          throw new Error("Failed to fetch DME records");
+        }
+
+        const dmeInstances = response.map(dme => new DME(
+          dme.id,
+          dme.patientId,
+          dme.medecinId,
+          dme.dateConsultation,
+          dme.reason,
+          dme.diagnostiques,
+          dme.ordonnances,
+          dme.laboTest,
+          dme.imgTest,
+          dme.notes
+        ));
+
+        setDmeRecords(dmeInstances);
+
+        const consultations = dmeInstances.map(dme => ({
+          id: dme.id,
+          date: new Date(dme.dateConsultation).toLocaleDateString(),
+          time: new Date(dme.dateConsultation).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          doctor: `Dr. ${dme.medecinId}`,
+          specialty: "General Practitioner",
+          reason: dme.reason,
+          diagnosis: dme.diagnostiques.join(", "),
+          treatments: Array.isArray(dme.ordonnances)
+            ? dme.ordonnances.map(med => ({
+                name: med.name || med,
+                dosage: med.dosage || "",
+                frequency: med.frequency || ""
+              }))
+            : [],
+          tests: dme.laboTest || [],
+          images: dme.imgTest || [],
+          notes: dme.notes || ""
+        }));
+
+        const totalConsultations = dmeInstances.length;
+        const lastVisit = totalConsultations > 0
+          ? new Date(dmeInstances[0].dateConsultation).toLocaleDateString()
+          : "No visits";
+
+        setStatsData({
+          totalConsultations: totalConsultations.toString(),
+          lastVisit,
+          upcomingAppointments: "0",
+          mostVisitedSpecialty: "General"
+        });
+
+        const monthlyCounts = dmeInstances.reduce((acc, record) => {
+          try {
+            const month = new Date(record.dateConsultation).toLocaleString('default', { month: 'short' });
+            acc[month] = (acc[month] || 0) + 1;
+          } catch (e) {
+            console.error("Error processing date:", record.dateConsultation);
+          }
+          return acc;
+        }, {});
+
+        setConsultationTrends(
+          Object.entries(monthlyCounts)
+            .map(([month, count]) => ({ month, consultations: count }))
+            .sort((a, b) => new Date(`${a.month} 1, 2023`) - new Date(`${b.month} 1, 2023`))
+        );
+
+      } catch (error) {
+        console.error("Error loading DME records:", error);
+        setError(error.message || "An unknown error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDME();
+  }, []);
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <SoftBox display="flex" justifyContent="center" alignItems="center" height="80vh">
+          <SoftTypography variant="h5">Loading patient data...</SoftTypography>
+        </SoftBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <SoftBox display="flex" justifyContent="center" alignItems="center" height="80vh">
+          <SoftTypography variant="h5" color="error">Error: {error}</SoftTypography>
+        </SoftBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  const consultationsToDisplay = dmeRecords.map(dme => ({
+    id: dme.id,
+    date: new Date(dme.dateConsultation).toLocaleDateString(),
+    time: new Date(dme.dateConsultation).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    doctor: `Dr. ${dme.medecinId}`,
+    specialty: "General Practitioner",
+    reason: dme.reason,
+    diagnosis: dme.diagnostiques.join(", "),
+    treatments: Array.isArray(dme.ordonnances)
+      ? dme.ordonnances.map(med => ({
+          name: typeof med === 'string' ? med : med.name || '',
+          dosage: typeof med === 'string' ? '' : med.dosage || '',
+          frequency: typeof med === 'string' ? '' : med.frequency || ''
+        }))
+      : [],
+    tests: dme.laboTest || [],
+    images: dme.imgTest || [],
+    notes: dme.notes || ''
+  }));
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <SoftBox 
+      <SoftBox
         sx={{
           minHeight: "100vh",
           background: darkMode
@@ -458,10 +592,10 @@ const PatientConsultations = () => {
         }}
       >
         <SoftBox px={3}>
-          <SoftBox 
-            display="flex" 
-            justifyContent="space-between" 
-            alignItems="center" 
+          <SoftBox
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
             mb={4}
             p={2}
             sx={{
@@ -471,15 +605,15 @@ const PatientConsultations = () => {
             }}
           >
             <SoftBox display="flex" alignItems="center" gap={2}>
-            <Avatar sx={{ 
-  bgcolor: "#002b5c", 
-  color: "#ffffff", 
-  border: "2px solid white", 
-  width: 48, 
-  height: 48 
-}}>
-  <MedicalServicesIcon fontSize="large" />
-</Avatar>
+              <Avatar sx={{
+                bgcolor: "#002b5c",
+                color: "#ffffff",
+                border: "2px solid white",
+                width: 48,
+                height: 48
+              }}>
+                <MedicalServicesIcon fontSize="large" />
+              </Avatar>
               <SoftBox>
                 <SoftTypography variant="h6" color={darkMode ? "gray" : "text.secondary"}>
                   Medical History
@@ -532,9 +666,9 @@ const PatientConsultations = () => {
           </Grid>
 
           <SoftBox mb={4}>
-            <SoftTypography 
-              variant="h5" 
-              fontWeight="bold" 
+            <SoftTypography
+              variant="h5"
+              fontWeight="bold"
               gutterBottom
               color={darkMode ? "white" : "dark"}
             >
@@ -544,19 +678,155 @@ const PatientConsultations = () => {
             <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"} paragraph>
               Review your complete consultation history with detailed visit information.
             </SoftTypography>
+            <SoftButton
+              variant="outlined"
+              size="small"
+              color="info"
+              onClick={handleOpenModal}
+            >
+              Add Consultation
+            </SoftButton>
           </SoftBox>
 
           <SoftBox>
-            {consultationsData.map((consultation) => (
-              <ConsultationCard 
-                key={consultation.id} 
-                consultation={consultation} 
-                darkMode={darkMode} 
-              />
-            ))}
+            {consultationsToDisplay.length > 0 ? (
+              consultationsToDisplay.map((consultation) => (
+                <ConsultationCard
+                  key={consultation.id}
+                  consultation={consultation}
+                  darkMode={darkMode}
+                />
+              ))
+            ) : (
+              <SoftTypography variant="body1" color={darkMode ? "white" : "dark"}>
+                No consultation records found for this patient.
+              </SoftTypography>
+            )}
           </SoftBox>
         </SoftBox>
       </SoftBox>
+
+      <Modal
+        open={showModal}
+        onClose={handleCloseModal}
+        aria-labelledby="consultation-modal-title"
+      >
+        <Box sx={modalStyle(darkMode)}>
+          <SoftTypography
+            id="consultation-modal-title"
+            variant="h5"
+            fontWeight="bold"
+            mb={3}
+            color={darkMode ? "white" : "dark"}
+          >
+            <MedicalServicesIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
+            New Medical Consultation
+          </SoftTypography>
+
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Date"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                margin="normal"
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Time"
+                type="time"
+                InputLabelProps={{ shrink: true }}
+                margin="normal"
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Doctor"
+                margin="normal"
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Specialty"
+                margin="normal"
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Reason for Visit"
+                margin="normal"
+                multiline
+                rows={2}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Diagnosis"
+                margin="normal"
+                multiline
+                rows={2}
+                required
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Prescribed Treatments (one per line)"
+                margin="normal"
+                multiline
+                rows={3}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Requested Tests (comma separated)"
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Doctor's Notes"
+                margin="normal"
+                multiline
+                rows={4}
+              />
+            </Grid>
+          </Grid>
+
+          <SoftBox mt={4} display="flex" justifyContent="flex-end">
+            <SoftButton
+              color="secondary"
+              variant={darkMode ? "contained" : "outlined"}
+              onClick={handleCloseModal}
+              sx={{ mr: 2 }}
+            >
+              Cancel
+            </SoftButton>
+            <SoftButton
+              color="info"
+              variant="gradient"
+              type="submit"
+            >
+              Save Consultation
+            </SoftButton>
+          </SoftBox>
+        </Box>
+      </Modal>
+
       <Footer />
     </DashboardLayout>
   );
