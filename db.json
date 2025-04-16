@@ -245,6 +245,29 @@
         "Eye fundus examination"
       ],
       "notes": "Patient instructed on the importance of controlling blood sugar levels and maintaining a healthy diet. Follow-up in 3 months."
+    },
+    {
+      "id": "fb96",
+      "patientId": "1a04",
+      "medecinId": "2",
+      "dateConsultation": "2025-04-18T00:00:00.000Z",
+      "reason": "Routine check-up",
+      "diagnostiques": [
+        "\"Hypertension\"",
+        "\"Diabetes\""
+      ],
+      "ordonnances": [
+        "\"Lisinopril 10mg once daily\",",
+        "\"Metformin 500mg twice daily\""
+      ],
+      "laboTest": [
+        "\"Blood glucose\"",
+        "\"Cholesterol panel\""
+      ],
+      "imgTest": [
+        "\"Chest X-ray\""
+      ],
+      "notes": "\"Patient advised to follow up in 6 months.\""
     }
   ],
   "reports": [

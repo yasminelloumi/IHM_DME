@@ -45,7 +45,7 @@ function SignIn() {
 
         // Redirect based on user role
         if (userType === "patient") {
-          navigate("/patient/dashboard"); // Redirect to patient dashboard
+          navigate("dashboard"); 
         } else if (userType === "staff") {
           const role = user.role;
           if (role === "medecins") {
@@ -53,9 +53,7 @@ function SignIn() {
           } else if (role === "laboratoire") {
             navigate("/laboratory");
           } else if (role === "centreImagerie") {
-            navigate("/centre-imagerie/dashboard");
-          } else {
-            navigate("/staff/dashboard");
+            navigate("/imaging");
           }
         }
       } else {
