@@ -11,37 +11,32 @@ import Footer from "examples/Footer";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import { getDMEByPatientId } from "../../services/dmeService";
+import { getDMEByPatientId, createDME } from "../../services/dmeService";
 import { getById } from "../../services/medecinService";
 import DME from '../../models/DME';
 import {
   Event as EventIcon,
   MedicalServices as MedicalServicesIcon,
-  LocalHospital as LocalHospitalIcon,
   Science as ScienceIcon,
   InsertPhoto as InsertPhotoIcon,
   Notes as NotesIcon,
   Healing as DiagnosesIcon,
   Description as DescriptionIcon,
-  AccessTime as TimeIcon,
   Person as DoctorIcon,
   DarkMode,
   LightMode
 } from '@mui/icons-material';
 import Grid from "@mui/material/Grid";
-import Divider from "@mui/material/Divider";
 import Avatar from "@mui/material/Avatar";
 import { FormControlLabel, Switch } from "@mui/material";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-// Modal style function
 const modalStyle = (darkMode) => ({
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: '90%', md: '600px' },
+  width: { xs: '90%', md: '700px' },
   bgcolor: darkMode ? '#2c3e50' : 'background.paper',
   borderRadius: '16px',
   boxShadow: 24,
@@ -51,7 +46,6 @@ const modalStyle = (darkMode) => ({
   overflowY: 'auto'
 });
 
-// Custom styled card component
 const StyledCard = ({ children, icon, title, color = "primary", darkMode }) => (
   <Card sx={{
     borderRadius: "16px",
@@ -89,7 +83,6 @@ StyledCard.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Treatment item component
 const TreatmentItem = ({ treatment, darkMode }) => (
   <SoftBox display="flex" alignItems="center" mb={1} pl={2}>
     <MedicalServicesIcon color={darkMode ? "secondary" : "primary"} fontSize="small" sx={{ mr: 1 }} />
@@ -106,7 +99,6 @@ TreatmentItem.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Test item component
 const TestItem = ({ test, darkMode }) => (
   <SoftBox display="flex" alignItems="center" mb={1} pl={2}>
     <ScienceIcon color={darkMode ? "secondary" : "secondary"} fontSize="small" sx={{ mr: 1 }} />
@@ -121,7 +113,6 @@ TestItem.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Image item component
 const ImageItem = ({ image, darkMode }) => (
   <SoftBox display="flex" alignItems="center" mb={1} pl={2}>
     <InsertPhotoIcon color={darkMode ? "secondary" : "info"} fontSize="small" sx={{ mr: 1 }} />
@@ -136,7 +127,6 @@ ImageItem.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Stats card component
 const StatsCard = ({ stats, darkMode }) => (
   <Card sx={{
     borderRadius: "16px",
@@ -169,7 +159,6 @@ StatsCard.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Trends card component
 const TrendsCard = ({ data, darkMode }) => (
   <Card sx={{
     borderRadius: "16px",
@@ -217,7 +206,6 @@ TrendsCard.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Consultation card component
 const ConsultationCard = ({ consultation, darkMode }) => {
   return (
     <Card sx={{
@@ -239,7 +227,7 @@ const ConsultationCard = ({ consultation, darkMode }) => {
         <SoftBox display="flex" alignItems="center">
           <EventIcon sx={{ mr: 1, color: "#ffffff" }} />
           <SoftTypography variant="h6" fontWeight="bold">
-            {consultation.date} at {consultation.time}
+            {consultation.date}
           </SoftTypography>
         </SoftBox>
         <SoftBox display="flex" alignItems="center">
@@ -382,7 +370,6 @@ ConsultationCard.propTypes = {
   consultation: PropTypes.shape({
     id: PropTypes.number.isRequired,
     date: PropTypes.string.isRequired,
-    time: PropTypes.string.isRequired,
     doctor: PropTypes.string.isRequired,
     specialty: PropTypes.string.isRequired,
     reason: PropTypes.string.isRequired,
@@ -390,7 +377,6 @@ ConsultationCard.propTypes = {
     treatments: PropTypes.arrayOf(
       PropTypes.shape({
         name: PropTypes.string.isRequired,
-
       })
     ).isRequired,
     tests: PropTypes.arrayOf(PropTypes.string).isRequired,
@@ -414,10 +400,101 @@ const PatientConsultations = () => {
     mostVisitedSpecialty: "None"
   });
   const [consultationTrends, setConsultationTrends] = useState([]);
+  const [formData, setFormData] = useState({
+    dateConsultation: "",
+    reason: "",
+    diagnosis: "",
+    treatments: "",
+    laboTest: "",
+    imgTest: "",
+    notes: ""
+  });
+  const [submitStatus, setSubmitStatus] = useState(null);
 
   const toggleDarkMode = () => setDarkMode(!darkMode);
   const handleOpenModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setFormData({
+      dateConsultation: "",
+      reason: "",
+      diagnosis: "",
+      treatments: "",
+      laboTest: "",
+      imgTest: "",
+      notes: ""
+    });
+    setSubmitStatus(null);
+  };
+
+  const handleInputChange = (e) =>  {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitStatus("submitting");
+
+    try {
+      const user = JSON.parse(localStorage.getItem("connectedUser")) || {};
+      const scannedPatient = JSON.parse(localStorage.getItem("scannedPatient")) || {};
+
+      const dateConsultation = formData.dateConsultation
+        ? new Date(formData.dateConsultation).toISOString()
+        : null;
+
+        const dmeData = {
+          patientId: scannedPatient.id,
+          medecinId: user.id,
+          dateConsultation: new Date(formData.dateConsultation).toISOString(),
+          reason: formData.reason,
+          diagnostiques: formData.diagnosis.split(",").map(d => d.trim()).filter(Boolean),
+          ordonnances: formData.treatments.split("\n").map(t => t.trim()).filter(Boolean),
+          laboTest: formData.laboTest.split(",").map(t => t.trim()).filter(Boolean),
+          imgTest: formData.imgTest.split(",").map(i => i.trim()).filter(Boolean),
+          notes: formData.notes
+        };
+      
+      const result = await createDME(dmeData);
+      if (result) {
+        console.log("DME created:", result);
+        // Optionally refresh data or show a success message
+      } else {
+        console.error("Failed to create DME");
+      }
+      const refreshedRecords = await getDMEByPatientId(scannedPatient.id);
+      setDmeRecords(refreshedRecords.map(dme => new DME(
+        dme.id,
+        dme.patientId,
+        dme.medecinId,
+        dme.dateConsultation,
+        dme.reason,
+        dme.diagnostiques,
+        dme.ordonnances,
+        dme.laboTest,
+        dme.imgTest,
+        dme.notes
+      )));
+
+      setSubmitStatus("success");
+      setFormData({
+        dateConsultation: "", // ✅ fix
+        reason: "",
+        diagnosis: "",
+        treatments: "",
+        laboTest: "", // ✅ fix, it was tests before
+        imgTest: "",
+        notes: ""
+      });
+      setTimeout(handleCloseModal, 1500);
+    } catch (error) {
+      console.error("Error submitting DME:", error);
+      setSubmitStatus("error");
+    }
+  };
 
   useEffect(() => {
     const fetchDME = async () => {
@@ -460,7 +537,6 @@ const PatientConsultations = () => {
           dme.notes
         ));
 
-        // Fetch doctor details for each unique medecinId
         const uniqueMedecinIds = [...new Set(dmeInstances.map(dme => dme.medecinId))];
         const doctorPromises = uniqueMedecinIds.map(async (id) => {
           try {
@@ -482,13 +558,11 @@ const PatientConsultations = () => {
         setDoctors(doctorsMap);
         setDmeRecords(dmeInstances);
 
-        // Map consultations with doctor details
         const consultations = dmeInstances.map(dme => {
           const doctor = doctorsMap[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
           return {
             id: dme.id,
             date: new Date(dme.dateConsultation).toLocaleDateString(),
-            time: new Date(dme.dateConsultation).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             doctor: `Dr. ${doctor.prenom} ${doctor.nom}`,
             specialty: doctor.specialite,
             reason: dme.reason,
@@ -496,7 +570,6 @@ const PatientConsultations = () => {
             treatments: Array.isArray(dme.ordonnances)
               ? dme.ordonnances.map(med => ({
                   name: typeof med === 'string' ? med : med.name || '',
-
                 }))
               : [],
             tests: dme.laboTest || [],
@@ -505,7 +578,6 @@ const PatientConsultations = () => {
           };
         });
 
-        // Calculate stats
         const totalConsultations = dmeInstances.length;
         const lastVisit = totalConsultations > 0
           ? new Date(dmeInstances[0].dateConsultation).toLocaleDateString()
@@ -525,7 +597,6 @@ const PatientConsultations = () => {
           mostVisitedSpecialty
         });
 
-        // Calculate trends
         const monthlyCounts = dmeInstances.reduce((acc, record) => {
           try {
             const month = new Date(record.dateConsultation).toLocaleString('default', { month: 'short' });
@@ -582,7 +653,6 @@ const PatientConsultations = () => {
     return {
       id: dme.id,
       date: new Date(dme.dateConsultation).toLocaleDateString(),
-      time: new Date(dme.dateConsultation).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       doctor: `Dr. ${doctor.prenom} ${doctor.nom}`,
       specialty: doctor.specialite,
       reason: dme.reason,
@@ -590,7 +660,6 @@ const PatientConsultations = () => {
       treatments: Array.isArray(dme.ordonnances)
         ? dme.ordonnances.map(med => ({
             name: typeof med === 'string' ? med : med.name || '',
-
           }))
         : [],
       tests: dme.laboTest || [],
@@ -735,118 +804,203 @@ const PatientConsultations = () => {
         aria-labelledby="consultation-modal-title"
       >
         <Box sx={modalStyle(darkMode)}>
-          <SoftTypography
-            id="consultation-modal-title"
-            variant="h5"
-            fontWeight="bold"
-            mb={3}
-            color={darkMode ? "white" : "dark"}
-          >
-            <MedicalServicesIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
-            New Medical Consultation
-          </SoftTypography>
-
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Date"
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                margin="normal"
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Time"
-                type="time"
-                InputLabelProps={{ shrink: true }}
-                margin="normal"
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Doctor"
-                margin="normal"
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Specialty"
-                margin="normal"
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Reason for Visit"
-                margin="normal"
-                multiline
-                rows={2}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Diagnosis"
-                margin="normal"
-                multiline
-                rows={2}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Prescribed Treatments (one per line)"
-                margin="normal"
-                multiline
-                rows={3}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Requested Tests (comma separated)"
-                margin="normal"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Doctor's Notes"
-                margin="normal"
-                multiline
-                rows={4}
-              />
-            </Grid>
-          </Grid>
-
-          <SoftBox mt={4} display="flex" justifyContent="flex-end">
-            <SoftButton
-              color="secondary"
-              variant={darkMode ? "contained" : "outlined"}
-              onClick={handleCloseModal}
-              sx={{ mr: 2 }}
+          <SoftBox display="flex" justifyContent="space-between" alignItems="flex-start" mb={3}>
+            <SoftTypography
+              id="consultation-modal-title"
+              variant="h5"
+              fontWeight="bold"
+              color={darkMode ? "white" : "dark"}
             >
-              Cancel
-            </SoftButton>
-            <SoftButton
-              color="info"
-              variant="gradient"
-              type="submit"
+              <MedicalServicesIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
+              New Medical Consultation
+            </SoftTypography>
+            
+            <SoftBox 
+              sx={{
+                background: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                borderRadius: '8px',
+                padding: '8px 12px',
+                textAlign: 'right'
+              }}
             >
-              Save Consultation
-            </SoftButton>
+              {(() => {
+                const user = JSON.parse(localStorage.getItem("connectedUser")) || {};
+                const scannedPatient = JSON.parse(localStorage.getItem("scannedPatient")) || {};
+                return (
+                  <>
+                    <SoftTypography variant="caption" display="block" color={darkMode ? "gray" : "text.secondary"}>
+                      Doctor: {user.prenom && user.nom ? `${user.prenom} ${user.nom}` : 'Unknown'}
+                    </SoftTypography>
+                    <SoftTypography variant="caption" display="block" color={darkMode ? "gray" : "text.secondary"}>
+                      Patient ID: {scannedPatient.id || 'N/A'}
+                    </SoftTypography>
+                  </>
+                );
+              })()}
+            </SoftBox>
           </SoftBox>
+
+          {submitStatus === "success" && (
+            <SoftBox mb={2} p={2} bgcolor="success.light" borderRadius="8px">
+              <SoftTypography variant="body2" color="success.main">
+                Consultation saved successfully!
+              </SoftTypography>
+            </SoftBox>
+          )}
+          {submitStatus === "error" && (
+            <SoftBox mb={2} p={2} bgcolor="error.light" borderRadius="8px">
+              <SoftTypography variant="body2" color="error.main">
+                Failed to save consultation. Please try again.
+              </SoftTypography>
+            </SoftBox>
+          )}
+
+<form onSubmit={handleFormSubmit}>
+  <Box mb={3}>
+    <label htmlFor="date">Date</label>
+    <input
+      type="date"
+      name="dateConsultation"
+      id="date"
+      required
+      value={formData.dateConsultation}
+      onChange={handleInputChange}
+      style={{ width: "100%", padding: "8px", fontSize: "1rem" }}
+    />
+  </Box>
+
+  <Box mb={3}>
+    <label htmlFor="reason">Reason of Visit</label>
+    <textarea
+      name="reason"
+      id="reason"
+      rows="6"
+      value={formData.reason}
+      onChange={handleInputChange}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontFamily: "Roboto",
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+        overflowX: "auto"
+      }}
+    />
+  </Box>
+
+  <Box mb={3}>
+    <label htmlFor="diagnosis">Diagnosis (comma separated)</label>
+    <textarea
+      name="diagnosis"
+      id="diagnosis"
+      rows="5"
+      required
+      value={formData.diagnosis}
+      onChange={handleInputChange}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontFamily: "Roboto",
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+        overflowX: "auto"
+      }}
+    />
+  </Box>
+
+  <Box mb={3}>
+    <label htmlFor="treatments">Prescribed Treatments (one per line)</label>
+    <textarea
+      name="treatments"
+      id="treatments"
+      rows="4"
+      value={formData.treatments}
+      onChange={handleInputChange}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontFamily: "Roboto",
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+        overflowX: "auto"
+      }}
+    />
+  </Box>
+
+  <Box mb={3}>
+    <label htmlFor="laboTest">Lab Tests (comma separated)</label>
+    <input
+      type="text"
+      name="laboTest"
+      id="laboTest"
+      value={formData.laboTest}
+      onChange={handleInputChange}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontFamily: "Roboto",
+        fontSize: "1rem"
+      }}
+    />
+  </Box>
+
+  <Box mb={3}>
+    <label htmlFor="imgTest">Imaging Tests (comma separated)</label>
+    <input
+      type="text"
+      name="imgTest"
+      id="imgTest"
+      value={formData.imgTest}
+      onChange={handleInputChange}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontFamily: "Roboto",
+        fontSize: "1rem"
+      }}
+    />
+  </Box>
+
+  <Box mb={3}>
+    <label htmlFor="notes">Doctor Notes</label>
+    <textarea
+      name="notes"
+      id="notes"
+      rows="6"
+      value={formData.notes}
+      onChange={handleInputChange}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontFamily: "Roboto",
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+        overflowX: "auto"
+      }}
+    />
+  </Box>
+
+  <SoftBox mt={4} display="flex" justifyContent="flex-end">
+    <SoftButton
+      color="secondary"
+      variant={darkMode ? "contained" : "outlined"}
+      onClick={handleCloseModal}
+      sx={{ mr: 2 }}
+      disabled={submitStatus === "submitting"}
+    >
+      Cancel
+    </SoftButton>
+    <SoftButton
+      color="info"
+      variant="gradient"
+      type="submit"
+      disabled={submitStatus === "submitting"}
+    >
+      {submitStatus === "submitting" ? "Saving..." : "Save Consultation"}
+    </SoftButton>
+  </SoftBox>
+</form>
+
         </Box>
       </Modal>
 
@@ -854,5 +1008,4 @@ const PatientConsultations = () => {
     </DashboardLayout>
   );
 };
-
 export default PatientConsultations;

@@ -177,28 +177,74 @@
   ],
   "dme": [
     {
-      "id": 1,
+      "id": "1",
       "patientId": "1a04",
       "medecinId": "2",
       "dateConsultation": "2023-06-15T10:30:00",
       "reason": "Chest pain evaluation",
-      "diagnostiques": ["Hypertension (Stage 1)"],
-      "ordonnances": ["Amlodipine 5mg As prescribed", "Blood pressure monitoring N/A Daily"],
-      "laboTest": ["ECG", "Complete blood count", "Cholesterol panel"],
-      "imgTest": ["Chest X-ray"],
+      "diagnostiques": [
+        "Hypertension (Stage 1)"
+      ],
+      "ordonnances": [
+        "Amlodipine 5mg As prescribed",
+        "Blood pressure monitoring N/A Daily"
+      ],
+      "laboTest": [
+        "ECG",
+        "Complete blood count",
+        "Cholesterol panel"
+      ],
+      "imgTest": [
+        "Chest X-ray"
+      ],
       "notes": "Patient advised to reduce sodium intake and exercise regularly."
     },
     {
-      "id": 2,
+      "id": "2",
       "patientId": "1a04",
       "medecinId": "2",
       "dateConsultation": "2023-12-10T14:00:00",
       "reason": "Follow-up for hypertension",
-      "diagnostiques": ["Hypertension (Stable)", "Mild hyperlipidemia"],
-      "ordonnances": ["Amlodipine 5mg As prescribed", "Atorvastatin 10mg N/A Daily"],
-      "laboTest": ["Lipid panel", "Kidney function test"],
+      "diagnostiques": [
+        "Hypertension (Stable)",
+        "Mild hyperlipidemia"
+      ],
+      "ordonnances": [
+        "Amlodipine 5mg As prescribed",
+        "Atorvastatin 10mg N/A Daily"
+      ],
+      "laboTest": [
+        "Lipid panel",
+        "Kidney function test"
+      ],
       "imgTest": [],
       "notes": "Patient reports adherence to medication. Advised to continue low-sodium diet and schedule next visit in 3 months."
+    },
+    {
+      "id": "efc3",
+      "patientId": "1a04",
+      "medecinId": "1",
+      "dateConsultation": "2025-04-17T00:00:00.000Z",
+      "reason": "Diabetes management and follow-up",
+      "diagnostiques": [
+        "Type 2 Diabetes",
+        "Hypertension (Stage 2)"
+      ],
+      "ordonnances": [
+        "Metformin 500mg twice daily",
+        "Lisinopril 10mg once daily",
+        "Monitor blood sugar levels before meals"
+      ],
+      "laboTest": [
+        "Fasting blood glucose",
+        "HbA1c",
+        "Kidney function test"
+      ],
+      "imgTest": [
+        "Abdominal ultrasound",
+        "Eye fundus examination"
+      ],
+      "notes": "Patient instructed on the importance of controlling blood sugar levels and maintaining a healthy diet. Follow-up in 3 months."
     }
   ],
   "reports": [

@@ -46,19 +46,25 @@ export const getDMEById = async (dmeId) => {
 // Create a new DME
 export const createDME = async (dmeData) => {
   try {
-    const response = await fetch(apiUrl, {
-      method: "POST",
+    const response = await fetch('http://localhost:3001/dme', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(dmeData),
+      body: JSON.stringify(dmeData)
     });
-    if (!response.ok) throw new Error("Failed to create DME");
-    return await response.json();
+
+    if (!response.ok) {
+      throw new Error('Failed to create DME');
+    }
+
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error(error);
-    return null;
+    throw error;
   }
 };
+
 
 
