@@ -18,6 +18,7 @@ import PatientConsultations from "layouts/PatientConsultations/PatientConsultati
 import CentreImage from "layouts/CentreImagerie";
 import Labo from "layouts/Laboratoire";
 import ProtectedRoute from './components/ProtectedRoute';
+import ListPatientData from "layouts/ListPatientData/data/ListPatientData";
 
 const getUserRole = () => {
   // Retrieve the connected user's role from localStorage (or session)
@@ -40,6 +41,15 @@ const routes = [
     title: "Patient Management", 
     key: "patient-management" 
   },
+  ...(getUserRole() !== 'patient' && getUserRole() !== 'medecins' ? [{
+    type: "collapse",
+    name: "Patients List",
+    key: "ListPatientData",
+    route: "/ListPatientData",
+    icon: <Shop size="12px" />,
+    component: <ListPatientData />,
+    noCollapse: true,
+}] : []),
   ...(getUserRole() !== 'patient' && getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
     type: "collapse",
     name: "Patients List",

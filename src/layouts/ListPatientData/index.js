@@ -1,22 +1,17 @@
+// src/layouts/ListPatientData/ListDatas.js
 import { Card } from "@mui/material";
-
-// Soft UI Dashboard React components
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
-
-// Soft UI Dashboard React examples
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import ListPatientData from "./data/FindPatient";
-import ListePatient from "layouts/TablePatient/data/ListePatient";
+import ListPatientData from "./data/ListPatientData";
 
-function PatientT() {
+function ListDatas() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <SoftBox py={3}>
-        {/* Section 1 : Authors table */}
         <SoftBox mb={3}>
           <Card>
             <SoftBox
@@ -38,4 +33,5 @@ function PatientT() {
     </DashboardLayout>
   );
 }
-export default PatientT;
+
+export default ListDatas;

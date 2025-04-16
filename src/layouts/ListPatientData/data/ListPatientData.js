@@ -1,3 +1,4 @@
+// src/layouts/ListPatientData/data/ListPatientData.js
 import { useState } from "react";
 import PropTypes from "prop-types";
 import SoftBox from "components/SoftBox";
@@ -23,10 +24,10 @@ import {
   Close,
   QrCodeScanner,
 } from "@mui/icons-material";
-import QRCodeScanner from "./QRCodeScanners"; // make sure path is correct
+import QRCodeScanner from "./QRCodeScanners";
 import axios from "axios";
 
-// -------------------- Modal Styling --------------------
+// Modal Styling
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -41,7 +42,7 @@ const modalStyle = {
   p: 3,
 };
 
-// -------------------- PatientCard --------------------
+// PatientCard Component
 function PatientCard({ CIN, nom, prenom, telephone, dateNaissance, nationalite, index }) {
   const avatarColors = ["#0077b6", "#0096c7", "#00b4d8"];
   const avatarBgColor = avatarColors[index % avatarColors.length];
@@ -191,7 +192,7 @@ DetailItemModal.propTypes = {
   icon: PropTypes.node.isRequired,
 };
 
-// -------------------- ListPatientData --------------------
+// Main Component
 function ListPatientData() {
   const [search, setSearch] = useState("");
   const [scannerOpen, setScannerOpen] = useState(false);
