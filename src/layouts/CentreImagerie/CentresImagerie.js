@@ -119,7 +119,7 @@ function ImagingCenterWorkspace({ centerName }) {
     };
     fetchImages();
 
-    const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
+    const connectedUser = JSON.parse(localStorage.getItem("scannedPatient"));
     if (connectedUser) {
       setUserData({
         name: `${connectedUser.firstName} ${connectedUser.lastName}`,
