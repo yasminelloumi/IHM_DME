@@ -42,4 +42,8 @@ export const authenticateStaff = async (matricule, password) => {
       throw new Error("Error authenticating medical staff");
     }
   };
+  export const logout = (navigate) => {
+    localStorage.clear(); // or use removeItem("connectedUser") if only that one is needed
+    navigate("/authentication/sign-in");
+  };
   
