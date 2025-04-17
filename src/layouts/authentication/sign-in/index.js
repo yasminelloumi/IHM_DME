@@ -51,9 +51,9 @@ function SignIn() {
           if (role === "medecins") {
             navigate("/dashboard");
           } else if (role === "laboratoire") {
-            navigate("/laboratory");
+            navigate("/ListPatientData");
           } else if (role === "centreImagerie") {
-            navigate("/imaging");
+            navigate("/ListPatientData");
           }
         }
       } else {
