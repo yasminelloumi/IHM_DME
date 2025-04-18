@@ -6,14 +6,14 @@ import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
-import { authenticatePatient, authenticateStaff } from "services/authService"; // Import the authentication service
+import { authenticatePatient, authenticateStaff } from "services/authService";
 import curved9 from "assets/images/curved-images/curved-6.jpg";
 
 function SignIn() {
   const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(true);
-  const [userType, setUserType] = useState("patient"); // Default is patient
-  const [identifier, setIdentifier] = useState(""); // CIN for patient, Matricule for staff
+  const [userType, setUserType] = useState("patient");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -25,52 +25,57 @@ function SignIn() {
     setError(null);
 
     try {
-      // Validate input
       if (!identifier || !password) {
         throw new Error("Please fill in all fields.");
       }
 
       let user = null;
+      let authFunction = userType === "patient" ? authenticatePatient : authenticateStaff;
+      user = await authFunction(identifier, password);
 
-      // Authenticate based on userType
-      if (userType === "patient") {
-        const result = await authenticatePatient(identifier, password);
-        user = result ? result : null; // Assuming authenticatePatient returns a user object or null
-      } else if (userType === "staff") {
-        user = await authenticateStaff(identifier, password);
-      }
-
-      if (user) {
-        alert("Login successful!");
-
-        // Redirect based on user role
-        if (userType === "patient") {
-          navigate("dashboard"); 
-        } else if (userType === "staff") {
-          const role = user.role;
-          if (role === "medecins") {
-            navigate("/dashboard");
-          } else if (role === "laboratoire") {
-            navigate("/ListPatientData");
-          } else if (role === "centreImagerie") {
-            navigate("/ListPatientData");
-          }
-        }
-      } else {
+      if (!user) {
         throw new Error("Invalid credentials.");
       }
+
+      // Store user data in localStorage
+      localStorage.setItem("connectedUser", JSON.stringify({
+        ...user,
+        type: userType,
+        rememberMe
+      }));
+
+      // Redirect based on role with page refresh
+      const redirectPath = getRedirectPath(userType, user.role);
+      window.location.href = redirectPath; // Full page refresh to ensure routes update
+
     } catch (err) {
-      setError(err.message || "Failed to authenticate.");
-      console.error("Error during login:", err);
+      setError(err.message || "Failed to authenticate. Please try again.");
+      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }
   };
 
+  const getRedirectPath = (userType, role) => {
+    if (userType === "patient") return "/dashboard";
+    
+    switch(role) {
+      case "medecins":
+        return "/dashboard";
+      case "laboratoire":
+        return "/laboratory";
+      case "centreImagerie":
+        return "/ListPatientData";
+      default:
+        return "/ListPatientData";
+    }
+  };
+
   const handleUserTypeChange = (type) => {
     setUserType(type);
-    setIdentifier(""); // Clear identifier when changing user type
-    setPassword(""); // Clear password when changing user type
+    setIdentifier("");
+    setPassword("");
+    setError(null);
   };
 
   return (
@@ -79,49 +84,67 @@ function SignIn() {
       description="Access your medical portal"
       image={curved9}
     >
-      <SoftBox sx={{ width: "100%", maxWidth: "400px", position: "relative", overflow: "hidden", borderRadius: "8px", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}>
-        {/* Sliding Toggle for User Type */}
-        <SoftBox sx={{ display: "flex", backgroundColor: "#f8f9fa", borderRadius: "8px 8px 0 0" }}>
+      <SoftBox sx={{ 
+        width: "100%", 
+        maxWidth: "400px", 
+        borderRadius: "8px", 
+        boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+        overflow: "hidden"
+      }}>
+        {/* User Type Toggle */}
+        <SoftBox sx={{ 
+          display: "flex", 
+          backgroundColor: "#f8f9fa", 
+          borderRadius: "8px 8px 0 0"
+        }}>
           <SoftButton
-            variant={userType === "patient" ? "gradient" : "text"}
+            variant={userType === "patient" ? "contained" : "text"}
             color="info"
             sx={{
               flex: 1,
-              borderRadius: "8px 0 0 0",
-              transition: "all 0.3s ease",
-              background: userType === "patient" ? "linear-gradient(45deg, #2196F3, #21CBF3)" : "transparent",
-              color: userType === "patient" ? "white" : "gray",
+              borderRadius: 0,
+              py: 1.5,
+              backgroundColor: userType === "patient" ? "#1976d2" : "transparent",
+              color: userType === "patient" ? "white" : "text.secondary",
               "&:hover": {
-                background: userType === "patient" ? "linear-gradient(45deg, #2196F3, #21CBF3)" : "#f0f0f0",
+                backgroundColor: userType === "patient" ? "#1565c0" : "rgba(0,0,0,0.04)",
               }
             }}
             onClick={() => handleUserTypeChange("patient")}
+            disabled={loading}
           >
             Patient
           </SoftButton>
           <SoftButton
-            variant={userType === "staff" ? "gradient" : "text"}
+            variant={userType === "staff" ? "contained" : "text"}
             color="info"
             sx={{
               flex: 1,
-              borderRadius: "0 8px 0 0",
-              transition: "all 0.3s ease",
-              background: userType === "staff" ? "linear-gradient(45deg, #2196F3, #21CBF3)" : "transparent",
-              color: userType === "staff" ? "white" : "gray",
+              borderRadius: 0,
+              py: 1.5,
+              backgroundColor: userType === "staff" ? "#1976d2" : "transparent",
+              color: userType === "staff" ? "white" : "text.secondary",
               "&:hover": {
-                background: userType === "staff" ? "linear-gradient(45deg, #2196F3, #21CBF3)" : "#f0f0f0",
+                backgroundColor: userType === "staff" ? "#1565c0" : "rgba(0,0,0,0.04)",
               }
             }}
             onClick={() => handleUserTypeChange("staff")}
+            disabled={loading}
           >
             Medical Staff
           </SoftButton>
         </SoftBox>
 
-        {/* Sliding Form Content */}
-        <SoftBox component="form" role="form" sx={{ padding: 3, backgroundColor: "white" }}>
+        {/* Form Content */}
+        <SoftBox component="form" role="form" sx={{ 
+          padding: 3, 
+          backgroundColor: "white",
+          "& .Mui-focused": {
+            color: "text.primary",
+          }
+        }}>
           <SoftBox mb={2}>
-            <SoftTypography component="label" variant="caption" fontWeight="bold" sx={{ display: "block", mb: 1 }}>
+            <SoftTypography variant="caption" fontWeight="bold" display="block" mb={1}>
               {userType === "staff" ? "Matricule" : "CIN"}
             </SoftTypography>
             <SoftInput
@@ -129,11 +152,13 @@ function SignIn() {
               placeholder={userType === "staff" ? "Enter your matricule" : "Enter your CIN"}
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
+              fullWidth
+              disabled={loading}
             />
           </SoftBox>
 
           <SoftBox mb={2}>
-            <SoftTypography component="label" variant="caption" fontWeight="bold" sx={{ display: "block", mb: 1 }}>
+            <SoftTypography variant="caption" fontWeight="bold" display="block" mb={1}>
               Password
             </SoftTypography>
             <SoftInput
@@ -141,23 +166,46 @@ function SignIn() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              fullWidth
+              disabled={loading}
             />
           </SoftBox>
 
           <SoftBox display="flex" alignItems="center" mb={3}>
-            <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-            <SoftTypography variant="button" onClick={handleSetRememberMe} sx={{ cursor: "pointer", userSelect: "none", ml: 1 }}>
+            <Switch 
+              checked={rememberMe} 
+              onChange={handleSetRememberMe}
+              color="info"
+              disabled={loading}
+            />
+            <SoftTypography 
+              variant="button" 
+              onClick={handleSetRememberMe} 
+              sx={{ 
+                cursor: "pointer", 
+                userSelect: "none", 
+                ml: 1,
+                color: "text.secondary"
+              }}
+            >
               Remember me
             </SoftTypography>
           </SoftBox>
 
-          <SoftButton variant="gradient" color="info" fullWidth onClick={handleSignIn}>
+          <SoftButton 
+            variant="gradient" 
+            color="info" 
+            fullWidth 
+            onClick={handleSignIn}
+            disabled={loading}
+            sx={{ mb: 2 }}
+          >
             {loading ? "Signing In..." : "Sign in"}
           </SoftButton>
 
           {error && (
-            <SoftBox mt={3} textAlign="center">
-              <SoftTypography variant="body2" color="error">
+            <SoftBox mt={2} textAlign="center">
+              <SoftTypography variant="caption" color="error">
                 {error}
               </SoftTypography>
             </SoftBox>
@@ -165,9 +213,16 @@ function SignIn() {
 
           {userType === "patient" && (
             <SoftBox mt={3} textAlign="center">
-              <SoftTypography variant="button" color="text" fontWeight="regular">
-                Don&apos;t have an account?{" "}
-                <SoftTypography component={Link} to="/authentication/sign-up" variant="button" color="info" fontWeight="bold">
+              <SoftTypography variant="button" color="text.secondary" fontWeight="regular">
+                Dont have an account?{" "}
+                <SoftTypography 
+                  component={Link} 
+                  to="/authentication/sign-up" 
+                  variant="button" 
+                  color="info" 
+                  fontWeight="bold"
+                  sx={{ textDecoration: "underline" }}
+                >
                   Sign up
                 </SoftTypography>
               </SoftTypography>

@@ -201,6 +201,26 @@
       "description": "Chronic inflammatory disease of the airways",
       "treatment": "Albuterol inhaler as needed, Fluticasone daily",
       "patientId": "e3a2"
+    },
+    {
+      "id": "ff4b",
+      "type": "allergy",
+      "name": "Peanut Allergy",
+      "diagnosisDate": "2025-04-18",
+      "severity": "",
+      "description": "Allergic to peanuts; causes hives, swelling, breathing issues. Confirmed by skin test. Avoid all peanut products.",
+      "treatment": "Carry EpiPen, use antihistamines for mild reactions, avoid peanuts, call 911 for severe reactions.",
+      "patientId": "1a04"
+    },
+    {
+      "id": "195e",
+      "type": "chronic",
+      "name": "Urticaria",
+      "diagnosisDate": "2018-10-23",
+      "severity": "",
+      "description": "Chronic hives triggered by heat or stress, causing itchy welts on skin. Diagnosed by allergist.",
+      "treatment": "Daily antihistamines (e.g., loratadine), avoid triggers, topical creams for relief, consult doctor for flare-ups.",
+      "patientId": "1a04"
     }
   ],
   "dme": [

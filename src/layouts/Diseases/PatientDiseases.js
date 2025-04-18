@@ -8,6 +8,14 @@ import {
   Switch,
   FormControlLabel,
   Stack,
+  Modal,
+  TextField,
+  Button,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Box,
 } from "@mui/material";
 import {
   DarkMode,
@@ -21,6 +29,7 @@ import {
   WarningAmber,
   CheckCircle,
   SignalCellularAlt,
+  AddCircle,
 } from "@mui/icons-material";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
@@ -28,7 +37,20 @@ import SoftBadge from "components/SoftBadge";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import { getConditionsByPatientId } from "services/conditionService";
+import { getConditionsByPatientId, createCondition } from "services/conditionService";
+
+// Modal style
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+  borderRadius: 2,
+};
 
 // Badge rendering by severity level
 const renderSeverityBadge = (severity) => {
@@ -107,7 +129,7 @@ DiseaseItem.propTypes = {
   darkMode: PropTypes.bool.isRequired,
 };
 
-const DiseaseCategory = ({ category, darkMode }) => {
+const DiseaseCategory = ({ category, darkMode, onAddDisease }) => {
   const [expanded, setExpanded] = useState(true);
 
   return (
@@ -138,9 +160,21 @@ const DiseaseCategory = ({ category, darkMode }) => {
             {category.name} ({category.items.length})
           </SoftTypography>
         </SoftBox>
-        <Icon color={darkMode ? "inherit" : "action"}>
-          {expanded ? "expand_less" : "expand_more"}
-        </Icon>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Icon 
+            color={darkMode ? "inherit" : "action"} 
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddDisease(category.name.toLowerCase());
+            }}
+            sx={{ cursor: 'pointer' }}
+          >
+            <AddCircle />
+          </Icon>
+          <Icon color={darkMode ? "inherit" : "action"}>
+            {expanded ? "expand_less" : "expand_more"}
+          </Icon>
+        </Stack>
       </SoftBox>
 
       <Collapse in={expanded} timeout="auto" unmountOnExit>
@@ -159,11 +193,21 @@ const DiseaseCategory = ({ category, darkMode }) => {
 DiseaseCategory.propTypes = {
   category: PropTypes.object.isRequired,
   darkMode: PropTypes.bool.isRequired,
+  onAddDisease: PropTypes.func.isRequired,
 };
 
 const PatientDiseases = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [newDisease, setNewDisease] = useState({
+    type: "",
+    name: "",
+    diagnosisDate: "",
+    severity: "",
+    description: "",
+    treatment: "",
+  });
 
   useEffect(() => {
     const fetchConditions = async () => {
@@ -229,6 +273,72 @@ const PatientDiseases = () => {
     fetchConditions();
   }, []);
   
+  const handleOpenModal = (type) => {
+    setNewDisease({
+      type: type,
+      name: "",
+      diagnosisDate: "",
+      severity: "",
+      description: "",
+      treatment: "",
+    });
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewDisease(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("connectedUser"));
+      let patientId = null;
+      
+      if (user.role === "patient") {
+        patientId = user.id;
+      } else {
+        const scannedPatient = JSON.parse(localStorage.getItem("scannedPatient"));
+        if (!scannedPatient) {
+          console.error("No scanned patient found");
+          return;
+        }
+        patientId = scannedPatient.id;
+      }
+
+      const diseaseToCreate = {
+        ...newDisease,
+        patientId: patientId
+      };
+
+      const createdDisease = await createCondition(diseaseToCreate);
+      
+      // Update the categories state with the new disease
+      setCategories(prevCategories => {
+        return prevCategories.map(category => {
+          if (category.name.toLowerCase() === newDisease.type.toLowerCase()) {
+            return {
+              ...category,
+              items: [...category.items, createdDisease]
+            };
+          }
+          return category;
+        });
+      });
+
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error creating condition:", error);
+    }
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -304,11 +414,124 @@ const PatientDiseases = () => {
           ) : (
             categories.map((category, index) => (
               category.items.length > 0 && (
-                <DiseaseCategory key={index} category={category} darkMode={darkMode} />
+                <DiseaseCategory 
+                  key={index} 
+                  category={category} 
+                  darkMode={darkMode} 
+                  onAddDisease={handleOpenModal}
+                />
               )
             ))
           )}
         </SoftBox>
+
+        {/* Add Disease Modal */}
+        <Modal
+          open={openModal}
+          onClose={handleCloseModal}
+          aria-labelledby="add-disease-modal"
+          aria-describedby="add-new-disease"
+        >
+          <Box sx={modalStyle}>
+            <SoftTypography variant="h6" mb={3}>
+              Add New {newDisease.type.charAt(0).toUpperCase() + newDisease.type.slice(1)} Condition
+            </SoftTypography>
+            
+            <Stack spacing={2}>
+              <TextField
+                fullWidth
+                label="Condition Name"
+                name="name"
+                value={newDisease.name}
+                onChange={handleInputChange}
+              />
+              
+              <TextField
+                fullWidth
+                label="Diagnosis Date"
+                type="date"
+                name="diagnosisDate"
+                value={newDisease.diagnosisDate}
+                onChange={handleInputChange}
+                InputLabelProps={{ shrink: true }}
+              />
+              
+              <FormControl fullWidth />
+              
+              <FormControl fullWidth>
+  <InputLabel id="severity-label" htmlFor="severity-select">
+    Severity
+  </InputLabel>
+  
+  <Box
+    component="select"
+    id="severity-select" // Match htmlFor
+    name="severity"
+    value={newDisease.severity || ""}
+    onChange={(e) => {
+      console.log("Severity selected:", e.target.value);
+      handleInputChange(e);
+    }}
+    onClick={() => console.log("Severity dropdown clicked")}
+    sx={{
+      width: "100%",
+      padding: "10px",
+      fontSize: "16px",
+      borderRadius: "4px",
+      border: "1px solid #ccc",
+      backgroundColor: "white",
+      zIndex: 1300,
+      pointerEvents: "auto",
+      "&:focus": {
+        outline: "2px solid #0077b6",
+        borderColor: "#0077b6",
+      },
+      // Ensure label compatibility
+      marginTop: "16px", // Space for floating label
+      height: "40px", // Consistent height
+    }}
+  >
+    <option value="" disabled>
+      Select Severity
+    </option>
+    <option value="Mild">Mild</option>
+    <option value="Moderate">Moderate</option>
+    <option value="Severe">Severe</option>
+    <option value="Controlled">Controlled</option>
+    <option value="Stage 1">Stage 1</option>
+  </Box>
+</FormControl>
+              <TextField
+                fullWidth
+                label="Description"
+                name="description"
+                value={newDisease.description}
+                onChange={handleInputChange}
+                multiline
+                rows={3}
+              />
+              
+              <TextField
+                fullWidth
+                label="Treatment"
+                name="treatment"
+                value={newDisease.treatment}
+                onChange={handleInputChange}
+                multiline
+                rows={2}
+              />
+              
+              <Stack direction="row" spacing={2} justifyContent="flex-end" mt={2}>
+                <Button variant="outlined" onClick={handleCloseModal}>
+                  Cancel
+                </Button>
+                <Button variant="contained" color="primary" onClick={handleSubmit}>
+                  Save
+                </Button>
+              </Stack>
+            </Stack>
+          </Box>
+        </Modal>
       </SoftBox>
       <Footer />
     </DashboardLayout>
