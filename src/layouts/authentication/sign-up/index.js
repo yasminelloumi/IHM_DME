@@ -1,156 +1,226 @@
 import { useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { 
+  Box, 
+  Switch, 
+  InputAdornment,
+  IconButton
+} from "@mui/material";
+import {
+  Fingerprint as FingerprintIcon,
+  Person as PersonIcon,
+  Badge as BadgeIcon,
+  Phone as PhoneIcon,
+  Cake as CakeIcon,
+  Public as PublicIcon,
+  Lock as LockIcon,
+  HowToReg as HowToRegIcon,
+  Visibility,
+  VisibilityOff,
+  ErrorOutline as ErrorOutlineIcon
+} from '@mui/icons-material';
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
 import SoftButton from "components/SoftButton";
-import BasicLayout from "layouts/authentication/components/BasicLayout";
-import curved6 from "assets/images/curved-images/curved14.jpg";
+import { registerPatient } from "services/registerService";
 import QRCode from "react-qr-code";
-
-// Import the registerPatient function from registerService.js
-import { registerPatient } from "../../../services/registerService";
+import medicalBg from "../../../assets/images/medical-bg.jpg";
+import { signInStyles } from "../sign-in/medicalTheme";
 
 function SignUp() {
-  const qrRef = useRef(); // Ref to capture QR code as an image
+  const qrRef = useRef();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [rememberMe, setRememberMe] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [patient, setPatient] = useState({
     CIN: "",
-    nom: "",
-    prenom: "",
-    tel: "",
-    dateNaissance: "",
-    nationalite: "",
+    lastName: "",
+    firstName: "",
+    phone: "",
+    birthDate: "",
+    nationality: "",
     password: "",
-    qrCode: "", // To store the QR code image or URL
+    qrCode: "",
   });
 
   const navigate = useNavigate();
 
-  // Handle changes in input fields
   const handleChange = (e) => {
     setPatient({ ...patient, [e.target.name]: e.target.value });
   };
 
-  // Handle form submission and patient registration
-  const handleSignUp = async () => {
+  const handleSignUp = async (e) => {
+    e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      // Add role as 'patient' before registering
       const patientWithRole = { ...patient, role: "patient" };
-
-      // Use the registerPatient function from registerService
-      const response = await registerPatient(patientWithRole); // register patient and get response with qr code
+      const response = await registerPatient(patientWithRole);
 
       if (response) {
-        alert("Patient registered and QR saved successfully!");
-
-        // Reset patient data and redirect to sign-in page
-        setPatient({
-          CIN: "",
-          nom: "",
-          prenom: "",
-          tel: "",
-          dateNaissance: "",
-          nationalite: "",
-          password: "",
-          qrCode: "",
-        });
-        navigate("/authentication/sign-in"); // Redirect to login page
+        alert("Registration successful!");
+        navigate("/authentication/sign-in");
       } else {
-        throw new Error("Patient registration failed.");
+        throw new Error("Registration failed");
       }
     } catch (err) {
-      const errorMessage = err.message || "An error occurred during registration.";
-      setError(errorMessage);
-      console.error("Error during signup:", err);
-      alert("Registration failed.");
+      setError(err.message || "An error occurred during registration");
     } finally {
       setLoading(false);
     }
   };
 
-  // Field labels for placeholders (without email)
-  const fieldLabels = {
-    CIN: "CIN",
-    nom: "Last Name",
-    prenom: "First Name",
-    tel: "Phone",
-    dateNaissance: "Date of Birth",
-    nationalite: "Nationality",
-    password: "Password",
-  };
+  const fieldConfig = [
+    { 
+      name: "CIN", 
+      label: "National ID", 
+      icon: <FingerprintIcon color="primary" />,
+      type: "text"
+    },
+    { 
+      name: "lastName", 
+      label: "Last Name", 
+      icon: <PersonIcon color="primary" />,
+      type: "text"
+    },
+    { 
+      name: "firstName", 
+      label: "First Name", 
+      icon: <BadgeIcon color="primary" />,
+      type: "text"
+    },
+    { 
+      name: "phone", 
+      label: "Phone", 
+      icon: <PhoneIcon color="primary" />,
+      type: "tel"
+    },
+    { 
+      name: "birthDate", 
+      label: "Date of Birth", 
+      icon: <CakeIcon color="primary" />,
+      type: "date",
+      InputLabelProps: { shrink: true }
+    },
+    { 
+      name: "nationality", 
+      label: "Nationality", 
+      icon: <PublicIcon color="primary" />,
+      type: "text"
+    },
+    { 
+      name: "password", 
+      label: "Password", 
+      icon: <LockIcon color="primary" />,
+      type: showPassword ? "text" : "password",
+      helperText: "Minimum 8 characters with uppercase and number",
+      endAdornment: (
+        <InputAdornment position="end">
+          <IconButton
+            onClick={() => setShowPassword(!showPassword)}
+            edge="end"
+          >
+            {showPassword ? <VisibilityOff /> : <Visibility />}
+          </IconButton>
+        </InputAdornment>
+      )
+    }
+  ];
 
   return (
-    <BasicLayout
-      title="Register as Patient"
-      description="Please fill the form below"
-      image={curved6}
-    >
-      <SoftBox component="form" role="form" p={3}>
-        {/* Render input fields dynamically */}
-        {Object.keys(fieldLabels).map((field) => (
-          <SoftBox mb={2} key={field}>
-            <SoftInput
-              type={field === "password" ? "password" : field === "dateNaissance" ? "date" : "text"}
-              name={field}
-              placeholder={fieldLabels[field]}
-              onChange={handleChange}
-              value={patient[field]}
+    <Box sx={{
+      ...signInStyles.pageContainer,
+     backgroundImage: `url(${medicalBg})`
+    }}>
+      <Box sx={signInStyles.formContainer}>
+        <Box sx={signInStyles.header}>
+          <HowToRegIcon color="primary" sx={{ fontSize: 40 }} />
+          <SoftTypography variant="h1" color="primary" fontWeight="bold" gutterBottom>
+            Create Account
+          </SoftTypography>
+          <SoftTypography variant="body1" color="text.secondary">
+            Join our medical platform
+          </SoftTypography>
+        </Box>
+
+        <Box component="form" onSubmit={handleSignUp} sx={signInStyles.formContent}>
+          {fieldConfig.map((field) => (
+            <SoftBox sx={signInStyles.inputField} key={field.name}>
+              <SoftInput
+                fullWidth
+                type={field.type}
+                label={field.label}
+                placeholder={`Enter your ${field.label.toLowerCase()}`}
+                name={field.name}
+                value={patient[field.name]}
+                onChange={handleChange}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      {field.icon}
+                    </InputAdornment>
+                  ),
+                  ...(field.endAdornment ? { endAdornment: field.endAdornment } : {})
+                }}
+                InputLabelProps={field.InputLabelProps}
+                helperText={field.helperText}
+              />
+            </SoftBox>
+          ))}
+
+          <Box sx={signInStyles.rememberMe}>
+            <Switch 
+              checked={rememberMe} 
+              onChange={() => setRememberMe(!rememberMe)} 
+              color="primary"
             />
-          </SoftBox>
-        ))}
+            <SoftTypography variant="body2" color="text.secondary">
+              I agree to the terms and conditions
+            </SoftTypography>
+          </Box>
 
-        {/* Submit button */}
-        <SoftBox mt={4} mb={1}>
-          <SoftButton
+          {error && (
+            <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
+              <ErrorOutlineIcon color="error" sx={{ mr: 1 }} />
+              <SoftTypography color="error">{error}</SoftTypography>
+            </Box>
+          )}
+
+          <SoftButton 
+            type="submit"
+            disabled={loading || !rememberMe}
             variant="gradient"
-            color="dark"
+            color="primary"
             fullWidth
-            onClick={handleSignUp}
-            disabled={loading}
+            sx={signInStyles.submitButton}
+            startIcon={!loading && <HowToRegIcon />}
           >
-            {loading ? "Loading..." : "Sign up"}
+            {loading ? "Registering..." : "Register Now"}
           </SoftButton>
-        </SoftBox>
+        </Box>
 
-        {/* Hidden QR code for image generation */}
         <div style={{ position: "absolute", top: "-9999px", left: "-9999px" }}>
           <div ref={qrRef}>
-            <QRCode value={`http://localhost:3000/dme/${patient.CIN}`} size={128} />
+            <QRCode value={`http://localhost:3000/emr/${patient.CIN}`} size={128} />
           </div>
         </div>
 
-        {/* Error message */}
-        {error && (
-          <SoftBox mt={3} textAlign="center">
-            <SoftTypography variant="body2" color="error">
-              {error}
-            </SoftTypography>
-          </SoftBox>
-        )}
-
-        {/* Redirect to sign-in page if user already has an account */}
-        <SoftBox mt={3} textAlign="center">
-          <SoftTypography variant="button" color="text" fontWeight="regular">
-            Already have an account?{" "}
-            <SoftTypography
-              component={Link}
-              to="/authentication/sign-in"
-              variant="button"
-              color="dark"
-              fontWeight="bold"
-              textGradient
-            >
-              Sign in
-            </SoftTypography>
+        <Box sx={signInStyles.footer}>
+          <SoftTypography variant="body2" color="text.secondary">
+            Already have an account? {' '}
+            <Link to="/authentication/sign-in" style={signInStyles.footerLink}>
+              Sign In
+            </Link>
           </SoftTypography>
-        </SoftBox>
-      </SoftBox>
-    </BasicLayout>
+          <SoftTypography variant="caption" color="text.secondary" mt={1}>
+            © {new Date().getFullYear()} Medical Platform. All rights reserved.
+          </SoftTypography>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
