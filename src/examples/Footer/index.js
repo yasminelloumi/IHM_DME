@@ -42,7 +42,7 @@ function Footer({ company, links }) {
       >
         &copy; {new Date().getFullYear()}, made with
         <SoftBox fontSize={size.md} color="text" mb={-0.5} mx={0.25}>
-          <Icon color="inherit" fontSize="inherit">
+          <Icon color="red" fontSize="inherit">
             favorite
           </Icon>
         </SoftBox>
@@ -52,8 +52,8 @@ function Footer({ company, links }) {
             &nbsp;{name}&nbsp;
           </SoftTypography>
         </Link>
-        for a better web.
-      </SoftBox>
+        for smarter, faster, and safer healthcare through electronic medical records
+              </SoftBox>
       <SoftBox
         component="ul"
         sx={({ breakpoints }) => ({

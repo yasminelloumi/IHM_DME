@@ -1,36 +1,37 @@
 import { useState, useEffect, useMemo } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
+import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 import rtlPlugin from "stylis-plugin-rtl";
-import { createTheme } from '@mui/material/styles';
-import { GlobalStyles } from '@mui/material';
+import { createTheme } from "@mui/material/styles";
+import { Icon } from "@mui/material";
 
 // Polices
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
 
-// Components
+// Composants personnalisés
 import SoftBox from "components/SoftBox";
 import Sidenav from "examples/Sidenav";
+import Configurator from "examples/Configurator";
 
-// Context
-import { useSoftUIController, setMiniSidenav } from "context";
-
-// Assets
+// Thèmes
 import theme from "assets/theme";
 import themeRTL from "assets/theme/theme-rtl";
+import { medicalTheme } from "layouts/authentication/sign-in/medicalTheme";
+
+// Routes
 import routes from "routes";
 
-// Soft UI Dashboard React contexts
+// Context
 import { useSoftUIController, setMiniSidenav, setOpenConfigurator } from "context";
 
-// Images
-import brand from "assets/images/EMRlogo.jpg";
+// Image de la marque
+import brand from "assets/images/logo3.png";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
@@ -39,7 +40,7 @@ export default function App() {
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
 
-  // Cache RTL
+  // Gestion du cache RTL
   useEffect(() => {
     if (direction === "rtl") {
       const cacheRtl = createCache({
@@ -50,7 +51,7 @@ export default function App() {
     }
   }, [direction]);
 
-  // Liste des routes sans sidebar
+  // Routes sans sidebar
   const noSidebarRoutes = useMemo(
     () => ["/authentication/sign-in", "/authentication/sign-up"],
     []
@@ -61,7 +62,7 @@ export default function App() {
     [pathname, noSidebarRoutes]
   );
 
-  // Fusion des thèmes avec configuration spécifique pour les icônes
+  // Fusion du thème principal avec le thème médical
   const mergedTheme = useMemo(() => {
     const baseTheme = direction === "rtl" ? themeRTL : theme;
     return createTheme({
@@ -80,19 +81,17 @@ export default function App() {
         MuiSvgIcon: {
           styleOverrides: {
             root: {
-              fontSize: '1.5rem',
-              // Ajoutez ces propriétés pour garantir l'affichage des icônes
-              display: 'inline-flex',
-              verticalAlign: 'middle',
-              color: 'inherit',
+              fontSize: "1.5rem",
+              display: "inline-flex",
+              verticalAlign: "middle",
+              color: "inherit",
             },
           },
         },
         MuiInputAdornment: {
           styleOverrides: {
             root: {
-              // Style pour les icônes dans les InputAdornment
-              '& .MuiSvgIcon-root': {
+              "& .MuiSvgIcon-root": {
                 color: medicalTheme.palette.primary.main,
               },
             },
@@ -117,26 +116,37 @@ export default function App() {
     }
   };
 
-  // Effets
+  // Changement de direction RTL/LTR
   useEffect(() => {
     document.body.setAttribute("dir", direction);
   }, [direction]);
 
+  // Scroll en haut à chaque changement de route
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  // Configuration des routes
+  // Génération dynamique des routes
   const getRoutes = (allRoutes) =>
     allRoutes.map((route) => {
       if (route.collapse) {
         return getRoutes(route.collapse);
       }
       if (route.route) {
-        return <Route exact path={route.route} element={route.component} key={route.key} />;
+        return (
+          <Route
+            exact
+            path={route.route}
+            element={route.component}
+            key={route.key}
+          />
+        );
       }
       return null;
     });
+
+  // Bouton de configuration
+  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, true);
 
   const configsButton = (
     <SoftBox
@@ -162,34 +172,9 @@ export default function App() {
     </SoftBox>
   );
 
-  return direction === "rtl" ? (
-    <CacheProvider value={rtlCache}>
-      <ThemeProvider theme={themeRTL}>
-        <CssBaseline />
-        {layout === "dashboard" && (
-          <>
-            <Sidenav
-              color={sidenavColor}
-              brand={brand}
-              brandName="Electronic Medical Record"
-              routes={routes}
-              onMouseEnter={handleOnMouseEnter}
-              onMouseLeave={handleOnMouseLeave}
-            />
-            <Configurator />
-            {configsButton}
-          </>
-        )}
-        {layout === "vr" && <Configurator />}
-        <Routes>
-          {getRoutes(routes)}
-          <Route path="*" element={<Navigate to="/dashboard" />} />
-        </Routes>
-      </ThemeProvider>
-    </CacheProvider>
-  ) : (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+  // Contenu principal
+  const appContent = (
+    <>
       {showSidebar && (
         <Sidenav
           color={sidenavColor}
@@ -200,6 +185,8 @@ export default function App() {
           onMouseLeave={handleOnMouseLeave}
         />
       )}
+      {layout === "dashboard" && <>{configsButton}<Configurator /></>}
+      {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
         <Route path="*" element={<Navigate to="/dashboard" />} />
@@ -210,7 +197,8 @@ export default function App() {
   return (
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={mergedTheme}>
-        {direction === "rtl" ? (
+        <CssBaseline />
+        {direction === "rtl" && rtlCache ? (
           <CacheProvider value={rtlCache}>{appContent}</CacheProvider>
         ) : (
           appContent
