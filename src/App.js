@@ -44,7 +44,7 @@ import routes from "routes";
 import { useSoftUIController, setMiniSidenav, setOpenConfigurator } from "context";
 
 // Images
-import brand from "assets/images/EMRlogo.jpg";
+import brand from "assets/images/logo3.png";
 
 export default function App() {
   const [controller, dispatch] = useSoftUIController();
@@ -111,22 +111,22 @@ export default function App() {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      width="3.5rem"
-      height="3.5rem"
-      bgColor="white"
+     // width="3.5rem"
+      //height="3.5rem"
+      //bgColor="white"
       shadow="sm"
       borderRadius="50%"
       position="fixed"
       right="2rem"
-      bottom="2rem"
+      //bottom="2rem"
       zIndex={99}
       color="dark"
       sx={{ cursor: "pointer" }}
       onClick={handleConfiguratorOpen}
     >
-      <Icon fontSize="default" color="inherit">
+      {/* <Icon fontSize="default" color="inherit">
         settings
-      </Icon>
+      </Icon> */}
     </SoftBox>
   );
 

@@ -129,7 +129,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
 
   return (
     <SidenavRoot {...rest} variant="permanent" ownerState={{ transparentSidenav, miniSidenav }}>
-      <SoftBox pt={3} pb={1} px={4} textAlign="center">
+      <SoftBox pt={0} pb={1} px={0} m={1} textAlign="center">
         <SoftBox
           display={{ xs: "block", xl: "none" }}
           position="absolute"
@@ -146,13 +146,14 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
         <SoftBox display="flex" flexDirection="column" alignItems="center" py={2}>
   {/* Logo au-dessus */}
   {brand && (
-    <SoftBox component="img" src={brand} alt="brand" width="70%" mb={1} />
+    // p pour padding (1 = 8px, 2 = 16px, etc.)
+    <SoftBox component="img" src={brand} alt="brand" width="60%" />
   )}
   {/* Titre en-dessous */}
   {brandName && (
     <SoftBox
       component="h6"
-      color="#38a3a5"
+      color="#0288d1"
       fontWeight="bold"
       fontSize="1.1rem"
       textAlign="center"
@@ -165,22 +166,7 @@ function Sidenav({ color, brand, brandName, routes, ...rest }) {
       </SoftBox>
       <Divider />
       <List>{renderRoutes}</List>
-      <SoftBox pt={2} my={2} mx={2} mt="auto">
-        <SidenavCard />
-        <SoftBox mt={2}>
-          <SoftButton
-            component="a"
-            href="https://creative-tim.com/product/soft-ui-dashboard-pro-react"
-            target="_blank"
-            rel="noreferrer"
-            variant="gradient"
-            color={color}
-            fullWidth
-          >
-            upgrade to pro
-          </SoftButton>
-        </SoftBox>
-      </SoftBox>
+
     </SidenavRoot>
   );
 }

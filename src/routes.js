@@ -1,7 +1,6 @@
 import React from "react";
 import Dashboard from "layouts/dashboard";
 import PatientDiseases from "layouts/Diseases/PatientDiseases";
-import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 
@@ -17,6 +16,7 @@ import PatientT from "layouts/TablePatient";
 import PatientConsultations from "layouts/PatientConsultations/PatientConsultations";  
 import CentreImage from "layouts/CentreImagerie";
 import Labo from "layouts/Laboratoire";
+import Overview from "layouts/profile";
 
 const routes = [
   {
@@ -89,7 +89,7 @@ const routes = [
     key: "profile",
     route: "/profile",
     icon: <MedicalServices size="12px" />,
-    component: <Profile />,
+    component: <Overview />,
     noCollapse: true,
   },
   {
