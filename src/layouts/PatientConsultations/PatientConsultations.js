@@ -10,65 +10,24 @@ import Footer from "examples/Footer";
 import {
   Event as EventIcon,
   MedicalServices as MedicalServicesIcon,
-  LocalHospital as LocalHospitalIcon,
   Science as ScienceIcon,
   InsertPhoto as InsertPhotoIcon,
   Notes as NotesIcon,
   Healing as DiagnosesIcon,
   Description as DescriptionIcon,
-  AccessTime as TimeIcon,
   Person as DoctorIcon,
   DarkMode,
-  LightMode
+  LightMode,
+  Download as DownloadIcon,
+  ZoomIn as ZoomInIcon,
+  PictureAsPdf as PdfIcon,
+  Description as ReportIcon,
+  Visibility as RadiologyIcon
 } from '@mui/icons-material';
 import Grid from "@mui/material/Grid";
-import Divider from "@mui/material/Divider";
 import Avatar from "@mui/material/Avatar";
-import { FormControlLabel, Switch } from "@mui/material";
+import { FormControlLabel, Switch, Button, Dialog, DialogContent, DialogActions, Box, Typography } from "@mui/material";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-// Demo data for consultations
-const consultationsData = [
-  {
-    id: 1,
-    date: "June 15, 2023",
-    time: "10:30 AM",
-    doctor: "Dr. Smith",
-    specialty: "Cardiologist",
-    reason: "Chest pain evaluation",
-    diagnosis: "Hypertension (Stage 1)",
-    treatments: [
-      { name: "Amlodipine", dosage: "5mg", frequency: "Once daily" },
-      { name: "Blood pressure monitoring", frequency: "Twice daily" }
-    ],
-    tests: ["ECG", "Complete blood count", "Cholesterol panel"],
-    images: ["Chest X-ray"],
-    notes: "Patient advised to reduce sodium intake and exercise regularly."
-  },
-  {
-    id: 2,
-    date: "May 10, 2023",
-    time: "2:15 PM",
-    doctor: "Dr. Johnson",
-    specialty: "General Practitioner",
-    reason: "Annual physical examination",
-    diagnosis: "Normal health status",
-    treatments: [],
-    tests: ["Complete blood count", "Urinalysis"],
-    images: [],
-    notes: "All results within normal range. Recommended follow-up in one year."
-  }
-];
-
-// Data for trends chart
-const consultationTrends = [
-  { month: "Jan", consultations: 3 },
-  { month: "Feb", consultations: 5 },
-  { month: "Mar", consultations: 4 },
-  { month: "Apr", consultations: 7 },
-  { month: "May", consultations: 6 },
-  { month: "Jun", consultations: 2 }
-];
 
 // Custom styled card component
 const StyledCard = ({ children, icon, title, color = "primary", darkMode }) => (
@@ -127,35 +86,101 @@ TreatmentItem.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Test item component
-const TestItem = ({ test, darkMode }) => (
-  <SoftBox display="flex" alignItems="center" mb={1} pl={2}>
-    <ScienceIcon color={darkMode ? "secondary" : "secondary"} fontSize="small" sx={{ mr: 1 }} />
-    <SoftTypography variant="button" fontWeight="regular" color={darkMode ? "white" : "dark"}>
-      {test}
-    </SoftTypography>
-  </SoftBox>
-);
+// Enhanced Medical Imaging Data
+const medicalImagingStudies = [
+  {
+    id: 1,
+    studyType: "X-ray",
+    modality: "Chest PA",
+    date: "06/12/2023",
+    imagingCenter: "Metropolitan Radiology Center",
+    referringPhysician: "Dr. Smith",
+    status: "Completed",
+    findings: "No acute cardiopulmonary findings",
+    impression: "Normal chest x-ray",
+    imageUrl: "https://example.com/xray-chest.jpg",
+    thumbnail: "https://via.placeholder.com/150?text=Chest+X-ray",
+    reportUrl: "https://example.com/report1.pdf",
+    dicomUrl: "https://example.com/dicom1.zip"
+  },
+  {
+    id: 2,
+    studyType: "MRI",
+    modality: "Brain with Contrast",
+    date: "05/05/2023",
+    imagingCenter: "Neuro Imaging Institute",
+    referringPhysician: "Dr. Johnson",
+    status: "Completed",
+    findings: "No evidence of acute intracranial abnormality",
+    impression: "Unremarkable brain MRI",
+    imageUrl: "https://example.com/mri-brain.jpg",
+    thumbnail: "https://via.placeholder.com/150?text=Brain+MRI",
+    reportUrl: "https://example.com/report2.pdf",
+    dicomUrl: "https://example.com/dicom2.zip"
+  }
+];
 
-TestItem.propTypes = {
-  test: PropTypes.string.isRequired,
-  darkMode: PropTypes.bool.isRequired
-};
+const labTests = [
+  {
+    id: 1,
+    name: "Complete Blood Count",
+    date: "06/10/2023",
+    lab: "BioLab Diagnostics",
+    result: "Normal",
+    reportUrl: "https://example.com/lab-report1.pdf"
+  },
+  {
+    id: 2,
+    name: "Cholesterol Panel",
+    date: "05/08/2023",
+    lab: "MediTest Laboratories",
+    result: "Elevated LDL",
+    reportUrl: "https://example.com/lab-report2.pdf"
+  }
+];
 
-// Image item component
-const ImageItem = ({ image, darkMode }) => (
-  <SoftBox display="flex" alignItems="center" mb={1} pl={2}>
-    <InsertPhotoIcon color={darkMode ? "secondary" : "info"} fontSize="small" sx={{ mr: 1 }} />
-    <SoftTypography variant="button" fontWeight="regular" color={darkMode ? "white" : "dark"}>
-      {image}
-    </SoftTypography>
-  </SoftBox>
-);
+// Updated consultations data
+const consultationsData = [
+  {
+    id: 1,
+    date: "06/15/2023",
+    time: "10:30 AM",
+    doctor: "Dr. Smith",
+    specialty: "Cardiology",
+    reason: "Chest pain evaluation",
+    diagnosis: "Hypertension (Stage 1)",
+    treatments: [
+      { name: "Amlodipine", dosage: "5mg", frequency: "Once daily" },
+      { name: "Blood pressure monitoring", frequency: "Twice daily" }
+    ],
+    labTests: labTests,
+    imagingStudies: medicalImagingStudies,
+    notes: "Patient advised to reduce sodium intake and exercise regularly. Follow-up in 3 months."
+  },
+  {
+    id: 2,
+    date: "05/10/2023",
+    time: "2:15 PM",
+    doctor: "Dr. Johnson",
+    specialty: "Primary Care",
+    reason: "Annual physical examination",
+    diagnosis: "Normal health status",
+    treatments: [],
+    labTests: [labTests[1]],
+    imagingStudies: [],
+    notes: "All results within normal range. Recommended follow-up in one year."
+  }
+];
 
-ImageItem.propTypes = {
-  image: PropTypes.string.isRequired,
-  darkMode: PropTypes.bool.isRequired
-};
+// Data for trends chart
+const consultationTrends = [
+  { month: "Jan", consultations: 3 },
+  { month: "Feb", consultations: 5 },
+  { month: "Mar", consultations: 4 },
+  { month: "Apr", consultations: 7 },
+  { month: "May", consultations: 6 },
+  { month: "Jun", consultations: 2 }
+];
 
 // Stats card component
 const StatsCard = ({ stats, darkMode }) => (
@@ -238,7 +263,295 @@ TrendsCard.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Consultation card component
+// Enhanced Medical Imaging Study Card
+// Enhanced Medical Imaging Study Card
+const ImagingStudyCard = ({ study, darkMode }) => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <Card sx={{
+      mb: 2,
+      borderRadius: "12px",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+      background: darkMode ? "#34495e" : "#f8f9fa",
+      transition: "transform 0.2s",
+      '&:hover': {
+        transform: "translateY(-2px)",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)"
+      }
+    }}>
+      <CardContent>
+        <Box display="flex" alignItems="center" mb={1}>
+          <RadiologyIcon color={darkMode ? "secondary" : "info"} sx={{ mr: 1 }} />
+          <Typography variant="h6" fontWeight="bold" color={darkMode ? "white" : "dark"}>
+            {study.studyType} - {study.modality}
+          </Typography>
+        </Box>
+        
+        <Box mb={2}>
+          <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+            <strong>Imaging Center:</strong> {study.imagingCenter}
+          </Typography>
+          <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+            <strong>Date:</strong> {study.date}
+          </Typography>
+          <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+            <strong>Referring Physician:</strong> {study.referringPhysician}
+          </Typography>
+          <Typography variant="body2">
+            <strong>Status:</strong> 
+            <span style={{ 
+              color: study.status === 'Completed' ? 
+                (darkMode ? "#81c784" : "#2e7d32") : 
+                (darkMode ? "#ff8a65" : "#d84315"),
+              fontWeight: "bold",
+              marginLeft: "4px"
+            }}>
+              {study.status}
+            </span>
+          </Typography>
+        </Box>
+
+        <Box sx={{ 
+          height: 140,
+          backgroundImage: `url(${study.thumbnail})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          borderRadius: "8px",
+          mb: 2,
+          cursor: "pointer",
+          position: "relative"
+        }} onClick={() => setOpen(true)}>
+          <Box sx={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            bgcolor: "rgba(0,0,0,0.7)",
+            color: "white",
+            p: 1,
+            borderBottomLeftRadius: "8px",
+            borderBottomRightRadius: "8px"
+          }}>
+            <Typography variant="caption">
+              {study.studyType} - Click to view
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box display="flex" justifyContent="space-between">
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<PdfIcon sx={{ fontSize: '1rem' }} />}
+            href={study.reportUrl}
+            target="_blank"
+            sx={{
+              color: darkMode ? "#ef9a9a" : "#d32f2f",
+              borderColor: darkMode ? "#ef9a9a" : "#d32f2f",
+              fontSize: '0.75rem',
+              padding: '4px 8px',
+              minWidth: 'auto'
+            }}
+          >
+            Radiology Report
+          </Button>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<DownloadIcon sx={{ fontSize: '1rem' }} />}
+            href={study.dicomUrl}
+            sx={{
+              color: darkMode ? "#a5d6a7" : "#388e3c",
+              borderColor: darkMode ? "#a5d6a7" : "#388e3c",
+              fontSize: '0.75rem',
+              padding: '4px 8px',
+              minWidth: 'auto'
+            }}
+          >
+            Download Files
+          </Button>
+        </Box>
+      </CardContent>
+
+      {/* Study Viewer Dialog */}
+      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
+        <DialogContent>
+          <Box sx={{ 
+            height: '400px',
+            background: '#000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            mb: 2
+          }}>
+            <img 
+              src={study.imageUrl} 
+              alt={study.studyType}
+              style={{ 
+                maxWidth: '100%',
+                maxHeight: '100%',
+                objectFit: 'contain'
+              }} 
+            />
+          </Box>
+          
+          <Box mb={2}>
+            <Typography variant="h6" gutterBottom>
+              Study Details
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography variant="body2">
+                  <strong>Study Type:</strong> {study.studyType}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Modality:</strong> {study.modality}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Imaging Center:</strong> {study.imagingCenter}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2">
+                  <strong>Study Date:</strong> {study.date}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Referring Physician:</strong> {study.referringPhysician}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Status:</strong> {study.status}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Clinical Findings
+            </Typography>
+            <Typography variant="body2" paragraph>
+              {study.findings}
+            </Typography>
+            
+            <Typography variant="h6" gutterBottom>
+              Radiologist Impression
+            </Typography>
+            <Typography variant="body2">
+              {study.impression}
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setOpen(false)}
+            color="primary"
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Card>
+  );
+};
+
+ImagingStudyCard.propTypes = {
+  study: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    studyType: PropTypes.string.isRequired,
+    modality: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+    imagingCenter: PropTypes.string.isRequired,
+    referringPhysician: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
+    findings: PropTypes.string.isRequired,
+    impression: PropTypes.string.isRequired,
+    imageUrl: PropTypes.string.isRequired,
+    thumbnail: PropTypes.string.isRequired,
+    reportUrl: PropTypes.string.isRequired,
+    dicomUrl: PropTypes.string.isRequired
+  }).isRequired,
+  darkMode: PropTypes.bool.isRequired
+};
+
+// Lab Test Card component
+const LabTestCard = ({ test, darkMode }) => {
+  return (
+    <Card sx={{
+      mb: 2,
+      borderRadius: "12px",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+      background: darkMode ? "#34495e" : "#f8f9fa",
+      transition: "transform 0.2s",
+      '&:hover': {
+        transform: "translateY(-2px)",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)"
+      }
+    }}>
+      <CardContent>
+        <Box display="flex" alignItems="center" mb={1}>
+          <ScienceIcon color={darkMode ? "secondary" : "secondary"} sx={{ mr: 1 }} />
+          <Typography variant="h6" fontWeight="bold" color={darkMode ? "white" : "dark"}>
+            {test.name}
+          </Typography>
+        </Box>
+        
+        <Box mb={1}>
+          <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+            <strong>Date:</strong> {test.date}
+          </Typography>
+          <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+            <strong>Lab:</strong> {test.lab}
+          </Typography>
+          <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+            <strong>Result:</strong> 
+            <span style={{ 
+              color: test.result === "Normal" ? 
+                (darkMode ? "#81c784" : "#2e7d32") : 
+                (darkMode ? "#ff8a65" : "#d84315"),
+              fontWeight: "bold",
+              marginLeft: "4px"
+            }}>
+              {test.result}
+            </span>
+          </Typography>
+        </Box>
+        
+        <Button
+          fullWidth
+          variant="contained"
+          size="small"
+          startIcon={<ReportIcon />}
+          href={test.reportUrl}
+          target="_blank"
+          sx={{
+            mt: 1,
+            backgroundColor: darkMode ? "#005F73" : "#0077b6",
+            '&:hover': {
+              backgroundColor: darkMode ? "#004b5d" : "#005f8c"
+            }
+          }}
+        >
+          View Lab Report
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
+LabTestCard.propTypes = {
+  test: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+    lab: PropTypes.string.isRequired,
+    result: PropTypes.string.isRequired,
+    reportUrl: PropTypes.string.isRequired
+  }).isRequired,
+  darkMode: PropTypes.bool.isRequired
+};
+
+// Updated ConsultationCard component
 const ConsultationCard = ({ consultation, darkMode }) => {
   return (
     <Card sx={{ 
@@ -246,66 +559,58 @@ const ConsultationCard = ({ consultation, darkMode }) => {
       borderRadius: "16px",
       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
       overflow: "hidden",
-      background: "#ffffff"  // Fond blanc
+      background: darkMode ? "#2c3e50" : "#ffffff"
     }}>
-      {/* Header section - Bleu foncé */}
-      <SoftBox 
+      {/* Header section */}
+      <Box 
         p={3} 
-        bgcolor="#005F73"  // Bleu médical foncé
+        bgcolor={darkMode ? "#005F73" : "#0077b6"}
         color="white"
         display="flex" 
         justifyContent="space-between" 
         alignItems="center"
         flexWrap="wrap"
       >
-        <SoftBox display="flex" alignItems="center">
-          <EventIcon sx={{ mr: 1, color: "#ffffff" }} />
-          <SoftTypography variant="h6" fontWeight="bold">
+        <Box display="flex" alignItems="center">
+          <EventIcon sx={{ mr: 1 }} />
+          <Typography variant="h6" fontWeight="bold">
             {consultation.date} at {consultation.time}
-          </SoftTypography>
-        </SoftBox>
-        <SoftBox display="flex" alignItems="center">
-          <DoctorIcon sx={{ mr: 1, color: "#ffffff" }} />
-          <SoftTypography variant="h6" fontWeight="medium">
+          </Typography>
+        </Box>
+        <Box display="flex" alignItems="center">
+          <DoctorIcon sx={{ mr: 1 }} />
+          <Typography variant="h6" fontWeight="medium">
             {consultation.doctor} ({consultation.specialty})
-          </SoftTypography>
-        </SoftBox>
-      </SoftBox>
+          </Typography>
+        </Box>
+      </Box>
 
-      <SoftBox p={3}>
+      <Box p={3}>
         <Grid container spacing={3}>
           {/* Reason and Diagnosis */}
           <Grid item xs={12} md={6}>
             <StyledCard 
-              icon={<DescriptionIcon sx={{ color: '#005F73' }} />}  // Icône bleu foncé
+              icon={<DescriptionIcon sx={{ color: darkMode ? '#90caf9' : '#0077b6' }} />}
               title="Reason for Visit"
               color="info"
               darkMode={darkMode}
-              sx={{
-                backgroundColor: "#ffffff", // Fond blanc
-                border: '2px solid #e0e0e0', // Bordure grise légère
-              }}
             >
-              <SoftTypography variant="button" fontWeight="regular" color="text.secondary">
+              <Typography variant="body1" color={darkMode ? "white" : "dark"}>
                 {consultation.reason}
-              </SoftTypography>
+              </Typography>
             </StyledCard>
           </Grid>
 
           <Grid item xs={12} md={6}>
             <StyledCard 
-              icon={<DiagnosesIcon sx={{ color: '#005F73' }} />}  // Icône bleu foncé
+              icon={<DiagnosesIcon sx={{ color: darkMode ? '#90caf9' : '#0077b6' }} />}
               title="Diagnosis"
               color="info"
               darkMode={darkMode}
-              sx={{
-                backgroundColor: "#ffffff",
-                border: '2px solid #e0e0e0',
-              }}
             >
-              <SoftTypography variant="button" fontWeight="regular" color="text.secondary">
+              <Typography variant="body1" color={darkMode ? "white" : "dark"}>
                 {consultation.diagnosis}
-              </SoftTypography>
+              </Typography>
             </StyledCard>
           </Grid>
 
@@ -313,14 +618,10 @@ const ConsultationCard = ({ consultation, darkMode }) => {
           {consultation.treatments.length > 0 && (
             <Grid item xs={12}>
               <StyledCard 
-                icon={<MedicalServicesIcon sx={{ color: '#005F73' }} />}  // Icône bleu foncé
+                icon={<MedicalServicesIcon sx={{ color: darkMode ? '#90caf9' : '#0077b6' }} />}
                 title="Prescribed Treatments"
                 color="info"
                 darkMode={darkMode}
-                sx={{
-                  backgroundColor: "#ffffff",
-                  border: '2px solid #e0e0e0',
-                }}
               >
                 {consultation.treatments.map((treatment, index) => (
                   <TreatmentItem key={index} treatment={treatment} darkMode={darkMode} />
@@ -329,52 +630,78 @@ const ConsultationCard = ({ consultation, darkMode }) => {
             </Grid>
           )}
 
-          {/* Tests and Images */}
-          {(consultation.tests.length > 0 || consultation.images.length > 0) && (
+          {/* Tests and Imaging Studies */}
+          {(consultation.labTests.length > 0 || consultation.imagingStudies.length > 0) && (
             <Grid item xs={12}>
               <StyledCard 
-                icon={<ScienceIcon sx={{ color: '#005F73' }} />}  // Icône bleu foncé
-                title="Requested Exams"
+                icon={<ScienceIcon sx={{ color: darkMode ? '#90caf9' : '#0077b6' }} />}
+                title="Diagnostic Studies"
                 color="info"
                 darkMode={darkMode}
-                sx={{
-                  backgroundColor: "#ffffff",
-                  border: '2px solid #e0e0e0',
-                }}
               >
-                {consultation.tests.length > 0 && (
-                  <SoftBox mb={2}>
-                    <SoftTypography 
-                      variant="caption" 
-                      fontWeight="bold" 
-                      display="block" 
-                      gutterBottom
-                      color="#005F73"  // Texte bleu foncé
-                    >
-                      LABORATORY TESTS
-                    </SoftTypography>
-                    {consultation.tests.map((test, index) => (
-                      <TestItem key={`test-${index}`} test={test} darkMode={darkMode} />
-                    ))}
-                  </SoftBox>
-                )}
+                <Grid container spacing={2}>
+                  {/* Laboratory Tests Section */}
+                  {consultation.labTests.length > 0 && (
+                    <Grid item xs={12} md={consultation.imagingStudies.length > 0 ? 6 : 12}>
+                      <Box 
+                        sx={{
+                          p: 2,
+                          borderRadius: "8px",
+                          background: darkMode ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 119, 182, 0.05)",
+                          borderLeft: `4px solid ${darkMode ? "#90caf9" : "#0077b6"}`
+                        }}
+                      >
+                        <Typography 
+                          variant="h6" 
+                          fontWeight="bold" 
+                          gutterBottom
+                          color={darkMode ? "white" : "dark"}
+                          display="flex"
+                          alignItems="center"
+                        >
+                          <ScienceIcon sx={{ mr: 1, color: darkMode ? "#90caf9" : "#0077b6" }} />
+                          LABORATORY TESTS
+                        </Typography>
+                        {consultation.labTests.map((test) => (
+                          <LabTestCard key={`test-${test.id}`} test={test} darkMode={darkMode} />
+                        ))}
+                      </Box>
+                    </Grid>
+                  )}
 
-                {consultation.images.length > 0 && (
-                  <SoftBox>
-                    <SoftTypography 
-                      variant="caption" 
-                      fontWeight="bold" 
-                      display="block" 
-                      gutterBottom
-                      color="#005F73"  // Texte bleu foncé
-                    >
-                      IMAGING STUDIES
-                    </SoftTypography>
-                    {consultation.images.map((image, index) => (
-                      <ImageItem key={`image-${index}`} image={image} darkMode={darkMode} />
-                    ))}
-                  </SoftBox>
-                )}
+                  {/* Medical Imaging Section */}
+                  {consultation.imagingStudies.length > 0 && (
+                    <Grid item xs={12} md={consultation.labTests.length > 0 ? 6 : 12}>
+                      <Box 
+                        sx={{
+                          p: 2,
+                          borderRadius: "8px",
+                          background: darkMode ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 119, 182, 0.05)",
+                          borderLeft: `4px solid ${darkMode ? "#90caf9" : "#0077b6"}`
+                        }}
+                      >
+                        <Typography 
+                          variant="h6" 
+                          fontWeight="bold" 
+                          gutterBottom
+                          color={darkMode ? "white" : "dark"}
+                          display="flex"
+                          alignItems="center"
+                        >
+                          <RadiologyIcon sx={{ mr: 1, color: darkMode ? "#90caf9" : "#0077b6" }} />
+                          MEDICAL IMAGING CENTER RESULTS
+                        </Typography>
+                        <Grid container spacing={2}>
+                          {consultation.imagingStudies.map((study) => (
+                            <Grid item xs={12} sm={6} key={`study-${study.id}`}>
+                              <ImagingStudyCard study={study} darkMode={darkMode} />
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </Box>
+                    </Grid>
+                  )}
+                </Grid>
               </StyledCard>
             </Grid>
           )}
@@ -383,23 +710,19 @@ const ConsultationCard = ({ consultation, darkMode }) => {
           {consultation.notes && (
             <Grid item xs={12}>
               <StyledCard 
-                icon={<NotesIcon sx={{ color: '#005F73' }} />}  // Icône bleu foncé
-                title="Doctor's Notes"
+                icon={<NotesIcon sx={{ color: darkMode ? '#90caf9' : '#0077b6' }} />}
+                title="Clinical Notes"
                 color="info"
                 darkMode={darkMode}
-                sx={{
-                  backgroundColor: "#ffffff",
-                  border: '2px solid #e0e0e0',
-                }}
               >
-                <SoftTypography variant="button" fontWeight="regular" color="text.secondary">
+                <Typography variant="body1" color={darkMode ? "white" : "dark"}>
                   {consultation.notes}
-                </SoftTypography>
+                </Typography>
               </StyledCard>
             </Grid>
           )}
         </Grid>
-      </SoftBox>
+      </Box>
     </Card>
   );
 };
@@ -420,8 +743,8 @@ ConsultationCard.propTypes = {
         frequency: PropTypes.string.isRequired
       })
     ).isRequired,
-    tests: PropTypes.arrayOf(PropTypes.string).isRequired,
-    images: PropTypes.arrayOf(PropTypes.string).isRequired,
+    labTests: PropTypes.array.isRequired,
+    imagingStudies: PropTypes.array.isRequired,
     notes: PropTypes.string
   }).isRequired,
   darkMode: PropTypes.bool.isRequired
@@ -445,20 +768,18 @@ const PatientConsultations = () => {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <SoftBox 
+      <Box 
         sx={{
           minHeight: "100vh",
           background: darkMode
             ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
-            : "url('https://via.placeholder.com/1920x1080?text=Medical-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+            : "linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
           padding: { xs: 2, md: 4 },
           color: darkMode ? "#e0e0e0" : "#1a2a3a",
         }}
       >
-        <SoftBox px={3}>
-          <SoftBox 
+        <Box px={3}>
+          <Box 
             display="flex" 
             justifyContent="space-between" 
             alignItems="center" 
@@ -470,25 +791,25 @@ const PatientConsultations = () => {
               boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)"
             }}
           >
-            <SoftBox display="flex" alignItems="center" gap={2}>
-            <Avatar sx={{ 
-  bgcolor: "#002b5c", 
-  color: "#ffffff", 
-  border: "2px solid white", 
-  width: 48, 
-  height: 48 
-}}>
-  <MedicalServicesIcon fontSize="large" />
-</Avatar>
-              <SoftBox>
-                <SoftTypography variant="h6" color={darkMode ? "gray" : "text.secondary"}>
+            <Box display="flex" alignItems="center" gap={2}>
+              <Avatar sx={{ 
+                bgcolor: "#002b5c", 
+                color: "#ffffff", 
+                border: "2px solid white", 
+                width: 48, 
+                height: 48 
+              }}>
+                <MedicalServicesIcon fontSize="large" />
+              </Avatar>
+              <Box>
+                <Typography variant="h6" color={darkMode ? "gray" : "text.secondary"}>
                   Medical History
-                </SoftTypography>
-                <SoftTypography variant="h4" fontWeight="bold" color={darkMode ? "white" : "dark"}>
+                </Typography>
+                <Typography variant="h4" fontWeight="bold" color={darkMode ? "white" : "dark"}>
                   My Consultations
-                </SoftTypography>
-              </SoftBox>
-            </SoftBox>
+                </Typography>
+              </Box>
+            </Box>
             <FormControlLabel
               control={
                 <Switch
@@ -506,21 +827,21 @@ const PatientConsultations = () => {
                 />
               }
               label={
-                <SoftBox display="flex" alignItems="center" gap={1}>
+                <Box display="flex" alignItems="center" gap={1}>
                   {darkMode ? (
                     <DarkMode sx={{ color: "#e0e0e0" }} />
                   ) : (
                     <LightMode sx={{ color: "#f9a825" }} />
                   )}
-                  <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+                  <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
                     Theme
-                  </SoftTypography>
-                </SoftBox>
+                  </Typography>
+                </Box>
               }
               labelPlacement="start"
               sx={{ margin: 0 }}
             />
-          </SoftBox>
+          </Box>
 
           <Grid container spacing={3} mb={4}>
             <Grid item xs={12} md={6}>
@@ -531,8 +852,8 @@ const PatientConsultations = () => {
             </Grid>
           </Grid>
 
-          <SoftBox mb={4}>
-            <SoftTypography 
+          <Box mb={4}>
+            <Typography 
               variant="h5" 
               fontWeight="bold" 
               gutterBottom
@@ -540,13 +861,13 @@ const PatientConsultations = () => {
             >
               <EventIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
               Consultation History
-            </SoftTypography>
-            <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"} paragraph>
+            </Typography>
+            <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"} paragraph>
               Review your complete consultation history with detailed visit information.
-            </SoftTypography>
-          </SoftBox>
+            </Typography>
+          </Box>
 
-          <SoftBox>
+          <Box>
             {consultationsData.map((consultation) => (
               <ConsultationCard 
                 key={consultation.id} 
@@ -554,9 +875,9 @@ const PatientConsultations = () => {
                 darkMode={darkMode} 
               />
             ))}
-          </SoftBox>
-        </SoftBox>
-      </SoftBox>
+          </Box>
+        </Box>
+      </Box>
       <Footer />
     </DashboardLayout>
   );
