@@ -16,10 +16,18 @@ import PatientT from "layouts/TablePatient";
 import PatientConsultations from "layouts/PatientConsultations/PatientConsultations";  
 import CentreImage from "layouts/CentreImagerie";
 import Labo from "layouts/Laboratoire";
+import ProtectedRoute from './components/ProtectedRoute';
+import ListPatientData from "layouts/ListPatientData/data/ListPatientData";
 import Overview from "layouts/profile";
 
+
+const getUserRole = () => {
+  // Retrieve the connected user's role from localStorage (or session)
+  const connectedUser = JSON.parse(localStorage.getItem('connectedUser'));
+  return connectedUser?.role || null;
+};
 const routes = [
-  {
+  ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
     type: "collapse",
     name: "Dashboard",
     key: "dashboard",
@@ -27,13 +35,22 @@ const routes = [
     icon: <MedicalServices size="12px" />,
     component: <Dashboard />,
     noCollapse: true,
-  },
+  }] : []),
   { 
     type: "title", 
     title: "Patient Management", 
     key: "patient-management" 
   },
-  {
+  ...(getUserRole() !== 'patient' && getUserRole() !== 'medecins' ? [{
+    type: "collapse",
+    name: "Patients List",
+    key: "ListPatientData",
+    route: "/ListPatientData",
+    icon: <Shop size="12px" />,
+    component: <PatientT />,
+    noCollapse: true,
+}] : []),
+  ...(getUserRole() !== 'patient' && getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
     type: "collapse",
     name: "Patients List",
     key: "TablePatient",
@@ -41,8 +58,9 @@ const routes = [
     icon: <Shop size="12px" />,
     component: <PatientT />,
     noCollapse: true,
-  },
-  {
+  }] : []),
+  ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
+  
     type: "collapse",
     name: "Diseases",
     key: "patient-diseases",
@@ -50,8 +68,9 @@ const routes = [
     icon: <MedicalServices size="12px" />,
     component: <PatientDiseases />,
     noCollapse: true,
-  },
-  {
+  }] : []),
+
+  ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
     type: "collapse",
     name: "Consultations",
     key: "patient-consultations",
@@ -59,8 +78,8 @@ const routes = [
     icon: <CalendarToday size="12px" />,
     component: <PatientConsultations />,
     noCollapse: true,
-  },
-  {
+  }] : []),
+  ...(getUserRole() !== 'patient' && getUserRole() !== 'centreImagerie' && getUserRole() !== 'medecins'? [{
     type: "collapse",
     name: "Laboratory",
     key: "patient-laboratory",
@@ -68,8 +87,8 @@ const routes = [
     icon: <Science size="12px" />,
     component: <Labo />,
     noCollapse: true,
-  },
-  {
+  }] : []),
+  ...(getUserRole() !== 'patient'&& getUserRole() !== 'laboratoire' && getUserRole() !== 'medecins' ? [{
     type: "collapse",
     name: "Medical Imaging",
     key: "patient-imaging",
@@ -77,13 +96,13 @@ const routes = [
     icon: <Collections size="12px" />,
     component: <CentreImage />,
     noCollapse: true,
-  },
+  }] : []),
   { 
     type: "title", 
     title: "Account Pages", 
     key: "account-pages" 
   },
-  {
+  ...(getUserRole() !== 'medecins'  && getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire'?[{
     type: "collapse",
     name: "Profile",
     key: "profile",
@@ -91,7 +110,7 @@ const routes = [
     icon: <MedicalServices size="12px" />,
     component: <Overview />,
     noCollapse: true,
-  },
+  }] : []),
   {
     type: "collapse",
     name: "Sign In",

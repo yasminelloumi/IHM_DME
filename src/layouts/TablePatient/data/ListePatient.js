@@ -205,6 +205,7 @@ function ListPatientData() {
       const response = await axios.get(`http://localhost:3001/patients?CIN=${CIN}`);
       if (response.data && response.data.length > 0) {
         const scannedPatient = response.data[0];
+        localStorage.setItem("scannedPatient", JSON.stringify(scannedPatient));
         // Add to history only if not already present
         setPatients((prev) => {
           const alreadyExists = prev.some((p) => p.CIN === scannedPatient.CIN);

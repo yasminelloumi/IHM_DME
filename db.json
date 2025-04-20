@@ -6,7 +6,7 @@
       "nom": "eloumi ",
       "prenom": "yasmina",
       "tel": "26354111",
-      "dateNaissance": "2025-04-02",
+      "dateNaissance": "2004-04-02",
       "nationalite": "tunisian",
       "password": "yasmina123@",
       "email": "bradairahma27@gmail.com",
@@ -19,7 +19,7 @@
       "nom": "Bradai",
       "prenom": "Rahma",
       "tel": "26354222",
-      "dateNaissance": "2025-04-18",
+      "dateNaissance": "1954-04-18",
       "nationalite": "tunisian",
       "password": "yasmina123@",
       "email": "bradairahma@gmail.com",
@@ -68,6 +68,18 @@
       "role": "patient"
     },
     {
+      "id": "4ee4",
+      "CIN": "1199",
+      "nom": "test",
+      "prenom": "test",
+      "tel": "12344321",
+      "dateNaissance": "2020-06-22",
+      "nationalite": "frfr",
+      "password": "1212",
+      "qrCode": "data:image/png;base64,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",
+      "role": "patient"
+    },
+    {
       "id": "a19f",
       "CIN": "111741852",
       "nom": "zaineb",
@@ -83,35 +95,38 @@
   ],
   "medecins": [
     {
-      "id": "1",
+      "id": "2",
       "matricule": "test002",
       "nom": "Salah",
       "prenom": "Hedi",
       "specialite": "Cardiologie",
       "adresse": "Tunis",
       "password": "med123",
-      "tel": "99887766"
-    }
-  ],
-  "dme": [
-    {
-      "id": "1",
-      "patientCIN": "444444",
-      "diagnostiques": [
-        "Hypertension",
-        "Diabète"
-      ],
-      "ordonnances": [
-        "Amlodipine",
-        "Metformine"
-      ]
+      "tel": "99887766",
+      "role": "medecins"
     }
   ],
   "images": [
     {
-      "id": "1",
-      "dateCreation": "2024-01-01",
-      "dmeId": 1
+      "id": "1744729377913",
+      "patientId": "7434",
+      "description": "see.jpg - 4/15/2025",
+      "url": "blob:http://localhost:3000/da8dfdf4-b0f5-4987-9c60-2ce03b7516ca",
+      "dateCreated": "2025-04-15T15:02:57.913Z"
+    },
+    {
+      "id": "1744729420342",
+      "patientId": "7434",
+      "description": "image.png - 4/15/2025",
+      "url": "blob:http://localhost:3000/f5734152-ae56-4bfa-99c9-db73f305948e",
+      "dateCreated": "2025-04-15T15:03:40.342Z"
+    },
+    {
+      "id": "1744835394128",
+      "patientId": "3",
+      "description": "test3.png - 4/16/2025",
+      "url": "blob:http://localhost:3000/7d610334-3e79-45aa-94f1-369cd29708f9",
+      "dateCreated": "2025-04-16T20:29:54.128Z"
     }
   ],
   "analyses": [
@@ -126,7 +141,8 @@
       "id": "3",
       "matricule": "11223",
       "password": "imgpass",
-      "nom": "Imaging Staff"
+      "nom": "Imaging Staff",
+      "role": "centreImagerie"
     }
   ],
   "laboratoire": [
@@ -134,7 +150,8 @@
       "id": "2",
       "matricule": "67890",
       "password": "labpass",
-      "nom": "Lab Tech"
+      "nom": "Lab Tech",
+      "role": "laboratoire"
     }
   ],
   "conditions": [
@@ -159,7 +176,7 @@
       "patientId": "1a04"
     },
     {
-      "id": "2",
+      "id": "3",
       "type": "infectious",
       "name": "Type 2 Diabetes",
       "diagnosisDate": "2019-02-10",
@@ -167,6 +184,151 @@
       "description": "Insulin-resistant diabetes mellitus",
       "treatment": "Metformin 850mg twice daily",
       "patientId": "1a04"
+    },
+    {
+      "id": "4",
+      "type": "allergy",
+      "name": "Hypertension",
+      "diagnosisDate": "2018-05-12",
+      "severity": "Mild",
+      "description": "Elevated blood pressure requiring medication",
+      "treatment": "Lisinopril 10mg daily, low sodium diet",
+      "patientId": "e3a2"
+    },
+    {
+      "id": "5",
+      "type": "chronic",
+      "name": "Penicillin Allergy",
+      "diagnosisDate": "2017-11-03",
+      "severity": "Severe",
+      "description": "Anaphylactic reaction to penicillin antibiotics",
+      "treatment": "Avoid all penicillin-class antibiotics, wear medical alert bracelet",
+      "patientId": "e3a2"
+    },
+    {
+      "id": "6",
+      "type": "infectious",
+      "name": "Asthma",
+      "diagnosisDate": "2015-08-20",
+      "severity": "Moderate",
+      "description": "Chronic inflammatory disease of the airways",
+      "treatment": "Albuterol inhaler as needed, Fluticasone daily",
+      "patientId": "e3a2"
+    },
+    {
+      "id": "ff4b",
+      "type": "allergy",
+      "name": "Peanut Allergy",
+      "diagnosisDate": "2025-04-18",
+      "severity": "",
+      "description": "Allergic to peanuts; causes hives, swelling, breathing issues. Confirmed by skin test. Avoid all peanut products.",
+      "treatment": "Carry EpiPen, use antihistamines for mild reactions, avoid peanuts, call 911 for severe reactions.",
+      "patientId": "1a04"
+    },
+    {
+      "id": "195e",
+      "type": "chronic",
+      "name": "Urticaria",
+      "diagnosisDate": "2018-10-23",
+      "severity": "",
+      "description": "Chronic hives triggered by heat or stress, causing itchy welts on skin. Diagnosed by allergist.",
+      "treatment": "Daily antihistamines (e.g., loratadine), avoid triggers, topical creams for relief, consult doctor for flare-ups.",
+      "patientId": "1a04"
+    }
+  ],
+  "dme": [
+    {
+      "id": "1",
+      "patientId": "1a04",
+      "medecinId": "2",
+      "dateConsultation": "2023-06-15T10:30:00",
+      "reason": "Chest pain evaluation",
+      "diagnostiques": [
+        "Hypertension (Stage 1)"
+      ],
+      "ordonnances": [
+        "Amlodipine 5mg As prescribed",
+        "Blood pressure monitoring N/A Daily"
+      ],
+      "laboTest": [
+        "ECG",
+        "Complete blood count",
+        "Cholesterol panel"
+      ],
+      "imgTest": [
+        "Chest X-ray"
+      ],
+      "notes": "Patient advised to reduce sodium intake and exercise regularly."
+    },
+    {
+      "id": "2",
+      "patientId": "1a04",
+      "medecinId": "2",
+      "dateConsultation": "2023-12-10T14:00:00",
+      "reason": "Follow-up for hypertension",
+      "diagnostiques": [
+        "Hypertension (Stable)",
+        "Mild hyperlipidemia"
+      ],
+      "ordonnances": [
+        "Amlodipine 5mg As prescribed",
+        "Atorvastatin 10mg N/A Daily"
+      ],
+      "laboTest": [
+        "Lipid panel",
+        "Kidney function test"
+      ],
+      "imgTest": [],
+      "notes": "Patient reports adherence to medication. Advised to continue low-sodium diet and schedule next visit in 3 months."
+    },
+    {
+      "id": "efc3",
+      "patientId": "1a04",
+      "medecinId": "1",
+      "dateConsultation": "2025-04-17T00:00:00.000Z",
+      "reason": "Diabetes management and follow-up",
+      "diagnostiques": [
+        "Type 2 Diabetes",
+        "Hypertension (Stage 2)"
+      ],
+      "ordonnances": [
+        "Metformin 500mg twice daily",
+        "Lisinopril 10mg once daily",
+        "Monitor blood sugar levels before meals"
+      ],
+      "laboTest": [
+        "Fasting blood glucose",
+        "HbA1c",
+        "Kidney function test"
+      ],
+      "imgTest": [
+        "Abdominal ultrasound",
+        "Eye fundus examination"
+      ],
+      "notes": "Patient instructed on the importance of controlling blood sugar levels and maintaining a healthy diet. Follow-up in 3 months."
+    },
+    {
+      "id": "fb96",
+      "patientId": "1a04",
+      "medecinId": "2",
+      "dateConsultation": "2025-04-18T00:00:00.000Z",
+      "reason": "Routine check-up",
+      "diagnostiques": [
+        "\"Hypertension\"",
+        "\"Diabetes\""
+      ],
+      "ordonnances": [
+        "\"Lisinopril 10mg once daily\",",
+        "\"Metformin 500mg twice daily\""
+      ],
+      "laboTest": [
+        "\"Blood glucose\"",
+        "\"Cholesterol panel\""
+      ],
+      "imgTest": [
+        "\"Chest X-ray\""
+      ],
+      "notes": "\"Patient advised to follow up in 6 months.\""
     }
   ],
   "reports": [
@@ -183,6 +345,27 @@
       "description": "mknjiuy",
       "fileName": "use case (1).pdf",
       "timestamp": "2025-04-14T13:53:34.874Z"
+    },
+    {
+      "id": "dc31",
+      "patientId": "1a04",
+      "description": "bmld;b:tmb",
+      "fileName": "DC_DME.pdf",
+      "timestamp": "2025-04-14T23:30:39.928Z"
+    },
+    {
+      "id": "b015",
+      "patientId": "7434",
+      "description": "test2",
+      "fileName": "devis_wie_ras.pdf",
+      "timestamp": "2025-04-15T15:05:08.760Z"
+    },
+    {
+      "id": "dc31",
+      "patientId": "1a04",
+      "description": "bmld;b:tmb",
+      "fileName": "DC_DME.pdf",
+      "timestamp": "2025-04-14T23:30:39.928Z"
     }
   ]
 }

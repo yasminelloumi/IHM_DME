@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -6,7 +6,14 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
+import SoftButton from "components/SoftButton";
 import Footer from "examples/Footer";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import { getDMEByPatientId, createDME } from "../../services/dmeService";
+import { getById } from "../../services/medecinService";
+import DME from '../../models/DME';
 import {
   Event as EventIcon,
   MedicalServices as MedicalServicesIcon,
@@ -29,7 +36,21 @@ import Avatar from "@mui/material/Avatar";
 import { FormControlLabel, Switch, Button, Dialog, DialogContent, DialogActions, Box, Typography } from "@mui/material";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-// Custom styled card component
+const modalStyle = (darkMode) => ({
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: { xs: '90%', md: '700px' },
+  bgcolor: darkMode ? '#2c3e50' : 'background.paper',
+  borderRadius: '16px',
+  boxShadow: 24,
+  p: 4,
+  color: darkMode ? '#e0e0e0' : '#1a2a3a',
+  maxHeight: '90vh',
+  overflowY: 'auto'
+});
+
 const StyledCard = ({ children, icon, title, color = "primary", darkMode }) => (
   <Card sx={{
     borderRadius: "16px",
@@ -67,12 +88,11 @@ StyledCard.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Treatment item component
 const TreatmentItem = ({ treatment, darkMode }) => (
   <SoftBox display="flex" alignItems="center" mb={1} pl={2}>
     <MedicalServicesIcon color={darkMode ? "secondary" : "primary"} fontSize="small" sx={{ mr: 1 }} />
     <SoftTypography variant="button" fontWeight="regular" color={darkMode ? "white" : "dark"}>
-      {treatment.name} - {treatment.dosage} ({treatment.frequency})
+      {treatment.name}
     </SoftTypography>
   </SoftBox>
 );
@@ -80,109 +100,38 @@ const TreatmentItem = ({ treatment, darkMode }) => (
 TreatmentItem.propTypes = {
   treatment: PropTypes.shape({
     name: PropTypes.string.isRequired,
-    dosage: PropTypes.string.isRequired,
-    frequency: PropTypes.string.isRequired
   }).isRequired,
   darkMode: PropTypes.bool.isRequired
 };
 
-// Enhanced Medical Imaging Data
-const medicalImagingStudies = [
-  {
-    id: 1,
-    studyType: "X-ray",
-    modality: "Chest PA",
-    date: "06/12/2023",
-    imagingCenter: "Metropolitan Radiology Center",
-    referringPhysician: "Dr. Smith",
-    status: "Completed",
-    findings: "No acute cardiopulmonary findings",
-    impression: "Normal chest x-ray",
-    imageUrl: "https://example.com/xray-chest.jpg",
-    thumbnail: "https://via.placeholder.com/150?text=Chest+X-ray",
-    reportUrl: "https://example.com/report1.pdf",
-    dicomUrl: "https://example.com/dicom1.zip"
-  },
-  {
-    id: 2,
-    studyType: "MRI",
-    modality: "Brain with Contrast",
-    date: "05/05/2023",
-    imagingCenter: "Neuro Imaging Institute",
-    referringPhysician: "Dr. Johnson",
-    status: "Completed",
-    findings: "No evidence of acute intracranial abnormality",
-    impression: "Unremarkable brain MRI",
-    imageUrl: "https://example.com/mri-brain.jpg",
-    thumbnail: "https://via.placeholder.com/150?text=Brain+MRI",
-    reportUrl: "https://example.com/report2.pdf",
-    dicomUrl: "https://example.com/dicom2.zip"
-  }
-];
+const TestItem = ({ test, darkMode }) => (
+  <SoftBox display="flex" alignItems="center" mb={1} pl={2}>
+    <ScienceIcon color={darkMode ? "secondary" : "secondary"} fontSize="small" sx={{ mr: 1 }} />
+    <SoftTypography variant="button" fontWeight="regular" color={darkMode ? "white" : "dark"}>
+      {test}
+    </SoftTypography>
+  </SoftBox>
+);
 
-const labTests = [
-  {
-    id: 1,
-    name: "Complete Blood Count",
-    date: "06/10/2023",
-    lab: "BioLab Diagnostics",
-    result: "Normal",
-    reportUrl: "https://example.com/lab-report1.pdf"
-  },
-  {
-    id: 2,
-    name: "Cholesterol Panel",
-    date: "05/08/2023",
-    lab: "MediTest Laboratories",
-    result: "Elevated LDL",
-    reportUrl: "https://example.com/lab-report2.pdf"
-  }
-];
+TestItem.propTypes = {
+  test: PropTypes.string.isRequired,
+  darkMode: PropTypes.bool.isRequired
+};
 
-// Updated consultations data
-const consultationsData = [
-  {
-    id: 1,
-    date: "06/15/2023",
-    time: "10:30 AM",
-    doctor: "Dr. Smith",
-    specialty: "Cardiology",
-    reason: "Chest pain evaluation",
-    diagnosis: "Hypertension (Stage 1)",
-    treatments: [
-      { name: "Amlodipine", dosage: "5mg", frequency: "Once daily" },
-      { name: "Blood pressure monitoring", frequency: "Twice daily" }
-    ],
-    labTests: labTests,
-    imagingStudies: medicalImagingStudies,
-    notes: "Patient advised to reduce sodium intake and exercise regularly. Follow-up in 3 months."
-  },
-  {
-    id: 2,
-    date: "05/10/2023",
-    time: "2:15 PM",
-    doctor: "Dr. Johnson",
-    specialty: "Primary Care",
-    reason: "Annual physical examination",
-    diagnosis: "Normal health status",
-    treatments: [],
-    labTests: [labTests[1]],
-    imagingStudies: [],
-    notes: "All results within normal range. Recommended follow-up in one year."
-  }
-];
+const ImageItem = ({ image, darkMode }) => (
+  <SoftBox display="flex" alignItems="center" mb={1} pl={2}>
+    <InsertPhotoIcon color={darkMode ? "secondary" : "info"} fontSize="small" sx={{ mr: 1 }} />
+    <SoftTypography variant="button" fontWeight="regular" color={darkMode ? "white" : "dark"}>
+      {image}
+    </SoftTypography>
+  </SoftBox>
+);
 
-// Data for trends chart
-const consultationTrends = [
-  { month: "Jan", consultations: 3 },
-  { month: "Feb", consultations: 5 },
-  { month: "Mar", consultations: 4 },
-  { month: "Apr", consultations: 7 },
-  { month: "May", consultations: 6 },
-  { month: "Jun", consultations: 2 }
-];
+ImageItem.propTypes = {
+  image: PropTypes.string.isRequired,
+  darkMode: PropTypes.bool.isRequired
+};
 
-// Stats card component
 const StatsCard = ({ stats, darkMode }) => (
   <Card sx={{
     borderRadius: "16px",
@@ -215,7 +164,6 @@ StatsCard.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Trends card component
 const TrendsCard = ({ data, darkMode }) => (
   <Card sx={{
     borderRadius: "16px",
@@ -240,11 +188,11 @@ const TrendsCard = ({ data, darkMode }) => (
               boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
             }}
           />
-          <Line 
-            type="monotone" 
-            dataKey="consultations" 
-            stroke="#0077b6" 
-            strokeWidth={2} 
+          <Line
+            type="monotone"
+            dataKey="consultations"
+            stroke="#0077b6"
+            strokeWidth={2}
             dot={{ fill: darkMode ? "#e0e0e0" : "#0077b6" }}
           />
         </LineChart>
@@ -554,7 +502,7 @@ LabTestCard.propTypes = {
 // Updated ConsultationCard component
 const ConsultationCard = ({ consultation, darkMode }) => {
   return (
-    <Card sx={{ 
+    <Card sx={{
       mb: 4,
       borderRadius: "16px",
       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
@@ -566,15 +514,15 @@ const ConsultationCard = ({ consultation, darkMode }) => {
         p={3} 
         bgcolor={darkMode ? "#005F73" : "#0077b6"}
         color="white"
-        display="flex" 
-        justifyContent="space-between" 
+        display="flex"
+        justifyContent="space-between"
         alignItems="center"
         flexWrap="wrap"
       >
         <Box display="flex" alignItems="center">
           <EventIcon sx={{ mr: 1 }} />
           <Typography variant="h6" fontWeight="bold">
-            {consultation.date} at {consultation.time}
+            {consultation.date}
           </Typography>
         </Box>
         <Box display="flex" alignItems="center">
@@ -587,7 +535,6 @@ const ConsultationCard = ({ consultation, darkMode }) => {
 
       <Box p={3}>
         <Grid container spacing={3}>
-          {/* Reason and Diagnosis */}
           <Grid item xs={12} md={6}>
             <StyledCard 
               icon={<DescriptionIcon sx={{ color: darkMode ? '#90caf9' : '#0077b6' }} />}
@@ -614,7 +561,6 @@ const ConsultationCard = ({ consultation, darkMode }) => {
             </StyledCard>
           </Grid>
 
-          {/* Treatments */}
           {consultation.treatments.length > 0 && (
             <Grid item xs={12}>
               <StyledCard 
@@ -630,19 +576,18 @@ const ConsultationCard = ({ consultation, darkMode }) => {
             </Grid>
           )}
 
-          {/* Tests and Imaging Studies */}
-          {(consultation.labTests.length > 0 || consultation.imagingStudies.length > 0) && (
+          {(consultation.tests.length > 0 || consultation.images.length > 0) && (
             <Grid item xs={12}>
-              <StyledCard 
+              <StyledCard
                 icon={<ScienceIcon sx={{ color: darkMode ? '#90caf9' : '#0077b6' }} />}
-                title="Diagnostic Studies"
+                title="Requested Exams"
                 color="info"
                 darkMode={darkMode}
               >
                 <Grid container spacing={2}>
                   {/* Laboratory Tests Section */}
-                  {consultation.labTests.length > 0 && (
-                    <Grid item xs={12} md={consultation.imagingStudies.length > 0 ? 6 : 12}>
+                  {consultation.tests.length > 0 && (
+                    <Grid item xs={12} md={consultation.images.length > 0 ? 6 : 12}>
                       <Box 
                         sx={{
                           p: 2,
@@ -662,7 +607,7 @@ const ConsultationCard = ({ consultation, darkMode }) => {
                           <ScienceIcon sx={{ mr: 1, color: darkMode ? "#90caf9" : "#0077b6" }} />
                           LABORATORY TESTS
                         </Typography>
-                        {consultation.labTests.map((test) => (
+                        {consultation.tests.map((test) => (
                           <LabTestCard key={`test-${test.id}`} test={test} darkMode={darkMode} />
                         ))}
                       </Box>
@@ -670,8 +615,8 @@ const ConsultationCard = ({ consultation, darkMode }) => {
                   )}
 
                   {/* Medical Imaging Section */}
-                  {consultation.imagingStudies.length > 0 && (
-                    <Grid item xs={12} md={consultation.labTests.length > 0 ? 6 : 12}>
+                  {consultation.images.length > 0 && (
+                    <Grid item xs={12} md={consultation.tests.length > 0 ? 6 : 12}>
                       <Box 
                         sx={{
                           p: 2,
@@ -692,7 +637,7 @@ const ConsultationCard = ({ consultation, darkMode }) => {
                           MEDICAL IMAGING CENTER RESULTS
                         </Typography>
                         <Grid container spacing={2}>
-                          {consultation.imagingStudies.map((study) => (
+                          {consultation.images.map((study) => (
                             <Grid item xs={12} sm={6} key={`study-${study.id}`}>
                               <ImagingStudyCard study={study} darkMode={darkMode} />
                             </Grid>
@@ -706,12 +651,11 @@ const ConsultationCard = ({ consultation, darkMode }) => {
             </Grid>
           )}
 
-          {/* Doctor's Notes */}
           {consultation.notes && (
             <Grid item xs={12}>
               <StyledCard 
                 icon={<NotesIcon sx={{ color: darkMode ? '#90caf9' : '#0077b6' }} />}
-                title="Clinical Notes"
+                title="Notes"
                 color="info"
                 darkMode={darkMode}
               >
@@ -731,7 +675,6 @@ ConsultationCard.propTypes = {
   consultation: PropTypes.shape({
     id: PropTypes.number.isRequired,
     date: PropTypes.string.isRequired,
-    time: PropTypes.string.isRequired,
     doctor: PropTypes.string.isRequired,
     specialty: PropTypes.string.isRequired,
     reason: PropTypes.string.isRequired,
@@ -739,8 +682,6 @@ ConsultationCard.propTypes = {
     treatments: PropTypes.arrayOf(
       PropTypes.shape({
         name: PropTypes.string.isRequired,
-        dosage: PropTypes.string.isRequired,
-        frequency: PropTypes.string.isRequired
       })
     ).isRequired,
     labTests: PropTypes.array.isRequired,
@@ -751,19 +692,287 @@ ConsultationCard.propTypes = {
 };
 
 const PatientConsultations = () => {
-  const [darkMode, setDarkMode] = React.useState(false);
-  
-  // Stats data
-  const statsData = {
-    totalConsultations: "12",
-    lastVisit: "June 15, 2023",
-    upcomingAppointments: "2",
-    mostVisitedSpecialty: "Cardiology"
+  const user = JSON.parse(localStorage.getItem("connectedUser"));
+  const [darkMode, setDarkMode] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [dmeRecords, setDmeRecords] = useState([]);
+  const [doctors, setDoctors] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [statsData, setStatsData] = useState({
+    totalConsultations: "0",
+    lastVisit: "No visits",
+    upcomingAppointments: "0",
+    mostVisitedSpecialty: "None"
+  });
+  const [consultationTrends, setConsultationTrends] = useState([]);
+  const [formData, setFormData] = useState({
+    dateConsultation: "",
+    reason: "",
+    diagnosis: "",
+    treatments: "",
+    laboTest: "",
+    imgTest: "",
+    notes: ""
+  });
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  const toggleDarkMode = () => setDarkMode(!darkMode);
+  const handleOpenModal = () => setShowModal(true);
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setFormData({
+      dateConsultation: "",
+      reason: "",
+      diagnosis: "",
+      treatments: "",
+      laboTest: "",
+      imgTest: "",
+      notes: ""
+    });
+    setSubmitStatus(null);
   };
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+  const handleInputChange = (e) =>  {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitStatus("submitting");
+
+    try {
+      const user = JSON.parse(localStorage.getItem("connectedUser")) || {};
+      const scannedPatient = JSON.parse(localStorage.getItem("scannedPatient")) || {};
+
+      const dateConsultation = formData.dateConsultation
+        ? new Date(formData.dateConsultation).toISOString()
+        : null;
+
+        const dmeData = {
+          patientId: scannedPatient.id,
+          medecinId: user.id,
+          dateConsultation: new Date(formData.dateConsultation).toISOString(),
+          reason: formData.reason,
+          diagnostiques: formData.diagnosis.split(",").map(d => d.trim()).filter(Boolean),
+          ordonnances: formData.treatments.split("\n").map(t => t.trim()).filter(Boolean),
+          laboTest: formData.laboTest.split(",").map(t => t.trim()).filter(Boolean),
+          imgTest: formData.imgTest.split(",").map(i => i.trim()).filter(Boolean),
+          notes: formData.notes
+        };
+      
+      const result = await createDME(dmeData);
+      if (result) {
+        console.log("DME created:", result);
+        // Optionally refresh data or show a success message
+      } else {
+        console.error("Failed to create DME");
+      }
+      const refreshedRecords = await getDMEByPatientId(scannedPatient.id);
+      setDmeRecords(refreshedRecords.map(dme => new DME(
+        dme.id,
+        dme.patientId,
+        dme.medecinId,
+        dme.dateConsultation,
+        dme.reason,
+        dme.diagnostiques,
+        dme.ordonnances,
+        dme.laboTest,
+        dme.imgTest,
+        dme.notes
+      )));
+
+      setSubmitStatus("success");
+      setFormData({
+        dateConsultation: "", // ✅ fix
+        reason: "",
+        diagnosis: "",
+        treatments: "",
+        laboTest: "", // ✅ fix, it was tests before
+        imgTest: "",
+        notes: ""
+      });
+      setTimeout(handleCloseModal, 1500);
+    } catch (error) {
+      console.error("Error submitting DME:", error);
+      setSubmitStatus("error");
+    }
+  };
+
+  useEffect(() => {
+    const fetchDME = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("connectedUser"));
+        if (!user) {
+          throw new Error("No connected user found");
+        }
+
+        let patientId = null;
+        if (user.role === "patient") {
+          patientId = user.id;
+        } else if (["medecins", "laboratoire", "centreImagerie"].includes(user.role)) {
+          const scannedPatient = JSON.parse(localStorage.getItem("scannedPatient"));
+          if (!scannedPatient) {
+            throw new Error("No scanned patient found");
+          }
+          patientId = scannedPatient.id;
+        }
+
+        if (!patientId) {
+          throw new Error("No patient ID found");
+        }
+
+        const response = await getDMEByPatientId(patientId);
+        if (!response) {
+          throw new Error("Failed to fetch DME records");
+        }
+
+        const dmeInstances = response.map(dme => new DME(
+          dme.id,
+          dme.patientId,
+          dme.medecinId,
+          dme.dateConsultation,
+          dme.reason,
+          dme.diagnostiques,
+          dme.ordonnances,
+          dme.laboTest,
+          dme.imgTest,
+          dme.notes
+        ));
+
+        const uniqueMedecinIds = [...new Set(dmeInstances.map(dme => dme.medecinId))];
+        const doctorPromises = uniqueMedecinIds.map(async (id) => {
+          try {
+            const doctor = await getById(id);
+            return { id, doctor };
+          } catch (error) {
+            console.warn(`Failed to fetch doctor with ID ${id}:`, error);
+            return { id, doctor: null };
+          }
+        });
+        const doctorResults = await Promise.all(doctorPromises);
+        const doctorsMap = doctorResults.reduce((acc, { id, doctor }) => {
+          if (doctor) {
+            acc[id] = doctor;
+          }
+          return acc;
+        }, {});
+
+        setDoctors(doctorsMap);
+        setDmeRecords(dmeInstances);
+
+        const consultations = dmeInstances.map(dme => {
+          const doctor = doctorsMap[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
+          return {
+            id: dme.id,
+            date: new Date(dme.dateConsultation).toLocaleDateString(),
+            doctor: `Dr. ${doctor.prenom} ${doctor.nom}`,
+            specialty: doctor.specialite,
+            reason: dme.reason,
+            diagnosis: dme.diagnostiques.join(", "),
+            treatments: Array.isArray(dme.ordonnances)
+              ? dme.ordonnances.map(med => ({
+                  name: typeof med === 'string' ? med : med.name || '',
+                }))
+              : [],
+            tests: dme.laboTest || [],
+            images: dme.imgTest || [],
+            notes: dme.notes || ""
+          };
+        });
+
+        const totalConsultations = dmeInstances.length;
+        const lastVisit = totalConsultations > 0
+          ? new Date(dmeInstances[0].dateConsultation).toLocaleDateString()
+          : "No visits";
+        const specialtyCounts = consultations.reduce((acc, curr) => {
+          acc[curr.specialty] = (acc[curr.specialty] || 0) + 1;
+          return acc;
+        }, {});
+        const mostVisitedSpecialty = Object.keys(specialtyCounts).length > 0
+          ? Object.entries(specialtyCounts).sort((a, b) => b[1] - a[1])[0][0]
+          : "None";
+
+        setStatsData({
+          totalConsultations: totalConsultations.toString(),
+          lastVisit,
+          upcomingAppointments: "0",
+          mostVisitedSpecialty
+        });
+
+        const monthlyCounts = dmeInstances.reduce((acc, record) => {
+          try {
+            const month = new Date(record.dateConsultation).toLocaleString('default', { month: 'short' });
+            acc[month] = (acc[month] || 0) + 1;
+          } catch (e) {
+            console.error("Error processing date:", record.dateConsultation);
+          }
+          return acc;
+        }, {});
+
+        setConsultationTrends(
+          Object.entries(monthlyCounts)
+            .map(([month, count]) => ({ month, consultations: count }))
+            .sort((a, b) => new Date(`1 ${a.month} 2023`) - new Date(`1 ${b.month} 2023`))
+        );
+
+      } catch (error) {
+        console.error("Error loading DME records:", error);
+        setError(error.message || "An unknown error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDME();
+  }, []);
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <SoftBox display="flex" justifyContent="center" alignItems="center" height="80vh">
+          <SoftTypography variant="h5">Loading patient data...</SoftTypography>
+        </SoftBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <SoftBox display="flex" justifyContent="center" alignItems="center" height="80vh">
+          <SoftTypography variant="h5" color="error">Error: {error}</SoftTypography>
+        </SoftBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  const consultationsToDisplay = dmeRecords.map(dme => {
+    const doctor = doctors[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
+    return {
+      id: dme.id,
+      date: new Date(dme.dateConsultation).toLocaleDateString(),
+      doctor: `Dr. ${doctor.prenom} ${doctor.nom}`,
+      specialty: doctor.specialite,
+      reason: dme.reason,
+      diagnosis: dme.diagnostiques.join(", "),
+      treatments: Array.isArray(dme.ordonnances)
+        ? dme.ordonnances.map(med => ({
+            name: typeof med === 'string' ? med : med.name || '',
+          }))
+        : [],
+      tests: dme.laboTest || [],
+      images: dme.imgTest || [],
+      notes: dme.notes || ''
+    };
+  });
 
   return (
     <DashboardLayout>
@@ -864,23 +1073,245 @@ const PatientConsultations = () => {
             </Typography>
             <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"} paragraph>
               Review your complete consultation history with detailed visit information.
-            </Typography>
-          </Box>
+              </Typography>
+              {user?.role !== "patient" && (
+              <SoftButton
+                variant="outlined"
+                size="small"
+                color="info"
+                onClick={handleOpenModal}
+              >
+                Add Consultation
+              </SoftButton>
+              )}
+         </Box>
 
           <Box>
-            {consultationsData.map((consultation) => (
-              <ConsultationCard 
-                key={consultation.id} 
-                consultation={consultation} 
-                darkMode={darkMode} 
-              />
-            ))}
+            {consultationsToDisplay.length > 0 ? (
+              consultationsToDisplay.map((consultation) => (
+                <ConsultationCard
+                  key={consultation.id}
+                  consultation={consultation}
+                  darkMode={darkMode}
+                />
+              ))
+            ) : (
+              <SoftTypography variant="body1" color={darkMode ? "white" : "dark"}>
+                No consultation records found for this patient.
+              </SoftTypography>
+            )}
           </Box>
         </Box>
       </Box>
+
+      <Modal
+        open={showModal}
+        onClose={handleCloseModal}
+        aria-labelledby="consultation-modal-title"
+      >
+        <Box sx={modalStyle(darkMode)}>
+          <SoftBox display="flex" justifyContent="space-between" alignItems="flex-start" mb={3}>
+            <SoftTypography
+              id="consultation-modal-title"
+              variant="h5"
+              fontWeight="bold"
+              color={darkMode ? "white" : "dark"}
+            >
+              <MedicalServicesIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
+              New Medical Consultation
+            </SoftTypography>
+            
+            <SoftBox 
+              sx={{
+                background: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                borderRadius: '8px',
+                padding: '8px 12px',
+                textAlign: 'right'
+              }}
+            >
+              {(() => {
+                const user = JSON.parse(localStorage.getItem("connectedUser")) || {};
+                const scannedPatient = JSON.parse(localStorage.getItem("scannedPatient")) || {};
+                return (
+                  <>
+                    <SoftTypography variant="caption" display="block" color={darkMode ? "gray" : "text.secondary"}>
+                      Doctor: {user.prenom && user.nom ? `${user.prenom} ${user.nom}` : 'Unknown'}
+                    </SoftTypography>
+                    <SoftTypography variant="caption" display="block" color={darkMode ? "gray" : "text.secondary"}>
+                      Patient ID: {scannedPatient.id || 'N/A'}
+                    </SoftTypography>
+                  </>
+                );
+              })()}
+            </SoftBox>
+          </SoftBox>
+
+          {submitStatus === "success" && (
+            <SoftBox mb={2} p={2} bgcolor="success.light" borderRadius="8px">
+              <SoftTypography variant="body2" color="success.main">
+                Consultation saved successfully!
+              </SoftTypography>
+            </SoftBox>
+          )}
+          {submitStatus === "error" && (
+            <SoftBox mb={2} p={2} bgcolor="error.light" borderRadius="8px">
+              <SoftTypography variant="body2" color="error.main">
+                Failed to save consultation. Please try again.
+              </SoftTypography>
+            </SoftBox>
+          )}
+
+<form onSubmit={handleFormSubmit}>
+  <Box mb={3}>
+    <label htmlFor="date">Date</label>
+    <input
+      type="date"
+      name="dateConsultation"
+      id="date"
+      required
+      value={formData.dateConsultation}
+      onChange={handleInputChange}
+      style={{ width: "100%", padding: "8px", fontSize: "1rem" }}
+    />
+  </Box>
+
+  <Box mb={3}>
+    <label htmlFor="reason">Reason of Visit</label>
+    <textarea
+      name="reason"
+      id="reason"
+      rows="6"
+      value={formData.reason}
+      onChange={handleInputChange}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontFamily: "Roboto",
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+        overflowX: "auto"
+      }}
+    />
+  </Box>
+
+  <Box mb={3}>
+    <label htmlFor="diagnosis">Diagnosis (comma separated)</label>
+    <textarea
+      name="diagnosis"
+      id="diagnosis"
+      rows="5"
+      required
+      value={formData.diagnosis}
+      onChange={handleInputChange}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontFamily: "Roboto",
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+        overflowX: "auto"
+      }}
+    />
+  </Box>
+
+  <Box mb={3}>
+    <label htmlFor="treatments">Prescribed Treatments (one per line)</label>
+    <textarea
+      name="treatments"
+      id="treatments"
+      rows="4"
+      value={formData.treatments}
+      onChange={handleInputChange}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontFamily: "Roboto",
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+        overflowX: "auto"
+      }}
+    />
+  </Box>
+
+  <Box mb={3}>
+    <label htmlFor="laboTest">Lab Tests (comma separated)</label>
+    <input
+      type="text"
+      name="laboTest"
+      id="laboTest"
+      value={formData.laboTest}
+      onChange={handleInputChange}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontFamily: "Roboto",
+        fontSize: "1rem"
+      }}
+    />
+  </Box>
+
+  <Box mb={3}>
+    <label htmlFor="imgTest">Imaging Tests (comma separated)</label>
+    <input
+      type="text"
+      name="imgTest"
+      id="imgTest"
+      value={formData.imgTest}
+      onChange={handleInputChange}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontFamily: "Roboto",
+        fontSize: "1rem"
+      }}
+    />
+  </Box>
+
+  <Box mb={3}>
+    <label htmlFor="notes">Doctor Notes</label>
+    <textarea
+      name="notes"
+      id="notes"
+      rows="6"
+      value={formData.notes}
+      onChange={handleInputChange}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontFamily: "Roboto",
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+        overflowX: "auto"
+      }}
+    />
+  </Box>
+
+  <SoftBox mt={4} display="flex" justifyContent="flex-end">
+    <SoftButton
+      color="secondary"
+      variant={darkMode ? "contained" : "outlined"}
+      onClick={handleCloseModal}
+      sx={{ mr: 2 }}
+      disabled={submitStatus === "submitting"}
+    >
+      Cancel
+    </SoftButton>
+    <SoftButton
+      color="info"
+      variant="gradient"
+      type="submit"
+      disabled={submitStatus === "submitting"}
+    >
+      {submitStatus === "submitting" ? "Saving..." : "Save Consultation"}
+    </SoftButton>
+  </SoftBox>
+</form>
+
+        </Box>
+      </Modal>
+
       <Footer />
     </DashboardLayout>
   );
 };
-
 export default PatientConsultations;

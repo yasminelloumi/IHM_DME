@@ -48,27 +48,53 @@ function SignIn() {
         throw new Error("Please fill in all fields");
       }
 
-      const user = userType === "patient"
-        ? await authenticatePatient(identifier, password)
-        : await authenticateStaff(identifier, password);
+      let user = null;
+      let authFunction = userType === "patient" ? authenticatePatient : authenticateStaff;
+      user = await authFunction(identifier, password);
 
-      if (!user) throw new Error("Invalid credentials");
+      if (!user) {
+        throw new Error("Invalid credentials.");
+      }
 
-      const redirectPaths = {
-        patient: "/patient/dashboard",
-        medecins: "/doctor/dashboard",
-        laboratoire: "/lab/dashboard",
-        centreImagerie: "/imaging/dashboard",
-        default: "/staff/dashboard"
-      };
+      // Store user data in localStorage
+      localStorage.setItem("connectedUser", JSON.stringify({
+        ...user,
+        type: userType,
+        rememberMe
+      }));
 
-      navigate(redirectPaths[user.role] || redirectPaths.default);
+      // Redirect based on role with page refresh
+      const redirectPath = getRedirectPath(userType, user.role);
+      window.location.href = redirectPath; // Full page refresh to ensure routes update
 
     } catch (err) {
-      setError(err.message || "Authentication failed");
+      setError(err.message || "Failed to authenticate. Please try again.");
+      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const getRedirectPath = (userType, role) => {
+    if (userType === "patient") return "/dashboard";
+    
+    switch(role) {
+      case "medecins":
+        return "/dashboard";
+      case "laboratoire":
+        return "/laboratory";
+      case "centreImagerie":
+        return "/ListPatientData";
+      default:
+        return "/ListPatientData";
+    }
+  };
+
+  const handleUserTypeChange = (type) => {
+    setUserType(type);
+    setIdentifier("");
+    setPassword("");
+    setError(null);
   };
 
   return (
