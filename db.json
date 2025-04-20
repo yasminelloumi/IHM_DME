@@ -558,6 +558,13 @@
       "description": "bmld;b:tmb",
       "fileName": "DC_DME.pdf",
       "timestamp": "2025-04-14T23:30:39.928Z"
+    },
+    {
+      "id": "e206",
+      "patientId": "4024",
+      "description": "Chest X-Ray showing no signs of infection or abnormal masses.",
+      "fileName": "Diagramme de classe DME.pdf",
+      "timestamp": "2025-04-20T21:35:37.351Z"
     }
   ]
 }

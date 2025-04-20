@@ -56,12 +56,9 @@ function Labo() {
             </SoftBox>
           </Card>
         </SoftBox>
-
-
       </SoftBox>
       <Footer />
     </DashboardLayout>
   );
 }
-
 export default Labo;

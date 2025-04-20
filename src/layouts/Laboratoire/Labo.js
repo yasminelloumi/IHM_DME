@@ -538,34 +538,28 @@ const handleReportSubmit = async () => {
                   aria-label="Upload laboratory report"
                 />
               </SoftBox>
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                placeholder="Add a description for the report..."
-                value={newReportDescription}
-                onChange={(e) => setNewReportDescription(e.target.value)}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
+              <input
+                  type="text"
+                  placeholder="Add a description for the report..."
+                  value={newReportDescription}
+                  onChange={(e) => setNewReportDescription(e.target.value)}
+                  aria-label="Add a description for the report"
+                  style={{
+                    width: "100%",
+                    padding: "12px",
                     borderRadius: "12px",
+                    border: "1px solid",
+                    borderColor: darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)",
                     backgroundColor: darkMode ? "#34495e" : "#fff",
-                    "& fieldset": {
-                      borderColor: darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: darkMode ? "#fff" : "rgba(0, 0, 0, 0.87)",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#0077b6",
-                    },
-                  },
-                  "& .MuiInputBase-input": {
                     color: darkMode ? "#e0e0e0" : "#333",
-                  },
-                }}
-                inputProps={{
-                  "aria-label": "Add a description for the report",
-                }}
+                    fontSize: "16px",
+                    outline: "none",
+                    transition: "border-color 0.3s ease",
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = "#0077b6")}
+                  onBlur={(e) =>
+                    (e.target.style.borderColor = darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)")
+                  }
               />
               <SoftButton
                 variant="gradient"
