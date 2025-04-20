@@ -143,14 +143,14 @@ export const signInStyles = {
   toggleButton: (active) => ({
     flex: 1,
     padding: '12px',
-    backgroundColor: active ? 'white' : 'transparent',
-    color: active ? '#1976d2' : '#455a64',
+    backgroundColor: active ? 'rgba(31, 140, 249, 0.58)' : 'transparent',
+    color: active ? '#455a64' : '#1976d2',
     fontWeight: active ? 600 : 500,
     border: 'none',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
     '&:hover': {
-      backgroundColor: active ? 'white' : 'rgba(25, 118, 210, 0.05)',
+      backgroundColor: active ? 'white' : 'rgba(31, 140, 249, 0.58)',
     },
   }),
   formContent: {
