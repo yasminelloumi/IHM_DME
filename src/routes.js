@@ -19,6 +19,8 @@ import Labo from "layouts/Laboratoire";
 import ProtectedRoute from './components/ProtectedRoute';
 import ListPatientData from "layouts/ListPatientData/data/ListPatientData";
 import Overview from "layouts/profile";
+import ListDatas from "layouts/ListPatientData";
+
 
 
 const getUserRole = () => {
@@ -41,13 +43,13 @@ const routes = [
     title: "Patient Management", 
     key: "patient-management" 
   },
-  ...(getUserRole() !== 'patient' && getUserRole() !== 'medecins' ? [{
+  ...(getUserRole() !== 'patient' && getUserRole() !== 'medecins'? [{
     type: "collapse",
-    name: "Patients List",
+    name: "Scan QR Code",
     key: "ListPatientData",
-    route: "/ListPatientData",
+    route: "/ScanQRCode",
     icon: <Shop size="12px" />,
-    component: <PatientT />,
+    component: <ListDatas />,
     noCollapse: true,
 }] : []),
   ...(getUserRole() !== 'patient' && getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
@@ -97,11 +99,12 @@ const routes = [
     component: <CentreImage />,
     noCollapse: true,
   }] : []),
-  { 
+  ...(getUserRole() !== 'laboratoire' && getUserRole() !== 'medecins' && getUserRole() !== 'centreImagerie' ? [{
+ 
     type: "title", 
-    title: "Account Pages", 
+    title: "Account Page", 
     key: "account-pages" 
-  },
+  }] : []),
   ...(getUserRole() !== 'medecins'  && getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire'?[{
     type: "collapse",
     name: "Profile",
@@ -111,8 +114,8 @@ const routes = [
     component: <Overview />,
     noCollapse: true,
   }] : []),
+  
   {
-    type: "collapse",
     name: "Sign In",
     key: "sign-in",
     route: "/authentication/sign-in",
@@ -121,7 +124,6 @@ const routes = [
     noCollapse: true,
   },
   {
-    type: "collapse",
     name: "Sign Up",
     key: "sign-up",
     route: "/authentication/sign-up",
@@ -130,5 +132,4 @@ const routes = [
     noCollapse: true,
   },
 ];
-
 export default routes;

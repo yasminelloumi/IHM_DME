@@ -7,13 +7,13 @@ import { Link } from "react-router-dom";
 
 function PatientDashboardCard({ title, count }) {
   const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
+  const role = connectedUser?.role;
+  const isPatient = role === "patient";
 
   // Restrict visibility for patient role
-  const isPatient = connectedUser?.role === "patient";
   const allowedForPatient = ["Diseases", "Consultations"];
-
   if (isPatient && !allowedForPatient.includes(title)) {
-    return null; // Hide this card for patients if not allowed
+    return null;
   }
 
   const cardConfig = {
@@ -45,6 +45,21 @@ function PatientDashboardCard({ title, count }) {
     path: "#"
   };
 
+  const descriptionMap = {
+    "Diseases": isPatient
+      ? "View your medical conditions and diagnoses"
+      : "View the patient's medical conditions and diagnoses",
+    "Consultations": isPatient
+      ? "Your scheduled and past medical visits"
+      : "Scheduled and past medical visits",
+    "Laboratory": isPatient
+      ? "Your lab test results and analysis reports"
+      : "Lab test results and analysis reports",
+    "Medical Imaging": isPatient
+      ? "Your radiology scans and medical imaging"
+      : "Radiology scans and medical imaging"
+  };
+
   return (
     <Card sx={{ height: "100%", cursor: "pointer" }}>
       <SoftBox p={3} display="flex" flexDirection="column" height="100%">
@@ -72,10 +87,7 @@ function PatientDashboardCard({ title, count }) {
             {title}
           </SoftTypography>
           <SoftTypography variant="body2" color="text">
-            {title === "Diseases" && "View your medical conditions and diagnoses"}
-            {title === "Consultations" && "Your scheduled and past medical visits"}
-            {title === "Laboratory" && "Your lab test results and analysis reports"}
-            {title === "Medical Imaging" && "Your radiology scans and medical imaging"}
+            {descriptionMap[title]}
           </SoftTypography>
         </SoftBox>
 

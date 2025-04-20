@@ -9,7 +9,6 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import SoftButton from "components/SoftButton";
 import Footer from "examples/Footer";
 import Modal from "@mui/material/Modal";
-import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { getDMEByPatientId, createDME } from "../../services/dmeService";
 import { getById } from "../../services/medecinService";
@@ -211,7 +210,6 @@ TrendsCard.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Enhanced Medical Imaging Study Card
 // Enhanced Medical Imaging Study Card
 const ImagingStudyCard = ({ study, darkMode }) => {
   const [open, setOpen] = React.useState(false);
@@ -684,8 +682,8 @@ ConsultationCard.propTypes = {
         name: PropTypes.string.isRequired,
       })
     ).isRequired,
-    labTests: PropTypes.array.isRequired,
-    imagingStudies: PropTypes.array.isRequired,
+    tests: PropTypes.array.isRequired,
+    images: PropTypes.array.isRequired,
     notes: PropTypes.string
   }).isRequired,
   darkMode: PropTypes.bool.isRequired
@@ -702,7 +700,6 @@ const PatientConsultations = () => {
   const [statsData, setStatsData] = useState({
     totalConsultations: "0",
     lastVisit: "No visits",
-    upcomingAppointments: "0",
     mostVisitedSpecialty: "None"
   });
   const [consultationTrends, setConsultationTrends] = useState([]);
@@ -752,22 +749,21 @@ const PatientConsultations = () => {
         ? new Date(formData.dateConsultation).toISOString()
         : null;
 
-        const dmeData = {
-          patientId: scannedPatient.id,
-          medecinId: user.id,
-          dateConsultation: new Date(formData.dateConsultation).toISOString(),
-          reason: formData.reason,
-          diagnostiques: formData.diagnosis.split(",").map(d => d.trim()).filter(Boolean),
-          ordonnances: formData.treatments.split("\n").map(t => t.trim()).filter(Boolean),
-          laboTest: formData.laboTest.split(",").map(t => t.trim()).filter(Boolean),
-          imgTest: formData.imgTest.split(",").map(i => i.trim()).filter(Boolean),
-          notes: formData.notes
-        };
+      const dmeData = {
+        patientId: scannedPatient.id,
+        medecinId: user.id,
+        dateConsultation: new Date(formData.dateConsultation).toISOString(),
+        reason: formData.reason,
+        diagnostiques: formData.diagnosis.split(",").map(d => d.trim()).filter(Boolean),
+        ordonnances: formData.treatments.split("\n").map(t => t.trim()).filter(Boolean),
+        laboTest: formData.laboTest.split(",").map(t => t.trim()).filter(Boolean),
+        imgTest: formData.imgTest.split(",").map(i => i.trim()).filter(Boolean),
+        notes: formData.notes
+      };
       
       const result = await createDME(dmeData);
       if (result) {
         console.log("DME created:", result);
-        // Optionally refresh data or show a success message
       } else {
         console.error("Failed to create DME");
       }
@@ -787,11 +783,11 @@ const PatientConsultations = () => {
 
       setSubmitStatus("success");
       setFormData({
-        dateConsultation: "", // ✅ fix
+        dateConsultation: "",
         reason: "",
         diagnosis: "",
         treatments: "",
-        laboTest: "", // ✅ fix, it was tests before
+        laboTest: "",
         imgTest: "",
         notes: ""
       });
@@ -899,7 +895,6 @@ const PatientConsultations = () => {
         setStatsData({
           totalConsultations: totalConsultations.toString(),
           lastVisit,
-          upcomingAppointments: "0",
           mostVisitedSpecialty
         });
 
@@ -954,25 +949,27 @@ const PatientConsultations = () => {
     );
   }
 
-  const consultationsToDisplay = dmeRecords.map(dme => {
-    const doctor = doctors[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
-    return {
-      id: dme.id,
-      date: new Date(dme.dateConsultation).toLocaleDateString(),
-      doctor: `Dr. ${doctor.prenom} ${doctor.nom}`,
-      specialty: doctor.specialite,
-      reason: dme.reason,
-      diagnosis: dme.diagnostiques.join(", "),
-      treatments: Array.isArray(dme.ordonnances)
-        ? dme.ordonnances.map(med => ({
-            name: typeof med === 'string' ? med : med.name || '',
-          }))
-        : [],
-      tests: dme.laboTest || [],
-      images: dme.imgTest || [],
-      notes: dme.notes || ''
-    };
-  });
+  const consultationsToDisplay = dmeRecords
+    .sort((a, b) => new Date(b.dateConsultation) - new Date(a.dateConsultation))
+    .map(dme => {
+      const doctor = doctors[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
+      return {
+        id: dme.id,
+        date: new Date(dme.dateConsultation).toLocaleDateString(),
+        doctor: `Dr. ${doctor.prenom} ${doctor.nom}`,
+        specialty: doctor.specialite,
+        reason: dme.reason,
+        diagnosis: dme.diagnostiques.join(", "),
+        treatments: Array.isArray(dme.ordonnances)
+          ? dme.ordonnances.map(med => ({
+              name: typeof med === 'string' ? med : med.name || '',
+            }))
+          : [],
+        tests: dme.laboTest || [],
+        images: dme.imgTest || [],
+        notes: dme.notes || ''
+      };
+    });
 
   return (
     <DashboardLayout>
@@ -1072,9 +1069,11 @@ const PatientConsultations = () => {
               Consultation History
             </Typography>
             <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"} paragraph>
-              Review your complete consultation history with detailed visit information.
-              </Typography>
-              {user?.role !== "patient" && (
+              {user?.role === "patient"
+                ? "Review your complete consultation history with detailed visit information."
+                : "Review the complete consultation of the patient's history with detailed visit information."}
+            </Typography>
+            {user?.role !== "patient" && (
               <SoftButton
                 variant="outlined"
                 size="small"
@@ -1083,8 +1082,8 @@ const PatientConsultations = () => {
               >
                 Add Consultation
               </SoftButton>
-              )}
-         </Box>
+            )}
+          </Box>
 
           <Box>
             {consultationsToDisplay.length > 0 ? (
@@ -1123,7 +1122,7 @@ const PatientConsultations = () => {
             
             <SoftBox 
               sx={{
-                background: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                background: darkMode ? 'rgba(255, 255, 819, 0.1)' : 'rgba(0, 0, 0, 0.05)',
                 borderRadius: '8px',
                 padding: '8px 12px',
                 textAlign: 'right'
@@ -1161,152 +1160,151 @@ const PatientConsultations = () => {
             </SoftBox>
           )}
 
-<form onSubmit={handleFormSubmit}>
-  <Box mb={3}>
-    <label htmlFor="date">Date</label>
-    <input
-      type="date"
-      name="dateConsultation"
-      id="date"
-      required
-      value={formData.dateConsultation}
-      onChange={handleInputChange}
-      style={{ width: "100%", padding: "8px", fontSize: "1rem" }}
-    />
-  </Box>
+          <form onSubmit={handleFormSubmit}>
+            <Box mb={3}>
+              <label htmlFor="date">Date</label>
+              <input
+                type="date"
+                name="dateConsultation"
+                id="date"
+                required
+                value={formData.dateConsultation}
+                onChange={handleInputChange}
+                style={{ width: "100%", padding: "8px", fontSize: "1rem" }}
+              />
+            </Box>
 
-  <Box mb={3}>
-    <label htmlFor="reason">Reason of Visit</label>
-    <textarea
-      name="reason"
-      id="reason"
-      rows="6"
-      value={formData.reason}
-      onChange={handleInputChange}
-      style={{
-        width: "100%",
-        padding: "8px",
-        fontFamily: "Roboto",
-        fontSize: "1rem",
-        whiteSpace: "nowrap",
-        overflowX: "auto"
-      }}
-    />
-  </Box>
+            <Box mb={3}>
+              <label htmlFor="reason">Reason of Visit</label>
+              <textarea
+                name="reason"
+                id="reason"
+                rows="6"
+                value={formData.reason}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  fontFamily: "Roboto",
+                  fontSize: "1rem",
+                  whiteSpace: "nowrap",
+                  overflowX: "auto"
+                }}
+              />
+            </Box>
 
-  <Box mb={3}>
-    <label htmlFor="diagnosis">Diagnosis (comma separated)</label>
-    <textarea
-      name="diagnosis"
-      id="diagnosis"
-      rows="5"
-      required
-      value={formData.diagnosis}
-      onChange={handleInputChange}
-      style={{
-        width: "100%",
-        padding: "8px",
-        fontFamily: "Roboto",
-        fontSize: "1rem",
-        whiteSpace: "nowrap",
-        overflowX: "auto"
-      }}
-    />
-  </Box>
+            <Box mb={3}>
+              <label htmlFor="diagnosis">Diagnosis (comma separated)</label>
+              <textarea
+                name="diagnosis"
+                id="diagnosis"
+                rows="5"
+                required
+                value={formData.diagnosis}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  fontFamily: "Roboto",
+                  fontSize: "1rem",
+                  whiteSpace: "nowrap",
+                  overflowX: "auto"
+                }}
+              />
+            </Box>
 
-  <Box mb={3}>
-    <label htmlFor="treatments">Prescribed Treatments (one per line)</label>
-    <textarea
-      name="treatments"
-      id="treatments"
-      rows="4"
-      value={formData.treatments}
-      onChange={handleInputChange}
-      style={{
-        width: "100%",
-        padding: "8px",
-        fontFamily: "Roboto",
-        fontSize: "1rem",
-        whiteSpace: "nowrap",
-        overflowX: "auto"
-      }}
-    />
-  </Box>
+            <Box mb={3}>
+              <label htmlFor="treatments">Prescribed Treatments (one per line)</label>
+              <textarea
+                name="treatments"
+                id="treatments"
+                rows="4"
+                value={formData.treatments}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  fontFamily: "Roboto",
+                  fontSize: "1rem",
+                  whiteSpace: "nowrap",
+                  overflowX: "auto"
+                }}
+              />
+            </Box>
 
-  <Box mb={3}>
-    <label htmlFor="laboTest">Lab Tests (comma separated)</label>
-    <input
-      type="text"
-      name="laboTest"
-      id="laboTest"
-      value={formData.laboTest}
-      onChange={handleInputChange}
-      style={{
-        width: "100%",
-        padding: "8px",
-        fontFamily: "Roboto",
-        fontSize: "1rem"
-      }}
-    />
-  </Box>
+            <Box mb={3}>
+              <label htmlFor="laboTest">Lab Tests (comma separated)</label>
+              <input
+                type="text"
+                name="laboTest"
+                id="laboTest"
+                value={formData.laboTest}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  fontFamily: "Roboto",
+                  fontSize: "1rem"
+                }}
+              />
+            </Box>
 
-  <Box mb={3}>
-    <label htmlFor="imgTest">Imaging Tests (comma separated)</label>
-    <input
-      type="text"
-      name="imgTest"
-      id="imgTest"
-      value={formData.imgTest}
-      onChange={handleInputChange}
-      style={{
-        width: "100%",
-        padding: "8px",
-        fontFamily: "Roboto",
-        fontSize: "1rem"
-      }}
-    />
-  </Box>
+            <Box mb={3}>
+              <label htmlFor="imgTest">Imaging Tests (comma separated)</label>
+              <input
+                type="text"
+                name="imgTest"
+                id="imgTest"
+                value={formData.imgTest}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  fontFamily: "Roboto",
+                  fontSize: "1rem"
+                }}
+              />
+            </Box>
 
-  <Box mb={3}>
-    <label htmlFor="notes">Doctor Notes</label>
-    <textarea
-      name="notes"
-      id="notes"
-      rows="6"
-      value={formData.notes}
-      onChange={handleInputChange}
-      style={{
-        width: "100%",
-        padding: "8px",
-        fontFamily: "Roboto",
-        fontSize: "1rem",
-        whiteSpace: "nowrap",
-        overflowX: "auto"
-      }}
-    />
-  </Box>
+            <Box mb={3}>
+              <label htmlFor="notes">Doctor Notes</label>
+              <textarea
+                name="notes"
+                id="notes"
+                rows="6"
+                value={formData.notes}
+                onChange={handleInputChange}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  fontFamily: "Roboto",
+                  fontSize: "1rem",
+                  whiteSpace: "nowrap",
+                  overflowX: "auto"
+                }}
+              />
+            </Box>
 
-  <SoftBox mt={4} display="flex" justifyContent="flex-end">
-    <SoftButton
-      color="secondary"
-      variant={darkMode ? "contained" : "outlined"}
-      onClick={handleCloseModal}
-      sx={{ mr: 2 }}
-      disabled={submitStatus === "submitting"}
-    >
-      Cancel
-    </SoftButton>
-    <SoftButton
-      color="info"
-      variant="gradient"
-      type="submit"
-      disabled={submitStatus === "submitting"}
-    >
-      {submitStatus === "submitting" ? "Saving..." : "Save Consultation"}
-    </SoftButton>
-  </SoftBox>
-</form>
-
+            <SoftBox mt={4} display="flex" justifyContent="flex-end">
+              <SoftButton
+                color="secondary"
+                variant={darkMode ? "contained" : "outlined"}
+                onClick={handleCloseModal}
+                sx={{ mr: 2 }}
+                disabled={submitStatus === "submitting"}
+              >
+                Cancel
+              </SoftButton>
+              <SoftButton
+                color="info"
+                variant="gradient"
+                type="submit"
+                disabled={submitStatus === "submitting"}
+              >
+                {submitStatus === "submitting" ? "Saving..." : "Save Consultation"}
+              </SoftButton>
+            </SoftBox>
+          </form>
         </Box>
       </Modal>
 
@@ -1314,4 +1312,5 @@ const PatientConsultations = () => {
     </DashboardLayout>
   );
 };
+
 export default PatientConsultations;

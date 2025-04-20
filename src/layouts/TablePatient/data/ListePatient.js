@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftButton from "components/SoftButton";
+import axios from "axios";
 import {
   Avatar,
   IconButton,
@@ -23,8 +25,7 @@ import {
   Close,
   QrCodeScanner,
 } from "@mui/icons-material";
-import QRCodeScanner from "./QRCodeScanner"; // make sure path is correct
-import axios from "axios";
+import QRCodeScanner from "./QRCodeScanner";
 
 const modalStyle = {
   position: "absolute",
@@ -91,7 +92,7 @@ function PatientCard({ CIN, nom, prenom, telephone, dateNaissance, nationalite, 
           </SoftTypography>
 
           <SoftBox display="grid" gridTemplateColumns={{ xs: "1fr", sm: "repeat(3, 1fr)" }} gap={2} mt={1}>
-            <DetailItem icon={<Phone />} label="TELEPHONE" value={telephone} />
+            <DetailItem icon={<Phone />} label="PHONE" value={telephone} />
             <DetailItem icon={<Cake />} label="BIRTH DATE" value={dateNaissance} />
             <DetailItem icon={<Public />} label="NATIONALITY" value={nationalite} />
           </SoftBox>
@@ -122,9 +123,9 @@ function PatientCard({ CIN, nom, prenom, telephone, dateNaissance, nationalite, 
             <Divider sx={{ mb: 2 }} />
             <SoftBox display="flex" flexDirection="column" gap={2}>
               <DetailItemModal icon={<Person />} label="CIN" value={CIN} />
-              <DetailItemModal icon={<Phone />} label="Téléphone" value={telephone} />
-              <DetailItemModal icon={<Cake />} label="Date de Naissance" value={dateNaissance} />
-              <DetailItemModal icon={<Public />} label="Nationalité" value={nationalite} />
+              <DetailItemModal icon={<Phone />} label="Phone" value={telephone} />
+              <DetailItemModal icon={<Cake />} label="Birth Date" value={dateNaissance} />
+              <DetailItemModal icon={<Public />} label="Nationality" value={nationalite} />
             </SoftBox>
           </SoftBox>
         </Fade>
@@ -194,6 +195,17 @@ function ListPatientData() {
   const [scannerOpen, setScannerOpen] = useState(false);
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  // 🔁 Load patients from localStorage when component mounts
+  useEffect(() => {
+    const storedPatients = JSON.parse(localStorage.getItem("patientsList")) || [];
+    setPatients(storedPatients);
+  }, []);
+
+  const savePatientsToLocalStorage = (newPatients) => {
+    localStorage.setItem("patientsList", JSON.stringify(newPatients));
+  };
 
   const handleClearSearch = () => setSearch("");
 
@@ -205,12 +217,16 @@ function ListPatientData() {
       const response = await axios.get(`http://localhost:3001/patients?CIN=${CIN}`);
       if (response.data && response.data.length > 0) {
         const scannedPatient = response.data[0];
+
+        const alreadyExists = patients.some((p) => p.CIN === scannedPatient.CIN);
+        if (!alreadyExists) {
+          const newPatients = [...patients, scannedPatient];
+          setPatients(newPatients);
+          savePatientsToLocalStorage(newPatients);
+        }
+
         localStorage.setItem("scannedPatient", JSON.stringify(scannedPatient));
-        // Add to history only if not already present
-        setPatients((prev) => {
-          const alreadyExists = prev.some((p) => p.CIN === scannedPatient.CIN);
-          return alreadyExists ? prev : [...prev, scannedPatient];
-        });
+        navigate("/dashboard");
       }
     } catch (error) {
       console.error("Error fetching patient data:", error);
@@ -239,17 +255,15 @@ function ListPatientData() {
       </SoftTypography>
 
       <SoftBox mb={3} display="flex" flexDirection="column" gap={2}>
-        <SoftBox display="flex" alignItems="center" gap={2}>
-          <SoftButton
-            variant="gradient"
-            color="info"
-            onClick={() => setScannerOpen(!scannerOpen)}
-            startIcon={<QrCodeScanner />}
-            sx={{ borderRadius: "12px", px: 3 }}
-          >
-            {scannerOpen ? "Fermer le Scanner" : "Scanner un QR Code"}
-          </SoftButton>
-        </SoftBox>
+        <SoftButton
+          variant="gradient"
+          color="info"
+          onClick={() => setScannerOpen(!scannerOpen)}
+          startIcon={<QrCodeScanner />}
+          sx={{ borderRadius: "12px", px: 3 }}
+        >
+          {scannerOpen ? "Fermer le Scanner" : "Scanner un QR Code"}
+        </SoftButton>
 
         {scannerOpen && (
           <SoftBox
@@ -270,7 +284,7 @@ function ListPatientData() {
       <SoftBox mb={3} display="flex" alignItems="center" gap={2}>
         <TextField
           variant="outlined"
-          placeholder="Sear By Name, CIN, Surname ......."
+          placeholder="Search By Name, CIN, Surname ......."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           fullWidth

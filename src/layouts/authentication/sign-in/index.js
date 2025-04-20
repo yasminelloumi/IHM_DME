@@ -80,13 +80,11 @@ function SignIn() {
     
     switch(role) {
       case "medecins":
-        return "/dashboard";
+        return "/TablePatient";
       case "laboratoire":
-        return "/laboratory";
+        return "/ScanQRCode";
       case "centreImagerie":
-        return "/ListPatientData";
-      default:
-        return "/ListPatientData";
+        return "/ScanQRCode";
     }
   };
 

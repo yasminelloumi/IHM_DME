@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 import { 
   Box, 
   Switch, 
@@ -36,11 +37,11 @@ function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [patient, setPatient] = useState({
     CIN: "",
-    lastName: "",
-    firstName: "",
-    phone: "",
-    birthDate: "",
-    nationality: "",
+    nom: "",
+    prenom: "",
+    tel: "",
+    dateNaissance: "",
+    nationalite: "",
     password: "",
     qrCode: "",
   });
@@ -51,18 +52,40 @@ function SignUp() {
     setPatient({ ...patient, [e.target.name]: e.target.value });
   };
 
+  const [success, setSuccess] = useState(null); // Add this line to your state
+
   const handleSignUp = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+    setSuccess(null);
+  
+    const requiredFields = ["CIN", "nom", "prenom", "tel", "dateNaissance", "nationalite", "password"];
+    const emptyFields = requiredFields.filter((field) => !patient[field]?.trim());
+  
+    if (emptyFields.length > 0) {
+      setError("Please fill in all fields.");
+      setLoading(false);
+      return;
+    }
+  
     try {
+      // Step 1: Check if CIN already exists in db.json
+      const { data: existingPatients } = await axios.get(`http://localhost:3001/patients?CIN=${patient.CIN}`);
+      
+      if (existingPatients.length > 0) {
+        setError("CIN already exists. Please use a different one.");
+        setLoading(false);
+        return;
+      }
+  
+      // Step 2: Register new patient
       const patientWithRole = { ...patient, role: "patient" };
       const response = await registerPatient(patientWithRole);
-
+  
       if (response) {
-        alert("Registration successful!");
-        navigate("/authentication/sign-in");
+        setSuccess("Registration successful! Redirecting...");
+        setTimeout(() => navigate("/authentication/sign-in"), 2000);
       } else {
         throw new Error("Registration failed");
       }
@@ -72,7 +95,6 @@ function SignUp() {
       setLoading(false);
     }
   };
-
   const fieldConfig = [
     { 
       name: "CIN", 
@@ -81,32 +103,32 @@ function SignUp() {
       type: "text"
     },
     { 
-      name: "lastName", 
+      name: "nom",  // Changed from lastName to nom
       label: "Last Name", 
       icon: <PersonIcon color="primary" />,
       type: "text"
     },
     { 
-      name: "firstName", 
+      name: "prenom", // Changed from firstName to prenom
       label: "First Name", 
       icon: <BadgeIcon color="primary" />,
       type: "text"
     },
     { 
-      name: "phone", 
+      name: "tel", // Changed from phone to tel
       label: "Phone", 
       icon: <PhoneIcon color="primary" />,
       type: "tel"
     },
     { 
-      name: "birthDate", 
+      name: "dateNaissance", // Changed from birthDate to dateNaissance
       label: "Date of Birth", 
       icon: <CakeIcon color="primary" />,
       type: "date",
       InputLabelProps: { shrink: true }
     },
     { 
-      name: "nationality", 
+      name: "nationalite", // Changed from nationality to nationalite
       label: "Nationality", 
       icon: <PublicIcon color="primary" />,
       type: "text"
@@ -133,7 +155,7 @@ function SignUp() {
   return (
     <Box sx={{
       ...signInStyles.pageContainer,
-     backgroundImage: `url(${medicalBg})`
+      backgroundImage: `url(${medicalBg})`
     }}>
       <Box sx={signInStyles.formContainer}>
         <Box sx={signInStyles.header}>
@@ -223,5 +245,4 @@ function SignUp() {
     </Box>
   );
 }
-
 export default SignUp;

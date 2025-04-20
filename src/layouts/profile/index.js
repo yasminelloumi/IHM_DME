@@ -24,6 +24,8 @@ import SoftTypography from "components/SoftTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import Footer from "examples/Footer";
 import ProfileInfoCard from "examples/Cards/InfoCards/ProfileInfoCard";
+import DashboardNavbar from "examples/Navbars/DashboardNavbar";
+
 
 // Import QR Code
 import { QRCodeSVG } from "qrcode.react";
@@ -72,6 +74,7 @@ function Overview() {
 
   return (
     <DashboardLayout>
+      <DashboardNavbar />
       {/* Custom Header */}
       <SoftBox
         py={3}
@@ -97,7 +100,6 @@ function Overview() {
           {profile ? `${profile.nom} ${profile.prenom}` : "User"}
         </SoftTypography>
       </SoftBox>
-
       {/* Main Content */}
       <SoftBox mb={3} px={2}>
         <Grid container spacing={3} justifyContent="center">

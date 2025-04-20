@@ -67,6 +67,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const route = useLocation().pathname.split("/").slice(1);
   const navigate = useNavigate();
 
+  const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
+
   useEffect(() => {
     if (fixedNavbar) {
       setNavbarType("sticky");
@@ -112,7 +114,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
         onClick={handleCloseMenu}
       />
       <NotificationItem
-        image={<img src={logoSpotify} alt="person" />}
+        image={<img src={logoSpotify} alt="spotify" />}
         title={["New album", "by Travis Scott"]}
         date="1 day"
         onClick={handleCloseMenu}
@@ -141,33 +143,33 @@ function DashboardNavbar({ absolute, light, isMini }) {
         <SoftBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
           <Breadcrumbs icon="home" title={route[route.length - 1]} route={route} light={light} />
         </SoftBox>
-        {isMini ? null : (
+        {!isMini && (
           <SoftBox sx={(theme) => navbarRow(theme, { isMini })}>
             <SoftBox pr={1}>
-              <SoftInput
-                placeholder="Type here..."
-                icon={{ component: "search", direction: "left" }}
-              />
+
             </SoftBox>
             <SoftBox color={light ? "white" : "inherit"} display="flex" alignItems="center" gap={1}>
-              <Link to="/authentication/sign-in">
-                <IconButton sx={navbarIconButton} size="small">
-                  <Icon
-                    sx={({ palette: { dark, white } }) => ({
-                      color: light ? white.main : dark.main,
-                    })}
-                  >
-                    account_circle
-                  </Icon>
-                  <SoftTypography
-                    variant="button"
-                    fontWeight="medium"
-                    color={light ? "white" : "dark"}
-                  >
-                    Sign in
-                  </SoftTypography>
-                </IconButton>
-              </Link>
+              {connectedUser?.role === "patient" && (
+                <Link to="/profile">
+                  <IconButton sx={navbarIconButton} size="small">
+                    <Icon
+                      sx={({ palette: { dark, white } }) => ({
+                        color: light ? white.main : dark.main,
+                      })}
+                    >
+                      account_circle
+                    </Icon>
+                    <SoftTypography
+                      variant="button"
+                      fontWeight="medium"
+                      color={light ? "white" : "dark"}
+                    >
+                      Profile
+                    </SoftTypography>
+                  </IconButton>
+                </Link>
+              )}
+
               <IconButton sx={navbarIconButton} size="small" onClick={handleLogout}>
                 <Icon
                   sx={({ palette: { dark, white } }) => ({
@@ -181,9 +183,10 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   fontWeight="medium"
                   color={light ? "white" : "dark"}
                 >
-                  Log out
+                  Log Out
                 </SoftTypography>
               </IconButton>
+
               <IconButton
                 size="small"
                 color="inherit"
@@ -194,6 +197,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   {miniSidenav ? "menu_open" : "menu"}
                 </Icon>
               </IconButton>
+
               <IconButton
                 size="small"
                 color="inherit"
@@ -202,6 +206,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               >
                 <Icon>settings</Icon>
               </IconButton>
+
               <IconButton
                 size="small"
                 color="inherit"
@@ -213,6 +218,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               >
                 <Icon className={light ? "text-white" : "text-dark"}>notifications</Icon>
               </IconButton>
+
               {renderMenu()}
             </SoftBox>
           </SoftBox>
@@ -235,3 +241,4 @@ DashboardNavbar.propTypes = {
 };
 
 export default DashboardNavbar;
+

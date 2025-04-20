@@ -57,14 +57,10 @@ function Dashboard() {
   } else if (role === "laboratoire") {
     allowedCards = allCards.filter(card => card.title !== "Medical Imaging");
   } else if (role === "centreImagerie") {
-    allowedCards = allCards.filter(card =>
-      card.title !== "Laboratory"
-    );
+    allowedCards = allCards.filter(card => card.title !== "Laboratory");
   } else if (role === "medecins") {
-    allowedCards = allCards.filter(card =>
-      card.title !== "Laboratory" && card.title !== "Medical Imaging"
-    );
-  } 
+    allowedCards = allCards.filter(card => card.title !== "Laboratory" && card.title !== "Medical Imaging");
+  }
 
   return (
     <DashboardLayout>
@@ -72,10 +68,14 @@ function Dashboard() {
       <SoftBox py={3}>
         <SoftBox mb={3}>
           <SoftTypography variant="h3" fontWeight="bold" gutterBottom>
-            My Electronic Health Record
+            {role === "patient"
+              ? "My Electronic Health Record"
+              : "Electronic Health Record"}
           </SoftTypography>
           <SoftTypography variant="body1" color="text" mb={3}>
-            Access your complete medical information in one secure location.
+            {role === "patient"
+              ? "Access your complete medical information in one secure location."
+              : "Access the complete medical information in one secure location."}
           </SoftTypography>
 
           {/* Centered visible cards */}

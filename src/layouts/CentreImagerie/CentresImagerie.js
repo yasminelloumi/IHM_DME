@@ -119,11 +119,11 @@ function ImagingCenterWorkspace({ centerName }) {
     };
     fetchImages();
 
-    const connectedUser = JSON.parse(localStorage.getItem("scannedPatient"));
-    if (connectedUser) {
+    const scannedPatient = JSON.parse(localStorage.getItem("scannedPatient"));
+    if (scannedPatient) {
       setUserData({
-        name: `${connectedUser.firstName} ${connectedUser.lastName}`,
-        id: connectedUser.cin || connectedUser.id || "N/A",
+        name: `${scannedPatient.prenom} ${scannedPatient.nom}`,
+        id: scannedPatient.CIN || scannedPatient.id || "N/A",
         heartRate: 76,
       });
     }
