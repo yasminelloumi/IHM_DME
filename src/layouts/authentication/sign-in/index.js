@@ -109,8 +109,8 @@ function SignIn() {
             <SoftInput
               fullWidth
               autoFocus
-              label={userType === "staff" ? "Employee ID" : "Patient ID"}
-              placeholder={`Enter your ${userType === "staff" ? "employee" : "patient"} ID`}
+              label={userType === "staff" ? "Matricule" : "CIN"}
+              placeholder={`Enter your ${userType === "staff" ? "matricule" : "CIN"}`}
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               autoComplete="username"
