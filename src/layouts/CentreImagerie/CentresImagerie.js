@@ -33,8 +33,7 @@ import { getDMEByPatientId } from "services/dmeService"; // Adjust path as neede
 
 // Placeholder patient data
 const patientData = {
-  name: "Sarah Connor",
-  id: "PAT-12345",
+  
   heartRate: 76,
 };
 
