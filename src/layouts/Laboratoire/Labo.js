@@ -13,6 +13,11 @@ import {
   Card,
   CardContent,
   Box,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  CircularProgress,
 } from "@mui/material";
 import {
   Bloodtype,
@@ -24,6 +29,7 @@ import {
   Science,
 } from "@mui/icons-material";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { getDMEByPatientId } from "services/dmeService";
 
 // Placeholder patient data (used as fallback)
 const patientData = {
@@ -33,8 +39,6 @@ const patientData = {
   age: 34,
   lastVisit: "2025-04-10",
 };
-
-
 
 // Placeholder for recent test types
 const recentTestTypes = [
@@ -254,108 +258,199 @@ LabStatsCard.propTypes = {
 // Main Component
 function LaboratoryWorkspace({ labName }) {
   const [patient, setPatient] = useState(null);
-  const [reports, setReports] = useState([]); // Initialize as empty, will filter from initialReports
+  const [reports, setReports] = useState([]);
   const [labStatsData, setLabStatsData] = useState(labStats);
   const [testTypes, setTestTypes] = useState(recentTestTypes);
   const [labTrendsData, setLabTrendsData] = useState(labTrends);
   const [newReportFile, setNewReportFile] = useState(null);
   const [newReportDescription, setNewReportDescription] = useState("");
+  const [selectedLabTest, setSelectedLabTest] = useState("");
+  const [dmeList, setDmeList] = useState([]);
+  const [selectedDME, setSelectedDME] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Set patient data and filter reports on component mount
-  // LaboratoryWorkspace.jsx
-useEffect(() => {
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      // Retrieve patient data from localStorage
-      const patientInfo = JSON.parse(localStorage.getItem("scannedPatient"));
+  // Fetch patient data, reports, and DME data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Retrieve patient data from localStorage
+        const patientInfo = JSON.parse(localStorage.getItem("scannedPatient"));
 
-      let patientDataToUse = patientData; // Default to placeholder
+        let patientDataToUse = patientData; // Default to placeholder
 
-      if (patientInfo) {
-        const birthDate = new Date(patientInfo.dateNaissance);
-        const today = new Date();
-        const age = today.getFullYear() - birthDate.getFullYear();
+        if (patientInfo) {
+          const birthDate = new Date(patientInfo.dateNaissance);
+          const today = new Date();
+          const age = today.getFullYear() - birthDate.getFullYear();
 
-        patientDataToUse = {
-          name: `${patientInfo.prenom} ${patientInfo.nom}`,
-          id: patientInfo.id,
-          bloodType: patientInfo.bloodType || patientData.bloodType,
-          age: age,
-          lastVisit: patientInfo.lastVisit || patientData.lastVisit,
-        };
-      } else {
-        setError("Patient data not found in localStorage. Using placeholder data.");
+          patientDataToUse = {
+            name: `${patientInfo.prenom} ${patientInfo.nom}`,
+            id: patientInfo.id,
+            bloodType: patientInfo.bloodType || patientData.bloodType,
+            age: age,
+            lastVisit: patientInfo.lastVisit || patientData.lastVisit,
+          };
+        } else {
+          setError("Patient data not found in localStorage. Using placeholder data.");
+        }
+
+        setPatient(patientDataToUse);
+
+        // Fetch reports for the patient
+        if (patientDataToUse.id) {
+          const fetchedReports = await getReportsByPatient(patientDataToUse.id);
+          setReports(fetchedReports);
+        } else {
+          setReports([]);
+        }
+
+        // Fetch DME data for the patient
+        if (patientDataToUse.id) {
+          const fetchedDMEs = await getDMEByPatientId(patientDataToUse.id);
+          // Filter DMEs with non-empty laboTest
+          const validDMEs = fetchedDMEs.filter(dme => dme.laboTest && dme.laboTest.length > 0);
+
+          if (validDMEs.length > 0) {
+            setDmeList(validDMEs);
+
+            // Check if a valid DME is stored in localStorage
+            const storedDME = JSON.parse(localStorage.getItem("scannedDME"));
+            const validStoredDME = storedDME && validDMEs.find(dme => dme.id === storedDME.id && dme.patientId === patientDataToUse.id);
+
+            if (validStoredDME && validStoredDME.laboTest && validStoredDME.laboTest.length > 0) {
+              setSelectedDME(validStoredDME);
+              setSelectedLabTest(validStoredDME.laboTest[0]);
+              localStorage.setItem("selectedLabTest", validStoredDME.laboTest[0]);
+              localStorage.setItem("scannedDME", JSON.stringify(validStoredDME));
+            } else {
+              // Default to the first valid DME and its first lab test
+              const defaultDME = validDMEs[0];
+              setSelectedDME(defaultDME);
+              setSelectedLabTest(defaultDME.laboTest[0]);
+              localStorage.setItem("selectedLabTest", defaultDME.laboTest[0]);
+              localStorage.setItem("scannedDME", JSON.stringify(defaultDME));
+            }
+          } else {
+            setDmeList([]);
+            setSelectedDME(null);
+            setSelectedLabTest("");
+            localStorage.removeItem("selectedLabTest");
+            setError("No DME data with valid lab tests found for this patient.");
+            localStorage.removeItem("scannedDME");
+          }
+        } else {
+          setDmeList([]);
+          setSelectedDME(null);
+          setSelectedLabTest("");
+          localStorage.removeItem("selectedLabTest");
+          localStorage.removeItem("scannedDME");
+        }
+      } catch (err) {
+        setError(`Failed to load data: ${err.message || "Unknown error"}`);
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false);
       }
+    };
+    fetchData();
+  }, []);
 
-      setPatient(patientDataToUse);
-
-      // Fetch reports for the patient from the backend
-      if (patientDataToUse.id) {
-        const fetchedReports = await getReportsByPatient(patientDataToUse.id);
-        setReports(fetchedReports);
-      } else {
-        setReports([]);
-      }
-    } catch (err) {
-      setError("Failed to load data. Using placeholder data.");
-      console.error("Error fetching data:", err);
-    } finally {
-      setLoading(false);
-    }
+  // Handle DME and lab test selection
+  const handleDMEChange = (event) => {
+    const [dmeId, labTest] = event.target.value.split("|");
+    const selected = dmeList.find(dme => dme.id === dmeId);
+    setSelectedDME(selected);
+    setSelectedLabTest(labTest);
+    localStorage.setItem("selectedLabTest", labTest);
+    localStorage.setItem("scannedDME", JSON.stringify(selected));
+    setError(null);
+    console.log("Selected lab test:", labTest, "Stored in localStorage:", localStorage.getItem("selectedLabTest"));
   };
-  fetchData();
-}, []);
 
   // Handle report file upload
   const handleReportUpload = (event) => {
     const file = event.target.files[0];
-    if (file) {
+    if (file && file.type === "application/pdf") {
       setNewReportFile(file);
+      setError(null);
+      console.log("Uploaded file:", file.name);
+    } else {
+      setError("Please select a valid PDF file.");
+      setNewReportFile(null);
     }
   };
 
   // Handle report submission
-  // LaboratoryWorkspace.jsx
-// src/components/LaboratoryWorkspace.jsx (or Labo.js)
-// Partial update for handleReportSubmit
-// Partial update for handleReportSubmit
-const handleReportSubmit = async () => {
-  if (!newReportFile || !newReportDescription.trim() || !patient?.id) {
-    setError("Please select a file and add a description.");
-    return;
-  }
+  const handleReportSubmit = async () => {
+    if (!newReportFile || !newReportDescription.trim() || !patient?.id || !selectedLabTest || !selectedDME?.id) {
+      setError("Please select a PDF file, add a description, choose a lab test, select a DME, and ensure patient data is available.");
+      return;
+    }
 
-  try {
-    const formData = new FormData();
-    formData.append("file", newReportFile);
-    formData.append("patientId", patient.id);
-    formData.append("description", newReportDescription);
-
-    // Add content type header for FormData
-    const response = await submitReport(formData);
-
-    const newReport = {
-      id: response.id,
-      patientId: patient.id,
-      fileName: newReportFile.name,
-      description: newReportDescription,
-      timestamp: new Date().toISOString(),
-      filePath: response.filePath
-    };
-
-    setReports([newReport, ...reports]);
-    setNewReportFile(null);
-    setNewReportDescription("");
+    setSubmitLoading(true);
     setError(null);
-  } catch (error) {
-    console.error("Error submitting report:", error);
-    setError(error.message || "Failed to submit report. Please try again.");
-  }
-};
+
+    try {
+      // Retrieve selectedLabTest from localStorage
+      const labTestName = localStorage.getItem("selectedLabTest")?.replace(/\.pdf$/i, '').trim();
+
+      if (!labTestName) {
+        throw new Error("No valid lab test name found in localStorage.");
+      }
+
+      // Debug log to verify values
+      console.log("Submitting report with:", {
+        labTestName,
+        selectedLabTest,
+        localStorageSelectedLabTest: localStorage.getItem("selectedLabTest"),
+        uploadedFileName: newReportFile.name,
+      });
+
+      const formData = new FormData();
+      formData.append("file", newReportFile);
+      formData.append("patientId", patient.id);
+      formData.append("description", newReportDescription);
+      formData.append("dmeId", selectedDME.id);
+      formData.append("labTest", selectedLabTest);
+      formData.append("fileName", labTestName);
+
+      // Log FormData contents (for debugging)
+      for (let [key, value] of formData.entries()) {
+        console.log(`FormData: ${key}=${value}`);
+      }
+
+      const response = await submitReport(formData);
+
+      const newReport = {
+        id: response.id,
+        patientId: patient.id,
+        fileName: labTestName,
+        description: newReportDescription,
+        timestamp: response.timestamp || new Date().toISOString(),
+        filePath: response.filePath,
+        dmeId: response.dmeId || selectedDME.id,
+        labTest: response.labTest || selectedLabTest,
+      };
+
+      setReports([newReport, ...reports]);
+      setNewReportFile(null);
+      setNewReportDescription("");
+      setSelectedLabTest("");
+      setSelectedDME(null);
+      localStorage.removeItem("selectedLabTest");
+      localStorage.removeItem("scannedDME");
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      setError(error.message || "Failed to submit report. Please try again.");
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
   // Toggle dark/light mode
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -379,14 +474,12 @@ const handleReportSubmit = async () => {
           color: darkMode ? "#e0e0e0" : "#1a2a3a",
         }}
       >
-        <SoftTypography variant="h6" color={darkMode ? "white" : "dark"}>
-          Loading...
-        </SoftTypography>
+        <CircularProgress color="info" />
       </SoftBox>
     );
   }
 
-  if (error) {
+  if (error && !patient) {
     return (
       <SoftBox
         sx={{
@@ -486,6 +579,15 @@ const handleReportSubmit = async () => {
         />
       </SoftBox>
 
+      {/* Error Message (non-blocking) */}
+      {error && (
+        <SoftBox mb={2} p={2} sx={{ backgroundColor: "#ffebee", borderRadius: "8px" }}>
+          <SoftTypography variant="body2" color="error">
+            {error}
+          </SoftTypography>
+        </SoftBox>
+      )}
+
       {/* Main Content */}
       <SoftBox
         display="grid"
@@ -509,6 +611,36 @@ const handleReportSubmit = async () => {
               <SoftTypography variant="h6" fontWeight="bold" mb={2} color={darkMode ? "white" : "dark"}>
                 Add Laboratory Report
               </SoftTypography>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel sx={{ color: darkMode ? "#e0e0e0" : "#333" }}>
+                  Select DME and Lab Test
+                </InputLabel>
+                <Select
+                  value={selectedDME && selectedLabTest ? `${selectedDME.id}|${selectedLabTest}` : ""}
+                  onChange={handleDMEChange}
+                  label="Select DME and Lab Test"
+                  sx={{
+                    borderRadius: "12px",
+                    backgroundColor: darkMode ? "#34495e" : "#fff",
+                    color: darkMode ? "#e0e0e0" : "#333",
+                    "& .MuiSelect-icon": {
+                      color: darkMode ? "#e0e0e0" : "#333",
+                    },
+                  }}
+                >
+                  {dmeList.length === 0 ? (
+                    <MenuItem disabled>No DMEs with valid lab tests available</MenuItem>
+                  ) : (
+                    dmeList.flatMap(dme =>
+                      dme.laboTest.map(labTest => (
+                        <MenuItem key={`${dme.id}|${labTest}`} value={`${dme.id}|${labTest}`}>
+                          DME {dme.id} ({labTest})
+                        </MenuItem>
+                      ))
+                    )
+                  )}
+                </Select>
+              </FormControl>
               <SoftBox
                 component="label"
                 display="flex"
@@ -539,38 +671,41 @@ const handleReportSubmit = async () => {
                 />
               </SoftBox>
               <input
-                  type="text"
-                  placeholder="Add a description for the report..."
-                  value={newReportDescription}
-                  onChange={(e) => setNewReportDescription(e.target.value)}
-                  aria-label="Add a description for the report"
-                  style={{
-                    width: "100%",
-                    padding: "12px",
-                    borderRadius: "12px",
-                    border: "1px solid",
-                    borderColor: darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)",
-                    backgroundColor: darkMode ? "#34495e" : "#fff",
-                    color: darkMode ? "#e0e0e0" : "#333",
-                    fontSize: "16px",
-                    outline: "none",
-                    transition: "border-color 0.3s ease",
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = "#0077b6")}
-                  onBlur={(e) =>
-                    (e.target.style.borderColor = darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)")
-                  }
+                type="text"
+                placeholder="Add a description for the report..."
+                value={newReportDescription}
+                onChange={(e) => {
+                  setNewReportDescription(e.target.value);
+                  setError(null);
+                }}
+                aria-label="Report description"
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "12px",
+                  border: "1px solid",
+                  borderColor: darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)",
+                  backgroundColor: darkMode ? "#34495e" : "#fff",
+                  color: darkMode ? "#e0e0e0" : "#333",
+                  fontSize: "16px",
+                  outline: "none",
+                  transition: "border-color 0.3s ease",
+                }}
+                onFocus={(e) => (e.target.style.borderColor = "#0077b6")}
+                onBlur={(e) =>
+                  (e.target.style.borderColor = darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)")
+                }
               />
               <SoftButton
                 variant="gradient"
                 color="info"
                 onClick={handleReportSubmit}
                 sx={{ borderRadius: "12px", mt: 2, px: 3 }}
-                startIcon={<UploadFile />}
-                disabled={!newReportFile || !newReportDescription.trim()}
+                startIcon={submitLoading ? <CircularProgress size={20} color="inherit" /> : <UploadFile />}
+                disabled={submitLoading || !newReportFile || !newReportDescription.trim() || !selectedLabTest || !selectedDME?.id}
                 aria-label="Submit laboratory report"
               >
-                Submit Report
+                {submitLoading ? "Submitting..." : "Submit Report"}
               </SoftButton>
             </CardContent>
           </Card>
@@ -611,6 +746,24 @@ const handleReportSubmit = async () => {
                       <SoftTypography variant="body1" color={darkMode ? "white" : "dark"} mt={0.5}>
                         {report.description}
                       </SoftTypography>
+                      {report.labTest && (
+                        <SoftTypography
+                          variant="body2"
+                          color={darkMode ? "gray" : "text.secondary"}
+                          mt={0.5}
+                        >
+                          Lab Test: {report.labTest}
+                        </SoftTypography>
+                      )}
+                      {report.dmeId && (
+                        <SoftTypography
+                          variant="body2"
+                          color={darkMode ? "gray" : "text.secondary"}
+                          mt={0.5}
+                        >
+                          DME ID: {report.dmeId}
+                        </SoftTypography>
+                      )}
                       <Divider sx={{ my: 1, borderColor: darkMode ? "#444" : "#e0e0e0" }} />
                     </SoftBox>
                   ))
