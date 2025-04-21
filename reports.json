@@ -1,0 +1,12 @@
+{
+  "reports": [
+    {
+      "id": "1745197705966",
+      "patientId": "4024",
+      "description": "this is the description of the report.part 2",
+      "fileName": "Diagramme de classe DME.pdf",
+      "filePath": "/uploads/pdfFiles/report-1745197705961-971460298.pdf",
+      "timestamp": "2025-04-21T01:08:25.966Z"
+    }
+  ]
+}

@@ -444,13 +444,10 @@ const LabTestCard = ({ test, darkMode }) => {
         
         <Box mb={1}>
           <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-            <strong>Date:</strong> {test.date}
+            <strong>Test Date:</strong> {test.date}
           </Typography>
           <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-            <strong>Lab:</strong> {test.lab}
-          </Typography>
-          <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-            <strong>Result:</strong> 
+            <strong>Description:</strong> 
             <span style={{ 
               color: test.result === "Normal" ? 
                 (darkMode ? "#81c784" : "#2e7d32") : 

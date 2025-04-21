@@ -529,42 +529,56 @@
       "patientId": "7434",
       "fileName": "blood_test_2025.pdf",
       "description": "Complete Blood Count (CBC) - Normal results.",
-      "timestamp": "2025-04-10T09:15:00.000Z"
+      "timestamp": "2025-04-10T09:15:00.000Z",
+      "filePath": "/uploads/pdfFiles/blood_test_2025.pdf"
     },
     {
       "id": "73e0",
       "patientId": "7434",
       "description": "mknjiuy",
       "fileName": "use case (1).pdf",
-      "timestamp": "2025-04-14T13:53:34.874Z"
+      "timestamp": "2025-04-14T13:53:34.874Z",
+      "filePath": "/uploads/pdfFiles/use case (1).pdf"
     },
     {
-      "id": "dc31",
+      "id": "dc31a",
       "patientId": "1a04",
       "description": "bmld;b:tmb",
       "fileName": "DC_DME.pdf",
-      "timestamp": "2025-04-14T23:30:39.928Z"
+      "timestamp": "2025-04-14T23:30:39.928Z",
+      "filePath": "/uploads/pdfFiles/DC_DME.pdf"
     },
     {
       "id": "b015",
       "patientId": "7434",
       "description": "test2",
       "fileName": "devis_wie_ras.pdf",
-      "timestamp": "2025-04-15T15:05:08.760Z"
-    },
-    {
-      "id": "dc31",
-      "patientId": "1a04",
-      "description": "bmld;b:tmb",
-      "fileName": "DC_DME.pdf",
-      "timestamp": "2025-04-14T23:30:39.928Z"
+      "timestamp": "2025-04-15T15:05:08.760Z",
+      "filePath": "/uploads/pdfFiles/devis_wie_ras.pdf"
     },
     {
       "id": "e206",
       "patientId": "4024",
       "description": "Chest X-Ray showing no signs of infection or abnormal masses.",
       "fileName": "Diagramme de classe DME.pdf",
-      "timestamp": "2025-04-20T21:35:37.351Z"
+      "timestamp": "2025-04-20T21:35:37.351Z",
+      "filePath": "/uploads/pdfFiles/Diagramme de classe DME.pdf"
+    },
+    {
+      "id": "ba0d",
+      "patientId": "4024",
+      "description": "this is the description of the report.",
+      "fileName": "Diagramme de classe DME.pdf",
+      "timestamp": "2025-04-21T00:09:18.891Z",
+      "filePath": "/uploads/pdfFiles/Diagramme de classe DME.pdf"
+    },
+    {
+      "id": "1745197705966",
+      "patientId": "4024",
+      "description": "this is the description of the report.part 2",
+      "fileName": "Diagramme de classe DME.pdf",
+      "filePath": "/uploads/pdfFiles/report-1745197705961-971460298.pdf",
+      "timestamp": "2025-04-21T01:08:25.966Z"
     }
   ]
 }

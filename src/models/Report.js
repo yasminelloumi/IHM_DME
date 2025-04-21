@@ -1,4 +1,3 @@
-// Report.js
 export class Report {
   constructor(id, patientId, fileName, description, timestamp, filePath = null) {
     this.id = id;
