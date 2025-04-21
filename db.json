@@ -199,6 +199,14 @@
       "fileName": "Screenshot 2025-04-17 171038.png",
       "url": "/uploads/images/image-1745270804627-602006415.png",
       "dateCreated": "2025-04-21T21:26:44.643Z"
+    },
+    {
+      "id": "1745274317535",
+      "patientId": "e3a2",
+      "description": "testtest",
+      "fileName": "Screenshot 2024-09-03 210851.png",
+      "url": "/uploads/images/image-1745274317511-95396880.png",
+      "dateCreated": "2025-04-21T22:25:17.535Z"
     }
   ],
   "analyses": [
@@ -566,6 +574,31 @@
         "MRI Brain"
       ],
       "notes": "Patient was recommended to maintain a sleep diary and avoid caffeine in the evening."
+    },
+    {
+      "id": "9135",
+      "patientId": "e3a2",
+      "medecinId": "2",
+      "dateConsultation": "2025-04-19T00:00:00.000Z",
+      "reason": "Fatigue persistante et perte d’appétit",
+      "diagnostiques": [
+        "Anémie ferriprive",
+        "Carence en vitamine D"
+      ],
+      "ordonnances": [
+        "Ferograd 80mg Une fois par jour pendant 3 mois",
+        "Vitamine D3 1000 UI Une fois par jour",
+        "Alimentation riche en fer recommandée"
+      ],
+      "laboTest": [
+        "FSC",
+        "Ferritine sérique",
+        "Vitamine D"
+      ],
+      "imgTest": [
+        "X_ray"
+      ],
+      "notes": "La patiente présente des symptômes compatibles avec une anémie légère. Recommandé de suivre un régime équilibré, riche en légumes verts et en protéines animales. Un suivi est prévu dans 6 semaines pour réévaluer les taux de fer et de vitamine D."
     }
   ],
   "reports": [

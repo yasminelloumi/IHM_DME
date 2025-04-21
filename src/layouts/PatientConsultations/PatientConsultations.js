@@ -419,74 +419,123 @@ ImagingStudyCard.propTypes = {
 };
 
 const LabTestCard = ({ test, darkMode }) => {
+  const [openPdfModal, setOpenPdfModal] = useState(false);
+
+  const handleViewReport = (e) => {
+    e.preventDefault();
+    if (!test.filePath) {
+      console.log('No PDF file available');
+      return;
+    }
+    console.log('Opening PDF in modal:', test.filePath);
+    setOpenPdfModal(true);
+  };
+
+  const handleClosePdfModal = () => {
+    setOpenPdfModal(false);
+  };
+
   return (
-    <Card sx={{
-      mb: 2,
-      borderRadius: "12px",
-      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-      background: darkMode ? "#34495e" : "#f8f9fa",
-      transition: "transform 0.2s",
-      '&:hover': {
-        transform: "translateY(-2px)",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)"
-      }
-    }}>
-      <CardContent>
-        <Box display="flex" alignItems="center" mb={1}>
-          <ScienceIcon color={darkMode ? "secondary" : "secondary"} sx={{ mr: 1 }} />
-          <Typography variant="h6" fontWeight="bold" color={darkMode ? "white" : "dark"}>
-            {test.name}
-          </Typography>
-        </Box>
-        
-        <Box mb={1}>
-          <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-            <strong>Test Date:</strong> {test.date}
-          </Typography>
-          <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-            <strong>Description:</strong> 
-            <span style={{ 
-              color: test.result === "Normal" ? 
-                (darkMode ? "#81c784" : "#2e7d32") : 
-                (darkMode ? "#ff8a65" : "#d84315"),
-              fontWeight: "bold",
-              marginLeft: "4px"
-            }}>
-              {test.result}
-            </span>
-          </Typography>
-        </Box>
-        
-        <Button
-          fullWidth
-          variant="contained"
-          size="small"
-          startIcon={<ReportIcon />}
-          href={test.reportUrl}
-          target="_blank"
-          sx={{
-            mt: 1,
-            backgroundColor: darkMode ? "#005F73" : "#0077b6",
-            '&:hover': {
-              backgroundColor: darkMode ? "#004b5d" : "#005f8c"
-            }
-          }}
-        >
-          View Lab Report
-        </Button>
-      </CardContent>
-    </Card>
+    <>
+      <Card sx={{
+        mb: 2,
+        borderRadius: "12px",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        background: darkMode ? "#34495e" : "#f8f9fa",
+        transition: "transform 0.2s",
+        '&:hover': {
+          transform: "translateY(-2px)",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)"
+        }
+      }}>
+        <CardContent>
+          <Box display="flex" alignItems="center" mb={1}>
+            <ScienceIcon color={darkMode ? "secondary" : "secondary"} sx={{ mr: 1 }} />
+            <Typography variant="h6" fontWeight="bold" color={darkMode ? "white" : "dark"}>
+              {test.labTest}
+            </Typography>
+          </Box>
+          
+          <Box mb={1}>
+            <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+              <strong>Test Date:</strong> {new Date(test.timestamp).toLocaleDateString()}
+            </Typography>
+            <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+              <strong>Result:</strong> 
+              <span style={{ 
+                color: test.description === "Normal" ? 
+                  (darkMode ? "#81c784" : "#2e7d32") : 
+                  (darkMode ? "#ff8a65" : "#d84315"),
+                fontWeight: "bold",
+                marginLeft: "4px"
+              }}>
+                {test.description}
+              </span>
+            </Typography>
+          </Box>
+          
+          <Button
+            fullWidth
+            variant="contained"
+            size="small"
+            startIcon={<ReportIcon />}
+            onClick={handleViewReport}
+            disabled={!test.filePath}
+            sx={{
+              mt: 1,
+              backgroundColor: darkMode ? "#005F73" : "#0077b6",
+              '&:hover': {
+                backgroundColor: darkMode ? "#004b5d" : "#005f8c"
+              },
+              '&.Mui-disabled': {
+                backgroundColor: darkMode ? "#4b5e6f" : "#b0bec5",
+                color: darkMode ? "#78909c" : "#90a4ae"
+              }
+            }}
+          >
+            View Lab Report
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Dialog
+        open={openPdfModal}
+        onClose={handleClosePdfModal}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogContent sx={{ p: 0, height: '80vh' }}>
+          {test.filePath ? (
+            <iframe
+              src={test.filePath}
+              title="Lab Report PDF"
+              style={{ width: '100%', height: '100%', border: 'none' }}
+            />
+          ) : (
+            <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+              <Typography variant="h6" color={darkMode ? "white" : "dark"}>
+                No PDF available
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePdfModal} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
 LabTestCard.propTypes = {
   test: PropTypes.shape({
     id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    date: PropTypes.string.isRequired,
-    lab: PropTypes.string.isRequired,
-    result: PropTypes.string.isRequired,
-    reportUrl: PropTypes.string.isRequired
+    labTest: PropTypes.string.isRequired,
+    timestamp: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    filePath: PropTypes.string
   }).isRequired,
   darkMode: PropTypes.bool.isRequired
 };
@@ -663,7 +712,15 @@ ConsultationCard.propTypes = {
         name: PropTypes.string.isRequired,
       })
     ).isRequired,
-    tests: PropTypes.array.isRequired,
+    tests: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        labTest: PropTypes.string.isRequired,
+        timestamp: PropTypes.string.isRequired,
+        description: PropTypes.string.isRequired,
+        filePath: PropTypes.string
+      })
+    ).isRequired,
     images: PropTypes.array.isRequired,
     notes: PropTypes.string
   }).isRequired,
@@ -787,7 +844,6 @@ const PatientConsultations = () => {
         if (!user) {
           throw new Error("No connected user found");
         }
-
         let patientId = null;
         if (user.role === "patient") {
           patientId = user.id;
@@ -798,16 +854,13 @@ const PatientConsultations = () => {
           }
           patientId = scannedPatient.id;
         }
-
         if (!patientId) {
           throw new Error("No patient ID found");
         }
-
         const response = await getDMEByPatientId(patientId);
         if (!response) {
           throw new Error("Failed to fetch DME records");
         }
-
         const dmeInstances = response.map(dme => new DME(
           dme.id,
           dme.patientId,
@@ -820,11 +873,15 @@ const PatientConsultations = () => {
           dme.imgTest,
           dme.notes
         ));
-
+        // Log the medecinIds from DME records
+        console.log("DME Records medecinIds:", dmeInstances.map(dme => dme.medecinId));
+        
         const uniqueMedecinIds = [...new Set(dmeInstances.map(dme => dme.medecinId))];
         const doctorPromises = uniqueMedecinIds.map(async (id) => {
           try {
             const doctor = await getById(id);
+            // Log the response from getById
+            console.log(`getById(${id}) response:`, doctor);
             return { id, doctor };
           } catch (error) {
             console.warn(`Failed to fetch doctor with ID ${id}:`, error);
@@ -838,18 +895,29 @@ const PatientConsultations = () => {
           }
           return acc;
         }, {});
-
+        // Log the final doctorsMap
+        console.log("doctorsMap:", doctorsMap);
+        
         setDoctors(doctorsMap);
         setDmeRecords(dmeInstances);
-
         const reportsResponse = await getReportsByPatient(patientId);
         if (!reportsResponse) {
           throw new Error("Failed to fetch laboratory tests");
         }
-        setReports(reportsResponse);
-
+        const modifiedReports = reportsResponse.map(report => ({
+          ...report,
+          filePath: report.filePath && !report.filePath.startsWith('http')
+            ? `http://localhost:3002${report.filePath}`
+            : report.filePath.replace('http://localhost:3000', 'http://localhost:3002')
+        }));
+        setReports(modifiedReports);
         const consultations = dmeInstances.map(dme => {
           const doctor = doctorsMap[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
+          // Log the doctor being used for each DME
+          console.log(`DME ID ${dme.id} - medecinId: ${dme.medecinId}, Doctor:`, doctor);
+          const associatedReports = modifiedReports.filter(report => 
+            dme.laboTest.includes(report.labTest)
+          );
           return {
             id: dme.id,
             date: new Date(dme.dateConsultation).toLocaleDateString(),
@@ -862,21 +930,19 @@ const PatientConsultations = () => {
                   name: typeof med === 'string' ? med : med.name || '',
                 }))
               : [],
-            tests: Array.isArray(dme.laboTest)
-              ? dme.laboTest.map(test => ({
-                  id: test.id || Math.random(),
-                  name: test.name || test,
-                  date: test.date || new Date(dme.dateConsultation).toLocaleDateString(),
-                  lab: test.lab || 'Unknown Lab',
-                  result: test.result || 'Pending',
-                  reportUrl: test.reportUrl || '#'
+            tests: Array.isArray(associatedReports)
+              ? associatedReports.map(report => ({
+                  id: report.id || Math.random(),
+                  labTest: report.labTest || 'Unknown Test',
+                  timestamp: report.timestamp || new Date(dme.dateConsultation).toISOString(),
+                  description: report.description || 'Pending',
+                  filePath: report.filePath
                 }))
               : [],
             images: dme.imgTest || [],
             notes: dme.notes || ""
           };
         });
-
         const totalConsultations = dmeInstances.length;
         const lastVisit = totalConsultations > 0
           ? new Date(dmeInstances[0].dateConsultation).toLocaleDateString()
@@ -888,13 +954,11 @@ const PatientConsultations = () => {
         const mostVisitedSpecialty = Object.keys(specialtyCounts).length > 0
           ? Object.entries(specialtyCounts).sort((a, b) => b[1] - a[1])[0][0]
           : "None";
-
         setStatsData({
           totalConsultations: totalConsultations.toString(),
           lastVisit,
           mostVisitedSpecialty
         });
-
         const monthlyCounts = dmeInstances.reduce((acc, record) => {
           try {
             const month = new Date(record.dateConsultation).toLocaleString('default', { month: 'short' });
@@ -904,13 +968,11 @@ const PatientConsultations = () => {
           }
           return acc;
         }, {});
-
         setConsultationTrends(
           Object.entries(monthlyCounts)
             .map(([month, count]) => ({ month, consultations: count }))
             .sort((a, b) => new Date(`1 ${a.month} 2023`) - new Date(`1 ${b.month} 2023`))
         );
-
       } catch (error) {
         console.error("Error loading data:", error);
         setError(error.message || "An unknown error occurred");
@@ -918,7 +980,6 @@ const PatientConsultations = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
@@ -950,6 +1011,9 @@ const PatientConsultations = () => {
     .sort((a, b) => new Date(b.dateConsultation) - new Date(a.dateConsultation))
     .map(dme => {
       const doctor = doctors[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
+      const associatedReports = reports.filter(report => 
+        dme.laboTest.includes(report.labTest)
+      );
       return {
         id: dme.id,
         date: new Date(dme.dateConsultation).toLocaleDateString(),
@@ -962,14 +1026,13 @@ const PatientConsultations = () => {
               name: typeof med === 'string' ? med : med.name || '',
             }))
           : [],
-        tests: Array.isArray(dme.laboTest)
-          ? dme.laboTest.map(test => ({
-              id: test.id || Math.random(),
-              name: test.name || test,
-              date: test.date || new Date(dme.dateConsultation).toLocaleDateString(),
-              lab: test.lab || 'Unknown Lab',
-              result: test.result || 'Pending',
-              reportUrl: test.reportUrl || '#'
+        tests: Array.isArray(associatedReports)
+          ? associatedReports.map(report => ({
+              id: report.id || Math.random(),
+              labTest: report.labTest || 'Unknown Test',
+              timestamp: report.timestamp || new Date(dme.dateConsultation).toISOString(),
+              description: report.description || 'Pending',
+              filePath: report.filePath
             }))
           : [],
         images: dme.imgTest || [],
@@ -1106,8 +1169,6 @@ const PatientConsultations = () => {
               </SoftTypography>
             )}
           </Box>
-
-          
         </Box>
       </Box>
 
