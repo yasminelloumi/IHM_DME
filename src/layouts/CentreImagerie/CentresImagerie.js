@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import SoftBox from "components/SoftBox";
@@ -12,6 +13,11 @@ import {
   Card,
   CardMedia,
   CardContent,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import {
   AddAPhoto,
@@ -22,7 +28,8 @@ import {
   LightMode,
   LocalHospital,
 } from "@mui/icons-material";
-import { getImages, uploadImage } from "services/imagesService";  // Adjust path if needed
+import { getImages, uploadImage } from "services/imagesService";
+import { getDMEByPatientId } from "services/dmeService"; // Adjust path as needed
 
 // Placeholder patient data
 const patientData = {
@@ -104,8 +111,12 @@ function ImagingCenterWorkspace({ centerName }) {
   const [newComment, setNewComment] = useState("");
   const [darkMode, setDarkMode] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [dmeRecords, setDmeRecords] = useState([]);
+  const [selectedDme, setSelectedDme] = useState("");
+  const [isLoadingDme, setIsLoadingDme] = useState(false);
+  const [dmeError, setDmeError] = useState(null);
 
-  // Fetch images on component mount
+  // Fetch images and DME records on component mount
   useEffect(() => {
     const fetchImages = async () => {
       try {
@@ -117,15 +128,46 @@ function ImagingCenterWorkspace({ centerName }) {
         console.error("Failed to load images:", error);
       }
     };
+
+    const fetchDmeRecords = async (patientId) => {
+      setIsLoadingDme(true);
+      setDmeError(null);
+      try {
+        console.log("Fetching DME records for patientId:", patientId);
+        const records = await getDMEByPatientId(patientId);
+        console.log("Raw API response:", records);
+        // Ensure records is an array
+        const dmeArray = Array.isArray(records) ? records : records.data || [];
+        console.log("Processed DME records:", dmeArray);
+        setDmeRecords(dmeArray);
+      } catch (error) {
+        console.error("Failed to load DME records:", error);
+        setDmeError("Failed to load DME records. Please try again.");
+      } finally {
+        setIsLoadingDme(false);
+      }
+    };
+
     fetchImages();
 
     const scannedPatient = JSON.parse(localStorage.getItem("scannedPatient"));
+    console.log("scannedPatient from localStorage:", scannedPatient);
     if (scannedPatient) {
+      const patientId = scannedPatient.id; // Use id explicitly (should be "1a04")
       setUserData({
         name: `${scannedPatient.prenom} ${scannedPatient.nom}`,
-        id: scannedPatient.CIN || scannedPatient.id || "N/A",
+        id: patientId,
         heartRate: 76,
       });
+      if (patientId) {
+        fetchDmeRecords(patientId);
+      } else {
+        setDmeError("No valid patient ID found.");
+        setIsLoadingDme(false);
+      }
+    } else {
+      setDmeError("No patient data found in localStorage.");
+      setIsLoadingDme(false);
     }
   }, []);
 
@@ -134,11 +176,10 @@ function ImagingCenterWorkspace({ centerName }) {
     const file = event.target.files[0];
     if (file) {
       const imageData = {
-        file, // Pass the file directly
+        file,
         patientId: userData?.id || patientData.id,
         description: `${file.name} - ${new Date().toLocaleDateString()}`,
       };
-      
       try {
         const uploadedImage = await uploadImage(imageData);
         setImages((prevImages) => [...prevImages, uploadedImage]);
@@ -160,6 +201,12 @@ function ImagingCenterWorkspace({ centerName }) {
       setComments([...comments, newCommentObj]);
       setNewComment("");
     }
+  };
+
+  // Handle DME selection
+  const handleDmeChange = (event) => {
+    setSelectedDme(event.target.value);
+    console.log("Selected DME and imgTest:", event.target.value);
   };
 
   // Toggle dark/light mode
@@ -286,6 +333,86 @@ function ImagingCenterWorkspace({ centerName }) {
               <SoftTypography variant="h6" fontWeight="bold" mb={2} color={darkMode ? "white" : "dark"}>
                 Upload Medical Images
               </SoftTypography>
+
+              {/* DME Dropdown */}
+              <SoftBox mb={3}>
+                {isLoadingDme ? (
+                  <SoftBox display="flex" alignItems="center" gap={2}>
+                    <CircularProgress size={24} sx={{ color: darkMode ? "#e0e0e0" : "#0077b6" }} />
+                    <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+                      Loading DME records...
+                    </SoftTypography>
+                  </SoftBox>
+                ) : dmeError ? (
+                  <SoftTypography variant="body2" color="error">
+                    {dmeError}
+                  </SoftTypography>
+                ) : (
+                  <FormControl fullWidth>
+                    <InputLabel
+                      sx={{
+                        color: darkMode ? "#e0e0e0" : "text.secondary",
+                        "&.Mui-focused": { color: "#0077b6" },
+                      }}
+                    >
+                      Select DME Imaging Test
+                    </InputLabel>
+                    <Select
+                      value={selectedDme}
+                      onChange={handleDmeChange}
+                      sx={{
+                        borderRadius: "12px",
+                        backgroundColor: darkMode ? "#34495e" : "#fff",
+                        color: darkMode ? "#e0e0e0" : "#333",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)",
+                        },
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: darkMode ? "#fff" : "rgba(0, 0, 0, 0.87)",
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#0077b6",
+                        },
+                      }}
+                      MenuProps={{
+                        PaperProps: {
+                          sx: {
+                            backgroundColor: darkMode ? "#2c3e50" : "#fff",
+                            color: darkMode ? "#e0e0e0" : "#333",
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="" disabled>
+                        Select a DME imaging test
+                      </MenuItem>
+                      {dmeRecords.length > 0 ? (
+                        dmeRecords.flatMap((dme) =>
+                          (dme.imgTest && dme.imgTest.length > 0
+                            ? dme.imgTest
+                            : ["No imaging tests"]
+                          ).map((test, index) => (
+                            <MenuItem
+                              key={`${dme.id}:${test}`}
+                              value={`${dme.id}:${test}`}
+                            >
+                              {`${new Date(dme.dateConsultation).toLocaleDateString(
+                                "en-US"
+                              )} - DME(${dme.id}) ${test}`}
+                            </MenuItem>
+                          ))
+                        )
+                      ) : (
+                        <MenuItem value="" disabled>
+                          No DME records available
+                        </MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
+                )}
+              </SoftBox>
+
+              {/* Image Upload Input */}
               <SoftBox
                 component="label"
                 display="flex"
@@ -327,13 +454,13 @@ function ImagingCenterWorkspace({ centerName }) {
                       background: darkMode ? "#34495e" : "#f9f9f9",
                     }}
                   >
-                  <CardMedia
-  component="img"
-  height="100"
-  image={`http://localhost:3002${image.url}`} // Prepend server URL
-  alt={image.description}
-  sx={{ borderRadius: '12px 12px 0 0' }}
-/>
+                    <CardMedia
+                      component="img"
+                      height="100"
+                      image={`http://localhost:3002${image.url}`}
+                      alt={image.description}
+                      sx={{ borderRadius: "12px 12px 0 0" }}
+                    />
                     <CardContent sx={{ p: 1 }}>
                       <SoftTypography
                         variant="caption"

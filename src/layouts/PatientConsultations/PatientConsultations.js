@@ -1107,35 +1107,7 @@ const PatientConsultations = () => {
             )}
           </Box>
 
-          <Box mb={4}>
-            <Typography 
-              variant="h5" 
-              fontWeight="bold" 
-              gutterBottom
-              color={darkMode ? "white" : "dark"}
-            >
-              <ScienceIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
-              Laboratory Tests
-            </Typography>
-            <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"} paragraph>
-              {user?.role === "patient"
-                ? "View your laboratory test results."
-                : "View the laboratory test results of the patient."}
-            </Typography>
-            {reports.length > 0 ? (
-              reports.map((report) => (
-                <LabTestCard
-                  key={report.id}
-                  test={report}
-                  darkMode={darkMode}
-                />
-              ))
-            ) : (
-              <SoftTypography variant="body1" color={darkMode ? "white" : "dark"}>
-                No laboratory tests found for this patient.
-              </SoftTypography>
-            )}
-          </Box>
+          
         </Box>
       </Box>
 
