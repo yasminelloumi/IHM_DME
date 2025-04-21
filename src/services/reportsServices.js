@@ -7,7 +7,7 @@ const FILE_SERVER_URL = "http://localhost:3002"; // For file uploads
 export const submitReport = async (formData) => {
   try {
     // Validate FormData contents
-    const requiredFields = ['file', 'patientId', 'description', 'dmeId', 'fileName'];
+    const requiredFields = ['file', 'patientId', 'description', 'dmeId', 'labTest'];
     for (const field of requiredFields) {
       if (!formData.get(field)) {
         throw new Error(`Missing required field: ${field}`);
@@ -26,7 +26,7 @@ export const submitReport = async (formData) => {
       },
     });
 
-    return response.data; // Expected: { id, filePath, patientId, description, dmeId, labTest, ... }
+    return response.data; // Expected: { id, filePath, patientId, description, dmeId, labTest, fileName, ... }
   } catch (error) {
     console.error('Error submitting report:', {
       message: error.message,
@@ -42,6 +42,7 @@ export const submitReport = async (formData) => {
 export const getReportsByPatient = async (patientId) => {
   try {
     const response = await axios.get(`${JSON_SERVER_URL}/reports?patientId=${patientId}`);
+    console.log("Fetched reports for patient", patientId, ":", response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching reports:', {
@@ -57,6 +58,7 @@ export const getReportsByPatient = async (patientId) => {
 export const getReports = async () => {
   try {
     const response = await axios.get(`${JSON_SERVER_URL}/reports`);
+    console.log("Fetched all reports:", response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching all reports:', {

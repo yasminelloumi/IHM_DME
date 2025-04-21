@@ -72,60 +72,51 @@ app.use('/uploads', express.static(UPLOAD_DIR));
 // Route to handle report uploads
 app.post('/reports', upload.single('file'), async (req, res) => {
   try {
-    // Log raw req.body before parsing
-    console.log("Raw req.body before multer:", req.body);
-
-    const { patientId, description, dmeId, labTest, fileName } = req.body;
-
     // Log parsed req.body and req.file
-    console.log("Server received req.body:", { patientId, description, dmeId, labTest, fileName });
+    console.log("Server received req.body:", req.body);
     console.log("Server received req.file:", {
       originalname: req.file?.originalname,
       filename: req.file?.filename,
     });
 
+    const { patientId, description, dmeId, labTest } = req.body;
+
     // Validate required fields
-    if (!req.file || !patientId || !description || !dmeId || !fileName) {
+    if (!req.file || !patientId || !description || !dmeId || !labTest) {
       console.error("Validation failed:", {
         hasFile: !!req.file,
         patientId,
         description,
         dmeId,
-        fileName,
+        labTest,
       });
-      return res.status(400).json({ error: 'Missing required fields: file, patientId, description, dmeId, and fileName are required' });
+      return res.status(400).json({ error: 'Missing required fields: file, patientId, description, dmeId, and labTest are required' });
     }
 
-    // Prevent fileName from matching the uploaded file's original name
-    if (fileName === req.file.originalname) {
-      console.error("fileName matches req.file.originalname, which is not allowed:", fileName);
-      return res.status(400).json({ error: 'fileName must not match the uploaded file’s original name' });
-    }
-
-    // Sanitize fileName to allow spaces, remove .pdf, and normalize
-    const sanitizedFileName = fileName
+    // Sanitize labTest to allow spaces, remove .pdf, and normalize
+    const sanitizedLabTest = labTest
       .replace(/\.pdf$/i, '') // Remove .pdf extension
       .replace(/[^a-zA-Z0-9\-_\s]/g, '') // Allow alphanumeric, hyphen, underscore, and spaces
       .trim();
 
-    if (!sanitizedFileName) {
-      console.error("Invalid fileName after sanitization:", fileName);
-      return res.status(400).json({ error: 'Invalid fileName provided' });
+    if (!sanitizedLabTest) {
+      console.error("Invalid labTest after sanitization:", labTest);
+      return res.status(400).json({ error: 'Invalid labTest provided' });
     }
 
-    // Log sanitized fileName
-    console.log("Sanitized fileName:", sanitizedFileName, "Original fileName:", fileName, "Uploaded file:", req.file.originalname);
+    // Log sanitized labTest
+    console.log("Sanitized labTest:", sanitizedLabTest, "Original labTest:", labTest, "Uploaded file:", req.file.originalname);
 
     // Create new report object
     const newReport = {
       id: Date.now().toString(),
       patientId,
       description,
-      fileName: sanitizedFileName,
+      labTest: sanitizedLabTest,
+      fileName: req.file.filename, // Use server-generated filename
       filePath: `/Uploads/pdfFiles/${req.file.filename}`,
       timestamp: new Date().toISOString(),
       dmeId,
-      labTest,
     };
 
     // Save to local JSON database (Node server)

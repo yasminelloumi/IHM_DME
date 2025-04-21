@@ -303,6 +303,7 @@ function LaboratoryWorkspace({ labName }) {
         // Fetch reports for the patient
         if (patientDataToUse.id) {
           const fetchedReports = await getReportsByPatient(patientDataToUse.id);
+          console.log("Setting reports state:", fetchedReports);
           setReports(fetchedReports);
         } else {
           setReports([]);
@@ -416,7 +417,6 @@ function LaboratoryWorkspace({ labName }) {
       formData.append("description", newReportDescription);
       formData.append("dmeId", selectedDME.id);
       formData.append("labTest", selectedLabTest);
-      formData.append("fileName", labTestName);
 
       // Log FormData contents (for debugging)
       for (let [key, value] of formData.entries()) {
@@ -428,7 +428,7 @@ function LaboratoryWorkspace({ labName }) {
       const newReport = {
         id: response.id,
         patientId: patient.id,
-        fileName: labTestName,
+        fileName: response.fileName,
         description: newReportDescription,
         timestamp: response.timestamp || new Date().toISOString(),
         filePath: response.filePath,
@@ -467,7 +467,7 @@ function LaboratoryWorkspace({ labName }) {
           alignItems: "center",
           background: darkMode
             ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
-            : "url('https://placehold.co/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
+            : "url('https://via.placeholder.com/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
           backgroundSize: "cover",
           backgroundPosition: "center",
           padding: { xs: 2, md: 4 },
@@ -489,7 +489,7 @@ function LaboratoryWorkspace({ labName }) {
           alignItems: "center",
           background: darkMode
             ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
-            : "url('https://placehold.co/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
+            : "url('https://via.placeholder.com/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
           backgroundSize: "cover",
           backgroundPosition: "center",
           padding: { xs: 2, md: 4 },
@@ -724,49 +724,50 @@ function LaboratoryWorkspace({ labName }) {
               </SoftTypography>
               <SoftBox maxHeight="300px" sx={{ overflowY: "auto" }}>
                 {reports.length > 0 ? (
-                  reports.map((report) => (
-                    <SoftBox key={report.id} mb={2}>
-                      <SoftBox display="flex" alignItems="center" gap={1}>
-                        <Description sx={{ color: darkMode ? "#e0e0e0" : "#0077b6" }} />
+                  reports.map((report) => {
+                    console.log("Rendering report:", report);
+                    return (
+                      <SoftBox key={report.id} mb={2}>
+                        <SoftBox display="flex" alignItems="center" gap={1}>
+                          <Description sx={{ color: darkMode ? "#e0e0e0" : "#0077b6" }} />
+                          <SoftTypography
+                            variant="body1"
+                            fontWeight="medium"
+                            color={darkMode ? "white" : "dark"}
+                          >
+                            {report.labTest || "Unnamed Report"}
+                          </SoftTypography>
+                        </SoftBox>
                         <SoftTypography
-                          variant="body1"
-                          fontWeight="medium"
-                          color={darkMode ? "white" : "dark"}
+                          variant="body2"
+                          color={darkMode ? "gray" : "text.secondary"}
+                          mt={0.5}
                         >
-                          {report.fileName}
+                          {new Date(report.timestamp).toLocaleString()}
                         </SoftTypography>
+                        <SoftTypography variant="body1" color={darkMode ? "white" : "dark"} mt={0.5}>
+                          {report.description}
+                        </SoftTypography>
+                        <SoftTypography
+                          variant="body2"
+                          color={darkMode ? "gray" : "text.secondary"}
+                          mt={0.5}
+                        >
+                          File: {report.fileName}
+                        </SoftTypography>
+                        {report.dmeId && (
+                          <SoftTypography
+                            variant="body2"
+                            color={darkMode ? "gray" : "text.secondary"}
+                            mt={0.5}
+                          >
+                            DME ID: {report.dmeId}
+                          </SoftTypography>
+                        )}
+                        <Divider sx={{ my: 1, borderColor: darkMode ? "#444" : "#e0e0e0" }} />
                       </SoftBox>
-                      <SoftTypography
-                        variant="body2"
-                        color={darkMode ? "gray" : "text.secondary"}
-                        mt={0.5}
-                      >
-                        {new Date(report.timestamp).toLocaleString()}
-                      </SoftTypography>
-                      <SoftTypography variant="body1" color={darkMode ? "white" : "dark"} mt={0.5}>
-                        {report.description}
-                      </SoftTypography>
-                      {report.labTest && (
-                        <SoftTypography
-                          variant="body2"
-                          color={darkMode ? "gray" : "text.secondary"}
-                          mt={0.5}
-                        >
-                          Lab Test: {report.labTest}
-                        </SoftTypography>
-                      )}
-                      {report.dmeId && (
-                        <SoftTypography
-                          variant="body2"
-                          color={darkMode ? "gray" : "text.secondary"}
-                          mt={0.5}
-                        >
-                          DME ID: {report.dmeId}
-                        </SoftTypography>
-                      )}
-                      <Divider sx={{ my: 1, borderColor: darkMode ? "#444" : "#e0e0e0" }} />
-                    </SoftBox>
-                  ))
+                    );
+                  })
                 ) : (
                   <SoftTypography variant="body1" color={darkMode ? "gray" : "text.secondary"} textAlign="center">
                     No reports available for this patient.
