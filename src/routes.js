@@ -29,6 +29,14 @@ const getUserRole = () => {
   return connectedUser?.role || null;
 };
 const routes = [
+  {
+    name: "Sign In",
+    key: "sign-in",
+    route: "/authentication/sign-in",
+    icon: <MedicalServices size="12px" />,
+    component: <SignIn />,
+    noCollapse: true,
+  },
   ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
     type: "collapse",
     name: "Dashboard",
@@ -115,14 +123,7 @@ const routes = [
     noCollapse: true,
   }] : []),
   
-  {
-    name: "Sign In",
-    key: "sign-in",
-    route: "/authentication/sign-in",
-    icon: <MedicalServices size="12px" />,
-    component: <SignIn />,
-    noCollapse: true,
-  },
+ 
   {
     name: "Sign Up",
     key: "sign-up",

@@ -133,16 +133,14 @@ function ImagingCenterWorkspace({ centerName }) {
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const tempUrl = URL.createObjectURL(file); // Temporary URL for preview
       const imageData = {
+        file, // Pass the file directly
         patientId: userData?.id || patientData.id,
         description: `${file.name} - ${new Date().toLocaleDateString()}`,
-        url: tempUrl,
       };
-      console.log("Uploading image data:", imageData);
+      
       try {
         const uploadedImage = await uploadImage(imageData);
-        console.log("Uploaded image:", uploadedImage);
         setImages((prevImages) => [...prevImages, uploadedImage]);
       } catch (error) {
         console.error("Image upload failed:", error);
@@ -329,13 +327,13 @@ function ImagingCenterWorkspace({ centerName }) {
                       background: darkMode ? "#34495e" : "#f9f9f9",
                     }}
                   >
-                    <CardMedia
-                      component="img"
-                      height="100"
-                      image={image.url}
-                      alt={image.description}
-                      sx={{ borderRadius: "12px 12px 0 0" }}
-                    />
+                  <CardMedia
+  component="img"
+  height="100"
+  image={`http://localhost:3002${image.url}`} // Prepend server URL
+  alt={image.description}
+  sx={{ borderRadius: '12px 12px 0 0' }}
+/>
                     <CardContent sx={{ p: 1 }}>
                       <SoftTypography
                         variant="caption"
