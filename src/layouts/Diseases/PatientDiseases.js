@@ -1,4 +1,3 @@
-// PatientDiseases.js
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
@@ -132,6 +131,10 @@ DiseaseItem.propTypes = {
 const DiseaseCategory = ({ category, darkMode, onAddDisease }) => {
   const [expanded, setExpanded] = useState(true);
 
+  // Retrieve connected user from localStorage
+  const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
+  const isMedecin = connectedUser?.role === "medecins";
+
   return (
     <Card
       sx={{
@@ -161,16 +164,18 @@ const DiseaseCategory = ({ category, darkMode, onAddDisease }) => {
           </SoftTypography>
         </SoftBox>
         <Stack direction="row" alignItems="center" spacing={1}>
-          <Icon 
-            color={darkMode ? "inherit" : "action"} 
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddDisease(category.name.toLowerCase());
-            }}
-            sx={{ cursor: 'pointer' }}
-          >
-            <AddCircle />
-          </Icon>
+          {isMedecin && (
+            <Icon
+              color={darkMode ? "inherit" : "action"}
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddDisease(category.name.toLowerCase());
+              }}
+              sx={{ cursor: "pointer" }}
+            >
+              <AddCircle />
+            </Icon>
+          )}
           <Icon color={darkMode ? "inherit" : "action"}>
             {expanded ? "expand_less" : "expand_more"}
           </Icon>
@@ -213,15 +218,15 @@ const PatientDiseases = () => {
     const fetchConditions = async () => {
       try {
         const user = JSON.parse(localStorage.getItem("connectedUser"));
-  
+
         if (!user) {
           console.error("No connected user found.");
           return;
         }
-  
+
         let patientId = null;
         let scannedPatient = null;
-  
+
         if (user.role === "patient") {
           patientId = user.id;
         } else if (
@@ -235,44 +240,44 @@ const PatientDiseases = () => {
           }
           patientId = scannedPatient.id;
         }
-  
+
         if (!patientId) {
           console.error("No patient ID found.");
           return;
         }
         console.log("scannedPatient:", scannedPatient);
         console.log("patientId:", patientId);
-  
+
         const conditions = await getConditionsByPatientId(patientId);
         console.log("Fetched conditions:", conditions);
-  
+
         const grouped = {
           Allergy: [],
           Chronic: [],
           Infectious: [],
         };
-  
+
         conditions.forEach((condition) => {
           const type = condition.type?.toLowerCase();
           if (type === "allergy") grouped.Allergy.push(condition);
           else if (type === "chronic") grouped.Chronic.push(condition);
           else if (type === "infectious") grouped.Infectious.push(condition);
         });
-  
+
         const categorized = Object.keys(grouped).map((key) => ({
           name: key,
           items: grouped[key],
         }));
-  
+
         setCategories(categorized);
       } catch (error) {
         console.error("Error loading conditions:", error);
       }
     };
-  
+
     fetchConditions();
   }, []);
-  
+
   const handleOpenModal = (type) => {
     setNewDisease({
       type: type,
@@ -291,9 +296,9 @@ const PatientDiseases = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewDisease(prev => ({
+    setNewDisease((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -301,7 +306,7 @@ const PatientDiseases = () => {
     try {
       const user = JSON.parse(localStorage.getItem("connectedUser"));
       let patientId = null;
-      
+
       if (user.role === "patient") {
         patientId = user.id;
       } else {
@@ -315,18 +320,18 @@ const PatientDiseases = () => {
 
       const diseaseToCreate = {
         ...newDisease,
-        patientId: patientId
+        patientId: patientId,
       };
 
       const createdDisease = await createCondition(diseaseToCreate);
-      
+
       // Update the categories state with the new disease
-      setCategories(prevCategories => {
-        return prevCategories.map(category => {
+      setCategories((prevCategories) => {
+        return prevCategories.map((category) => {
           if (category.name.toLowerCase() === newDisease.type.toLowerCase()) {
             return {
               ...category,
-              items: [...category.items, createdDisease]
+              items: [...category.items, createdDisease],
             };
           }
           return category;
@@ -414,10 +419,10 @@ const PatientDiseases = () => {
           ) : (
             categories.map((category, index) => (
               category.items.length > 0 && (
-                <DiseaseCategory 
-                  key={index} 
-                  category={category} 
-                  darkMode={darkMode} 
+                <DiseaseCategory
+                  key={index}
+                  category={category}
+                  darkMode={darkMode}
                   onAddDisease={handleOpenModal}
                 />
               )
@@ -436,7 +441,7 @@ const PatientDiseases = () => {
             <SoftTypography variant="h6" mb={3}>
               Add New {newDisease.type.charAt(0).toUpperCase() + newDisease.type.slice(1)} Condition
             </SoftTypography>
-            
+
             <Stack spacing={2}>
               <TextField
                 fullWidth
@@ -445,7 +450,7 @@ const PatientDiseases = () => {
                 value={newDisease.name}
                 onChange={handleInputChange}
               />
-              
+
               <TextField
                 fullWidth
                 label="Diagnosis Date"
@@ -455,52 +460,27 @@ const PatientDiseases = () => {
                 onChange={handleInputChange}
                 InputLabelProps={{ shrink: true }}
               />
-              
-              <FormControl fullWidth />
-              
+
               <FormControl fullWidth>
-  <InputLabel id="severity-label" htmlFor="severity-select">
-    Severity
-  </InputLabel>
-  
-  <Box
-    component="select"
-    id="severity-select" // Match htmlFor
-    name="severity"
-    value={newDisease.severity || ""}
-    onChange={(e) => {
-      console.log("Severity selected:", e.target.value);
-      handleInputChange(e);
-    }}
-    onClick={() => console.log("Severity dropdown clicked")}
-    sx={{
-      width: "100%",
-      padding: "10px",
-      fontSize: "16px",
-      borderRadius: "4px",
-      border: "1px solid #ccc",
-      backgroundColor: "white",
-      zIndex: 1300,
-      pointerEvents: "auto",
-      "&:focus": {
-        outline: "2px solid #0077b6",
-        borderColor: "#0077b6",
-      },
-      // Ensure label compatibility
-      marginTop: "16px", // Space for floating label
-      height: "40px", // Consistent height
-    }}
-  >
-    <option value="" disabled>
-      Select Severity
-    </option>
-    <option value="Mild">Mild</option>
-    <option value="Moderate">Moderate</option>
-    <option value="Severe">Severe</option>
-    <option value="Controlled">Controlled</option>
-    <option value="Stage 1">Stage 1</option>
-  </Box>
-</FormControl>
+                <InputLabel id="severity-label">Severity</InputLabel>
+                <Select
+                  labelId="severity-label"
+                  name="severity"
+                  value={newDisease.severity}
+                  onChange={handleInputChange}
+                  label="Severity"
+                >
+                  <MenuItem value="" disabled>
+                    Select Severity
+                  </MenuItem>
+                  <MenuItem value="Mild">Mild</MenuItem>
+                  <MenuItem value="Moderate">Moderate</MenuItem>
+                  <MenuItem value="Severe">Severe</MenuItem>
+                  <MenuItem value="Controlled">Controlled</MenuItem>
+                  <MenuItem value="Stage 1">Stage 1</MenuItem>
+                </Select>
+              </FormControl>
+
               <TextField
                 fullWidth
                 label="Description"
@@ -510,7 +490,7 @@ const PatientDiseases = () => {
                 multiline
                 rows={3}
               />
-              
+
               <TextField
                 fullWidth
                 label="Treatment"
@@ -520,7 +500,7 @@ const PatientDiseases = () => {
                 multiline
                 rows={2}
               />
-              
+
               <Stack direction="row" spacing={2} justifyContent="flex-end" mt={2}>
                 <Button variant="outlined" onClick={handleCloseModal}>
                   Cancel
