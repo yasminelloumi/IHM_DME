@@ -7,35 +7,21 @@ const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3002;
-const JSON_SERVER_URL = process.env.JSON_SERVER_URL || 'http://localhost:3001';
+const JSON_SERVER_URL = 'http://localhost:3001';
 
-// Directories for storing uploaded files
+// Directories
 const IMAGE_UPLOAD_DIR = path.join(__dirname, 'Uploads', 'images');
-
-// Ensure upload directory exists
 if (!fs.existsSync(IMAGE_UPLOAD_DIR)) {
-  console.log(`Creating directory: ${IMAGE_UPLOAD_DIR}`);
   fs.mkdirSync(IMAGE_UPLOAD_DIR, { recursive: true });
 }
 
-// Test directory permissions
-fs.access(IMAGE_UPLOAD_DIR, fs.constants.W_OK, (err) => {
-  if (err) {
-    console.error(`Directory ${IMAGE_UPLOAD_DIR} is not writable:`, err);
-  } else {
-    console.log(`Directory ${IMAGE_UPLOAD_DIR} is writable`);
-  }
-});
-
-// File to store image metadata
+// Image metadata storage
 const IMAGE_DB_FILE = path.join(__dirname, 'images.json');
-
-// Initialize image database if it doesn't exist
 if (!fs.existsSync(IMAGE_DB_FILE)) {
   fs.writeFileSync(IMAGE_DB_FILE, JSON.stringify({ images: [] }, null, 2));
 }
 
-// Helper functions for images
+// Helper functions
 const readImages = () => {
   try {
     return JSON.parse(fs.readFileSync(IMAGE_DB_FILE)).images;
@@ -48,14 +34,13 @@ const readImages = () => {
 const writeImages = (images) => {
   try {
     fs.writeFileSync(IMAGE_DB_FILE, JSON.stringify({ images }, null, 2));
-    console.log('Images written to images.json');
   } catch (err) {
-    console.error('Error writing to images.json:', err);
+    console.error('Error writing images.json:', err);
     throw err;
   }
 };
 
-// Configure Multer for Image uploads
+// Multer configuration for images
 const imageStorage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, IMAGE_UPLOAD_DIR),
   filename: (req, file, cb) => {
@@ -66,79 +51,74 @@ const imageStorage = multer.diskStorage({
 
 const imageUpload = multer({
   storage: imageStorage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = filetypes.test(file.mimetype);
-
-    if (mimetype && extname) {
+    if (extname && mimetype) {
       cb(null, true);
     } else {
-      cb(new Error('Only image files (jpeg, jpg, png, gif) are allowed'), false);
+      cb(new Error('Only images (jpeg, jpg, png, gif) allowed'));
     }
   },
 });
 
 // Middleware
-app.use(cors({
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'DELETE'],
-  allowedHeaders: ['Content-Type'],
-}));
+app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Serve static files
 app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
 
 // Image Upload Route
 app.post('/images', imageUpload.single('image'), async (req, res) => {
   try {
-    console.log('Received image upload request:', req.body, req.file);
-    const { patientId, description } = req.body;
-
-    // Validate required fields
-    if (!req.file) {
-      return res.status(400).json({ error: 'No image file provided' });
+    const { patientId, description, dmeId, imgTest } = req.body;
+    if (!req.file || !patientId || !description || !dmeId || !imgTest) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
-    if (!patientId || !description) {
-      return res.status(400).json({ error: 'patientId and description are required' });
+
+    const sanitizedImgTest = imgTest.replace(/[^a-zA-Z0-9\-_\s]/g, '').trim();
+    if (!sanitizedImgTest) {
+      return res.status(400).json({ error: 'Invalid imaging test' });
     }
 
     const newImage = {
       id: Date.now().toString(),
       patientId,
       description,
-      fileName: req.file.originalname,
+      fileName: req.file.filename,
       url: `/uploads/images/${req.file.filename}`,
       dateCreated: new Date().toISOString(),
+      dmeId,
+      imgTest: sanitizedImgTest,
     };
 
-    // Save to local image database
     const images = readImages();
     images.push(newImage);
     writeImages(images);
 
-    // Update JSON server
+    // Optional: Sync with JSON server
     try {
       await axios.post(`${JSON_SERVER_URL}/images`, newImage);
-    } catch (jsonServerError) {
-      console.error('JSON Server Error:', jsonServerError.message);
-      return res.status(500).json({ error: 'Failed to save to JSON server' });
+    } catch (err) {
+      console.error('JSON server sync failed:', err.message);
     }
 
     res.status(201).json(newImage);
   } catch (err) {
-    console.error('Image Upload Error:', err.message, err.stack);
-    res.status(500).json({ error: 'Failed to save image', details: err.message });
+    console.error('Image upload error:', err);
+    res.status(500).json({ error: 'Failed to upload image', details: err.message });
   }
 });
 
-// Get All Images Route
+// Get Images Route
 app.get('/images', (req, res) => {
   try {
-    const images = readImages();
+    const { patientId } = req.query;
+    let images = readImages();
+    if (patientId) {
+      images = images.filter((img) => img.patientId === patientId);
+    }
     res.json(images);
   } catch (err) {
     console.error('Error fetching images:', err);
@@ -152,27 +132,18 @@ app.delete('/images/:id', (req, res) => {
     const { id } = req.params;
     const images = readImages();
     const imageIndex = images.findIndex((img) => img.id === id);
-
     if (imageIndex === -1) {
       return res.status(404).json({ error: 'Image not found' });
     }
 
     const image = images[imageIndex];
-    const filePath = path.join(__dirname, 'Uploads', 'images', path.basename(image.url));
-
-    // Delete file from disk
+    const filePath = path.join(IMAGE_UPLOAD_DIR, image.fileName);
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
-      console.log(`Deleted file: ${filePath}`);
     }
 
-    // Remove from local database
     images.splice(imageIndex, 1);
     writeImages(images);
-
-    // Delete from JSON server
-    axios.delete(`${JSON_SERVER_URL}/images/${id}`)
-      .catch((err) => console.error('Failed to delete from JSON server:', err.message));
 
     res.json({ message: 'Image deleted' });
   } catch (err) {
@@ -181,7 +152,6 @@ app.delete('/images/:id', (req, res) => {
   }
 });
 
-// Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });

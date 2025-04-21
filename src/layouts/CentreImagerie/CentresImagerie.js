@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import SoftBox from "components/SoftBox";
@@ -29,11 +28,10 @@ import {
   LocalHospital,
 } from "@mui/icons-material";
 import { getImages, uploadImage } from "services/imagesService";
-import { getDMEByPatientId } from "services/dmeService"; // Adjust path as needed
+import { getDMEByPatientId } from "services/dmeService";
 
 // Placeholder patient data
 const patientData = {
-  
   heartRate: 76,
 };
 
@@ -100,118 +98,192 @@ HumanModelCard.propTypes = {
 // Main Component
 function ImagingCenterWorkspace({ centerName }) {
   const [images, setImages] = useState([]);
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      text: "Initial X-Ray shows no fractures.",
-      timestamp: "2025-04-13 10:30 AM",
-    },
-  ]);
+  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [darkMode, setDarkMode] = useState(false);
   const [userData, setUserData] = useState(null);
   const [dmeRecords, setDmeRecords] = useState([]);
   const [selectedDme, setSelectedDme] = useState("");
+  const [selectedImgTest, setSelectedImgTest] = useState("");
   const [isLoadingDme, setIsLoadingDme] = useState(false);
   const [dmeError, setDmeError] = useState(null);
+  const [uploadError, setUploadError] = useState(null);
+  const [newImageFile, setNewImageFile] = useState(null);
+  const [uploadLoading, setUploadLoading] = useState(false);
 
-  // Fetch images and DME records on component mount
+  // Fetch DME records and images on component mount
   useEffect(() => {
-    const fetchImages = async () => {
-      try {
-        console.log("Attempting to fetch images...");
-        const fetchedImages = await getImages();
-        console.log("Fetched images:", fetchedImages);
-        setImages(fetchedImages);
-      } catch (error) {
-        console.error("Failed to load images:", error);
-      }
-    };
-
-    const fetchDmeRecords = async (patientId) => {
+    const fetchData = async () => {
       setIsLoadingDme(true);
       setDmeError(null);
+
       try {
-        console.log("Fetching DME records for patientId:", patientId);
+        // Safely retrieve and parse scannedPatient from localStorage
+        let scannedPatient = null;
+        try {
+          const storedPatient = localStorage.getItem("scannedPatient");
+          console.log("Stored patient data:", storedPatient); // Debug log
+          if (storedPatient) {
+            scannedPatient = JSON.parse(storedPatient);
+          }
+        } catch (parseError) {
+          console.error("Error parsing scannedPatient from localStorage:", parseError);
+        }
+
+        if (!scannedPatient || !scannedPatient.id) {
+          setDmeError("Patient not found. Please select a patient to proceed.");
+          setIsLoadingDme(false);
+          return;
+        }
+
+        const patientId = scannedPatient.id;
+        setUserData({
+          name: `${scannedPatient.prenom} ${scannedPatient.nom}`,
+          id: patientId,
+          CIN: scannedPatient.CIN || "Not provided", // Include CIN
+          heartRate: patientData.heartRate,
+        });
+
+        // Fetch DME records
         const records = await getDMEByPatientId(patientId);
-        console.log("Raw API response:", records);
-        // Ensure records is an array
         const dmeArray = Array.isArray(records) ? records : records.data || [];
-        console.log("Processed DME records:", dmeArray);
-        setDmeRecords(dmeArray);
+        const validDMEs = dmeArray.filter((dme) => dme.imgTest && dme.imgTest.length > 0);
+        setDmeRecords(validDMEs);
+
+        if (validDMEs.length > 0) {
+          // Check for stored DME in localStorage
+          const storedDME = JSON.parse(localStorage.getItem("scannedDMEImaging"));
+          const validStoredDME = storedDME && validDMEs.find((dme) => dme.id === storedDME.id);
+
+          if (validStoredDME && validStoredDME.imgTest && validStoredDME.imgTest.length > 0) {
+            setSelectedDme(validStoredDME.id);
+            setSelectedImgTest(validStoredDME.imgTest[0]);
+            localStorage.setItem("selectedImgTest", validStoredDME.imgTest[0]);
+            localStorage.setItem("scannedDMEImaging", JSON.stringify(validStoredDME));
+          } else {
+            const defaultDME = validDMEs[0];
+            setSelectedDme(defaultDME.id);
+            setSelectedImgTest(defaultDME.imgTest[0]);
+            localStorage.setItem("selectedImgTest", defaultDME.imgTest[0]);
+            localStorage.setItem("scannedDMEImaging", JSON.stringify(defaultDME));
+          }
+        } else {
+          setDmeError("No DME records with imaging tests found.");
+        }
+
+        // Fetch images
+        const fetchedImages = await getImages(patientId);
+        setImages(fetchedImages || []);
       } catch (error) {
-        console.error("Failed to load DME records:", error);
-        setDmeError("Failed to load DME records. Please try again.");
+        console.error("Error fetching data:", error);
+        setDmeError("Failed to load data. Please try again.");
       } finally {
         setIsLoadingDme(false);
       }
     };
 
-    fetchImages();
-
-    const scannedPatient = JSON.parse(localStorage.getItem("scannedPatient"));
-    console.log("scannedPatient from localStorage:", scannedPatient);
-    if (scannedPatient) {
-      const patientId = scannedPatient.id; // Use id explicitly (should be "1a04")
-      setUserData({
-        name: `${scannedPatient.prenom} ${scannedPatient.nom}`,
-        id: patientId,
-        heartRate: 76,
-      });
-      if (patientId) {
-        fetchDmeRecords(patientId);
-      } else {
-        setDmeError("No valid patient ID found.");
-        setIsLoadingDme(false);
-      }
-    } else {
-      setDmeError("No patient data found in localStorage.");
-      setIsLoadingDme(false);
-    }
+    fetchData();
   }, []);
 
-  // Handle image upload
-  const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const imageData = {
-        file,
-        patientId: userData?.id || patientData.id,
-        description: `${file.name} - ${new Date().toLocaleDateString()}`,
-      };
-      try {
-        const uploadedImage = await uploadImage(imageData);
-        setImages((prevImages) => [...prevImages, uploadedImage]);
-      } catch (error) {
-        console.error("Image upload failed:", error);
-        alert("Failed to upload image: " + error.message);
-      }
-    }
-  };
-
-  // Handle comment submission
-  const handleCommentSubmit = () => {
-    if (newComment.trim()) {
-      const newCommentObj = {
-        id: comments.length + 1,
-        text: newComment,
-        timestamp: new Date().toLocaleString(),
-      };
-      setComments([...comments, newCommentObj]);
-      setNewComment("");
-    }
-  };
-
-  // Handle DME selection
+  // Handle DME and imgTest selection
   const handleDmeChange = (event) => {
-    setSelectedDme(event.target.value);
-    console.log("Selected DME and imgTest:", event.target.value);
+    const [dmeId, imgTest] = event.target.value.split("|");
+    const selected = dmeRecords.find((dme) => dme.id === dmeId);
+    setSelectedDme(dmeId);
+    setSelectedImgTest(imgTest);
+    localStorage.setItem("selectedImgTest", imgTest);
+    localStorage.setItem("scannedDMEImaging", JSON.stringify(selected));
+    setUploadError(null);
   };
 
-  // Toggle dark/light mode
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
+  // Handle image file selection
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    console.log("Selected file:", file); // Debug log
+    if (file && file.type.startsWith("image/")) {
+      setNewImageFile(file);
+      setUploadError(null);
+    } else {
+      setUploadError("Please select a valid image file (jpeg, jpg, png, gif).");
+      setNewImageFile(null);
+    }
   };
+
+  // Handle image submission
+  const handleImageSubmit = async () => {
+    if (!newImageFile || !selectedDme || !selectedImgTest) {
+      setUploadError("Please select an image, DME, and imaging test.");
+      return;
+    }
+  
+    console.log("Submitting image:", newImageFile); // Debug log
+  
+    setUploadLoading(true);
+    setUploadError(null);
+  
+    try {
+      const formData = new FormData();
+      formData.append("image", newImageFile);
+      formData.append("patientId", userData.id);
+      formData.append("description", newComment || `Image: ${newImageFile.name}`);
+      formData.append("dmeId", selectedDme);
+      formData.append("imgTest", selectedImgTest);
+  
+      // Log formData entries for debugging
+      for (let [key, value] of formData.entries()) {
+        console.log(`formData ${key}:`, value);
+      }
+  
+      const uploadedImage = await uploadImage(formData);
+      setImages((prev) => [uploadedImage, ...prev]);
+  
+      if (newComment.trim()) {
+        setComments((prev) => [
+          ...prev,
+          {
+            id: prev.length + 1,
+            text: newComment,
+            timestamp: new Date().toLocaleString(),
+          },
+        ]);
+      }
+  
+      // Reset form
+      setNewImageFile(null);
+      setNewComment("");
+      setSelectedDme("");
+      setSelectedImgTest("");
+      localStorage.removeItem("selectedImgTest");
+      localStorage.removeItem("scannedDMEImaging");
+    } catch (error) {
+      console.error("Image upload error:", error);
+      setUploadError(error.message || "Failed to upload image. Please try again.");
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  // Toggle dark mode
+  const toggleDarkMode = () => setDarkMode(!darkMode);
+
+  // Render loading or error states
+  if (isLoadingDme) {
+    return (
+      <SoftBox display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress color="info" />
+      </SoftBox>
+    );
+  }
+
+  if (dmeError && !userData) {
+    return (
+      <SoftBox display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <SoftTypography variant="h6" color="error">
+          {dmeError}
+        </SoftTypography>
+      </SoftBox>
+    );
+  }
 
   return (
     <SoftBox
@@ -221,7 +293,6 @@ function ImagingCenterWorkspace({ centerName }) {
           ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
           : "linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
         padding: { xs: 2, md: 4 },
-        color: darkMode ? "#e0e0e0" : "#1a2a3a",
       }}
     >
       {/* Header */}
@@ -231,89 +302,60 @@ function ImagingCenterWorkspace({ centerName }) {
         alignItems="center"
         mb={4}
         p={2}
-        sx={{
-          background: darkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.9)",
-          borderRadius: "16px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        }}
+        sx={{ background: darkMode ? "rgba(255, 255, 255, 0.1)" : "#fff", borderRadius: "16px" }}
       >
         <SoftBox display="flex" alignItems="center" gap={2}>
-          <Avatar sx={{ bgcolor: "#0077b6", width: 48, height: 48 }}>
-            <LocalHospital fontSize="large" />
+          <Avatar sx={{ bgcolor: "#0077b6" }}>
+            <LocalHospital />
           </Avatar>
           <SoftBox>
-            <SoftTypography
-              variant="h6"
-              fontWeight="bold"
-              color={darkMode ? "gray" : "text.secondary"}
-            >
+            <SoftTypography variant="h6" color={darkMode ? "gray" : "text.secondary"}>
               Imaging Center
             </SoftTypography>
-            <SoftTypography variant="h2" fontWeight="bold" color={darkMode ? "white" : "dark"}>
+            <SoftTypography variant="h5" color={darkMode ? "white" : "dark"}>
               {centerName}
             </SoftTypography>
           </SoftBox>
         </SoftBox>
         <FormControlLabel
-          control={
-            <Switch
-              checked={darkMode}
-              onChange={toggleDarkMode}
-              color="info"
-              sx={{
-                "& .MuiSwitch-thumb": {
-                  backgroundColor: darkMode ? "#e0e0e0" : "#0077b6",
-                },
-                "& .MuiSwitch-track": {
-                  backgroundColor: darkMode ? "#34495e" : "#b0bec5",
-                },
-              }}
-            />
-          }
+          control={<Switch checked={darkMode} onChange={toggleDarkMode} color="info" />}
           label={
             <SoftBox display="flex" alignItems="center" gap={1}>
-              {darkMode ? (
-                <DarkMode sx={{ color: "#e0e0e0" }} />
-              ) : (
-                <LightMode sx={{ color: "#f9a825" }} />
-              )}
+              {darkMode ? <DarkMode /> : <LightMode sx={{ color: "#f9a825" }} />}
               <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
                 Theme
               </SoftTypography>
             </SoftBox>
           }
           labelPlacement="start"
-          sx={{ margin: 0 }}
         />
       </SoftBox>
 
+      {uploadError && (
+        <SoftBox mb={2} p={2} sx={{ backgroundColor: "#ffebee", borderRadius: "8px" }}>
+          <SoftTypography variant="body2" color="error">
+            {uploadError}
+          </SoftTypography>
+        </SoftBox>
+      )}
+
       {/* Main Content */}
-      <SoftBox
-        display="grid"
-        gridTemplateColumns={{ xs: "1fr", md: "2fr 1fr" }}
-        gap={4}
-      >
-        {/* Left Section: Image Upload and Comments */}
+      <SoftBox display="grid" gridTemplateColumns={{ xs: "1fr", md: "2fr 1fr" }} gap={4}>
+        {/* Left Section */}
         <SoftBox display="flex" flexDirection="column" gap={4}>
-          {/* Patient Info Card */}
-          <Card
-            sx={{
-              borderRadius: "16px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              background: darkMode ? "#2c3e50" : "#fff",
-            }}
-          >
+          {/* Patient Info */}
+          <Card sx={{ background: darkMode ? "#2c3e50" : "#fff" }}>
             <CardContent>
               <SoftBox display="flex" alignItems="center" gap={2}>
-                <Avatar sx={{ bgcolor: "#0077b6", width: 48, height: 48 }}>
-                  <Person fontSize="large" />
+                <Avatar sx={{ bgcolor: "#0077b6" }}>
+                  <Person />
                 </Avatar>
                 <SoftBox>
-                  <SoftTypography variant="h6" fontWeight="bold" color={darkMode ? "white" : "dark"}>
-                    {userData ? userData.name : "Loading..."}
+                  <SoftTypography variant="h6" color={darkMode ? "white" : "dark"}>
+                    {userData?.name || "Loading..."}
                   </SoftTypography>
                   <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-                    CIN: {userData ? userData.id : "Loading..."}
+                    CIN: {userData?.CIN || "Not provided"}
                   </SoftTypography>
                 </SoftBox>
               </SoftBox>
@@ -321,138 +363,87 @@ function ImagingCenterWorkspace({ centerName }) {
           </Card>
 
           {/* Image Upload Section */}
-          <Card
-            sx={{
-              borderRadius: "16px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              background: darkMode ? "#2c3e50" : "#fff",
-            }}
-          >
+          <Card sx={{ background: darkMode ? "#2c3e50" : "#fff" }}>
             <CardContent>
-              <SoftTypography variant="h6" fontWeight="bold" mb={2} color={darkMode ? "white" : "dark"}>
+              <SoftTypography variant="h6" color={darkMode ? "white" : "dark"} mb={2}>
                 Upload Medical Images
               </SoftTypography>
 
               {/* DME Dropdown */}
-              <SoftBox mb={3}>
-                {isLoadingDme ? (
-                  <SoftBox display="flex" alignItems="center" gap={2}>
-                    <CircularProgress size={24} sx={{ color: darkMode ? "#e0e0e0" : "#0077b6" }} />
-                    <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-                      Loading DME records...
-                    </SoftTypography>
-                  </SoftBox>
-                ) : dmeError ? (
-                  <SoftTypography variant="body2" color="error">
-                    {dmeError}
-                  </SoftTypography>
-                ) : (
-                  <FormControl fullWidth>
-                    <InputLabel
-                      sx={{
-                        color: darkMode ? "#e0e0e0" : "text.secondary",
-                        "&.Mui-focused": { color: "#0077b6" },
-                      }}
-                    >
-                      Select DME Imaging Test
-                    </InputLabel>
-                    <Select
-                      value={selectedDme}
-                      onChange={handleDmeChange}
-                      sx={{
-                        borderRadius: "12px",
-                        backgroundColor: darkMode ? "#34495e" : "#fff",
-                        color: darkMode ? "#e0e0e0" : "#333",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)",
-                        },
-                        "&:hover .MuiOutlinedInput-notchedOutline": {
-                          borderColor: darkMode ? "#fff" : "rgba(0, 0, 0, 0.87)",
-                        },
-                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#0077b6",
-                        },
-                      }}
-                      MenuProps={{
-                        PaperProps: {
-                          sx: {
-                            backgroundColor: darkMode ? "#2c3e50" : "#fff",
-                            color: darkMode ? "#e0e0e0" : "#333",
-                          },
-                        },
-                      }}
-                    >
-                      <MenuItem value="" disabled>
-                        Select a DME imaging test
-                      </MenuItem>
-                      {dmeRecords.length > 0 ? (
-                        dmeRecords.flatMap((dme) =>
-                          (dme.imgTest && dme.imgTest.length > 0
-                            ? dme.imgTest
-                            : ["No imaging tests"]
-                          ).map((test, index) => (
-                            <MenuItem
-                              key={`${dme.id}:${test}`}
-                              value={`${dme.id}:${test}`}
-                            >
-                              {`${new Date(dme.dateConsultation).toLocaleDateString(
-                                "en-US"
-                              )} - DME(${dme.id}) ${test}`}
-                            </MenuItem>
-                          ))
-                        )
-                      ) : (
-                        <MenuItem value="" disabled>
-                          No DME records available
+              <FormControl fullWidth sx={{ mb: 3 }}>
+                <InputLabel sx={{ color: darkMode ? "#e0e0e0" : "text.secondary" }}>
+                  Select DME and Imaging Test
+                </InputLabel>
+                <Select
+                  value={selectedDme && selectedImgTest ? `${selectedDme}|${selectedImgTest}` : ""}
+                  onChange={handleDmeChange}
+                  sx={{
+                    backgroundColor: darkMode ? "#34495e" : "#fff",
+                    color: darkMode ? "#e0e0e0" : "#333",
+                  }}
+                >
+                  {dmeRecords.length === 0 ? (
+                    <MenuItem disabled>No imaging tests available</MenuItem>
+                  ) : (
+                    dmeRecords.flatMap((dme) =>
+                      dme.imgTest.map((test) => (
+                        <MenuItem key={`${dme.id}|${test}`} value={`${dme.id}|${test}`}>
+                          DME {dme.id} - {test} ({new Date(dme.dateConsultation).toLocaleDateString()})
                         </MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
-                )}
-              </SoftBox>
+                      ))
+                    )
+                  )}
+                </Select>
+              </FormControl>
 
-              {/* Image Upload Input */}
+              {/* Image Upload */}
               <SoftBox
                 component="label"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
                 p={3}
+                mb={2}
                 sx={{
                   border: "2px dashed",
                   borderColor: darkMode ? "#e0e0e0" : "#0077b6",
                   borderRadius: "12px",
                   cursor: "pointer",
-                  "&:hover": {
-                    backgroundColor: darkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 119, 182, 0.1)",
-                  },
                 }}
               >
-                <AddAPhoto sx={{ color: darkMode ? "#e0e0e0" : "#0077b6", fontSize: "2rem", mr: 1 }} />
+                <AddAPhoto sx={{ color: darkMode ? "#e0e0e0" : "#0077b6", mr: 1 }} />
                 <SoftTypography variant="body1" color={darkMode ? "gray" : "text.secondary"}>
-                  Click to upload an image
+                  {newImageFile ? newImageFile.name : "Click to upload an image"}
                 </SoftTypography>
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={handleImageUpload}
-                  aria-label="Upload medical image"
-                />
+                <input type="file" accept="image/*" hidden onChange={handleImageUpload} />
               </SoftBox>
+
+              {/* Comment Input */}
+              <TextField
+                fullWidth
+                multiline
+                rows={2}
+                placeholder="Add a description..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                sx={{ mb: 2 }}
+              />
+
+              {/* Submit Button */}
+              <SoftButton
+                variant="gradient"
+                color="info"
+                onClick={handleImageSubmit}
+                disabled={uploadLoading || !newImageFile || !selectedDme || !selectedImgTest}
+                startIcon={uploadLoading ? <CircularProgress size={20} /> : <Send />}
+              >
+                {uploadLoading ? "Uploading..." : "Submit Image"}
+              </SoftButton>
 
               {/* Image Previews */}
               <SoftBox display="flex" flexWrap="wrap" gap={2} mt={3}>
                 {images.map((image) => (
-                  <Card
-                    key={image.id}
-                    sx={{
-                      width: 150,
-                      borderRadius: "12px",
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-                      background: darkMode ? "#34495e" : "#f9f9f9",
-                    }}
-                  >
+                  <Card key={image.id} sx={{ width: 150, background: darkMode ? "#34495e" : "#f9f9f9" }}>
                     <CardMedia
                       component="img"
                       height="100"
@@ -461,12 +452,11 @@ function ImagingCenterWorkspace({ centerName }) {
                       sx={{ borderRadius: "12px 12px 0 0" }}
                     />
                     <CardContent sx={{ p: 1 }}>
-                      <SoftTypography
-                        variant="caption"
-                        color={darkMode ? "gray" : "text.secondary"}
-                        textAlign="center"
-                      >
+                      <SoftTypography variant="caption" color={darkMode ? "gray" : "text.secondary"}>
                         {image.description}
+                      </SoftTypography>
+                      <SoftTypography variant="caption" display="block" color={darkMode ? "gray" : "text.secondary"}>
+                        DME: {image.dmeId} - {image.imgTest}
                       </SoftTypography>
                     </CardContent>
                   </Card>
@@ -476,76 +466,21 @@ function ImagingCenterWorkspace({ centerName }) {
           </Card>
 
           {/* Comments Section */}
-          <Card
-            sx={{
-              borderRadius: "16px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              background: darkMode ? "#2c3e50" : "#fff",
-            }}
-          >
+          <Card sx={{ background: darkMode ? "#2c3e50" : "#fff" }}>
             <CardContent>
-              <SoftTypography variant="h6" fontWeight="bold" mb={2} color={darkMode ? "white" : "dark"}>
+              <SoftTypography variant="h6" color={darkMode ? "white" : "dark"} mb={2}>
                 Comments & Notes
               </SoftTypography>
-
-              {/* Comment Input */}
-              <SoftBox display="flex" alignItems="center" gap={2} mb={3}>
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={2}
-                  placeholder="Add a comment..."
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "12px",
-                      backgroundColor: darkMode ? "#34495e" : "#fff",
-                      "& fieldset": {
-                        borderColor: darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)",
-                      },
-                      "&:hover fieldset": {
-                        borderColor: darkMode ? "#fff" : "rgba(0, 0, 0, 0.87)",
-                      },
-                      "&.Mui-focused fieldset": {
-                        borderColor: "#0077b6",
-                      },
-                    },
-                    "& .MuiInputBase-input": {
-                      color: darkMode ? "#e0e0e0" : "#333",
-                    },
-                  }}
-                  inputProps={{
-                    "aria-label": "Add a comment",
-                  }}
-                />
-                <SoftButton
-                  variant="gradient"
-                  color="info"
-                  onClick={handleCommentSubmit}
-                  sx={{ borderRadius: "12px", px: 3 }}
-                  startIcon={<Send />}
-                  aria-label="Submit comment"
-                >
-                  Send
-                </SoftButton>
-              </SoftBox>
-
-              {/* Comment History */}
               <SoftBox maxHeight="200px" sx={{ overflowY: "auto" }}>
                 {comments.map((comment) => (
                   <SoftBox key={comment.id} mb={2}>
-                    <SoftTypography
-                      variant="body2"
-                      color={darkMode ? "gray" : "text.secondary"}
-                      mb={0.5}
-                    >
+                    <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
                       {comment.timestamp}
                     </SoftTypography>
                     <SoftTypography variant="body1" color={darkMode ? "white" : "dark"}>
                       {comment.text}
                     </SoftTypography>
-                    <Divider sx={{ my: 1, borderColor: darkMode ? "#444" : "#e0e0e0" }} />
+                    <Divider sx={{ my: 1 }} />
                   </SoftBox>
                 ))}
               </SoftBox>
@@ -553,9 +488,9 @@ function ImagingCenterWorkspace({ centerName }) {
           </Card>
         </SoftBox>
 
-        {/* Right Section: Vitals and 3D Human Model */}
+        {/* Right Section */}
         <SoftBox display="flex" flexDirection="column" gap={4}>
-          <VitalsCard heartRate={patientData.heartRate} />
+          <VitalsCard heartRate={userData?.heartRate || patientData.heartRate} />
           <HumanModelCard darkMode={darkMode} />
         </SoftBox>
       </SoftBox>

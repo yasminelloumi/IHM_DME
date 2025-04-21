@@ -191,6 +191,14 @@
       "fileName": "458084451_837143228566340_4462744018878007248_n.jpeg",
       "url": "/uploads/images/image-1745226263491-484966141.jpeg",
       "dateCreated": "2025-04-21T09:04:23.514Z"
+    },
+    {
+      "id": "1745270804643",
+      "patientId": "e3a2",
+      "description": "test test bla bla bla ",
+      "fileName": "Screenshot 2025-04-17 171038.png",
+      "url": "/uploads/images/image-1745270804627-602006415.png",
+      "dateCreated": "2025-04-21T21:26:44.643Z"
     }
   ],
   "analyses": [
@@ -536,6 +544,28 @@
         "Eye fundus examination"
       ],
       "notes": "Blood sugar levels have improved. Continue current medication and monitor diet. Next follow-up in 2 months."
+    },
+    {
+      "id": "e3s5",
+      "patientId": "e3a2",
+      "medecinId": "5",
+      "dateConsultation": "2023-09-22T14:45:00",
+      "reason": "Persistent headaches",
+      "diagnostiques": [
+        "Tension-type headache"
+      ],
+      "ordonnances": [
+        "Paracetamol 500mg Twice daily",
+        "Stress management techniques N/A Daily"
+      ],
+      "laboTest": [
+        "Thyroid function test",
+        "Vitamin B12 levels"
+      ],
+      "imgTest": [
+        "MRI Brain"
+      ],
+      "notes": "Patient was recommended to maintain a sleep diary and avoid caffeine in the evening."
     }
   ],
   "reports": [
