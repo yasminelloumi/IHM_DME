@@ -7,6 +7,14 @@
       "fileName": "Diagramme de classe DME.pdf",
       "filePath": "/uploads/pdfFiles/report-1745197705961-971460298.pdf",
       "timestamp": "2025-04-21T01:08:25.966Z"
+    },
+    {
+      "id": "1745222960888",
+      "patientId": "1a04",
+      "description": "the description for this report is use case.",
+      "fileName": "use case.pdf",
+      "filePath": "/uploads/pdfFiles/report-1745222960879-112343658.pdf",
+      "timestamp": "2025-04-21T08:09:20.888Z"
     }
   ]
 }

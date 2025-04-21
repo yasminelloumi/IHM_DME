@@ -12,6 +12,7 @@ import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import { getDMEByPatientId, createDME } from "../../services/dmeService";
 import { getById } from "../../services/medecinService";
+import { getReportsByPatient } from "../../services/reportsServices";
 import DME from '../../models/DME';
 import {
   Event as EventIcon,
@@ -25,7 +26,6 @@ import {
   DarkMode,
   LightMode,
   Download as DownloadIcon,
-  ZoomIn as ZoomInIcon,
   PictureAsPdf as PdfIcon,
   Description as ReportIcon,
   Visibility as RadiologyIcon
@@ -210,7 +210,6 @@ TrendsCard.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Enhanced Medical Imaging Study Card
 const ImagingStudyCard = ({ study, darkMode }) => {
   const [open, setOpen] = React.useState(false);
 
@@ -320,7 +319,6 @@ const ImagingStudyCard = ({ study, darkMode }) => {
         </Box>
       </CardContent>
 
-      {/* Study Viewer Dialog */}
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
         <DialogContent>
           <Box sx={{ 
@@ -420,7 +418,6 @@ ImagingStudyCard.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Lab Test Card component
 const LabTestCard = ({ test, darkMode }) => {
   return (
     <Card sx={{
@@ -494,7 +491,6 @@ LabTestCard.propTypes = {
   darkMode: PropTypes.bool.isRequired
 };
 
-// Updated ConsultationCard component
 const ConsultationCard = ({ consultation, darkMode }) => {
   return (
     <Card sx={{
@@ -504,7 +500,6 @@ const ConsultationCard = ({ consultation, darkMode }) => {
       overflow: "hidden",
       background: darkMode ? "#2c3e50" : "#ffffff"
     }}>
-      {/* Header section */}
       <Box 
         p={3} 
         bgcolor={darkMode ? "#005F73" : "#0077b6"}
@@ -580,36 +575,25 @@ const ConsultationCard = ({ consultation, darkMode }) => {
                 darkMode={darkMode}
               >
                 <Grid container spacing={2}>
-                  {/* Laboratory Tests Section */}
                   {consultation.tests.length > 0 && (
                     <Grid item xs={12} md={consultation.images.length > 0 ? 6 : 12}>
-                      <Box 
-                        sx={{
-                          p: 2,
-                          borderRadius: "8px",
-                          background: darkMode ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 119, 182, 0.05)",
-                          borderLeft: `4px solid ${darkMode ? "#90caf9" : "#0077b6"}`
-                        }}
+                      <Typography 
+                        variant="h6" 
+                        fontWeight="bold" 
+                        gutterBottom
+                        color={darkMode ? "white" : "dark"}
+                        display="flex"
+                        alignItems="center"
                       >
-                        <Typography 
-                          variant="h6" 
-                          fontWeight="bold" 
-                          gutterBottom
-                          color={darkMode ? "white" : "dark"}
-                          display="flex"
-                          alignItems="center"
-                        >
-                          <ScienceIcon sx={{ mr: 1, color: darkMode ? "#90caf9" : "#0077b6" }} />
-                          LABORATORY TESTS
-                        </Typography>
-                        {consultation.tests.map((test) => (
-                          <LabTestCard key={`test-${test.id}`} test={test} darkMode={darkMode} />
-                        ))}
-                      </Box>
+                        <ScienceIcon sx={{ mr: 1, color: darkMode ? "#90caf9" : "#0077b6" }} />
+                        LABORATORY TESTS
+                      </Typography>
+                      {consultation.tests.map((test) => (
+                        <LabTestCard key={`test-${test.id}`} test={test} darkMode={darkMode} />
+                      ))}
                     </Grid>
                   )}
 
-                  {/* Medical Imaging Section */}
                   {consultation.images.length > 0 && (
                     <Grid item xs={12} md={consultation.tests.length > 0 ? 6 : 12}>
                       <Box 
@@ -692,6 +676,7 @@ const PatientConsultations = () => {
   const [showModal, setShowModal] = useState(false);
   const [dmeRecords, setDmeRecords] = useState([]);
   const [doctors, setDoctors] = useState({});
+  const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statsData, setStatsData] = useState({
@@ -727,7 +712,7 @@ const PatientConsultations = () => {
     setSubmitStatus(null);
   };
 
-  const handleInputChange = (e) =>  {
+  const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -796,7 +781,7 @@ const PatientConsultations = () => {
   };
 
   useEffect(() => {
-    const fetchDME = async () => {
+    const fetchData = async () => {
       try {
         const user = JSON.parse(localStorage.getItem("connectedUser"));
         if (!user) {
@@ -857,6 +842,12 @@ const PatientConsultations = () => {
         setDoctors(doctorsMap);
         setDmeRecords(dmeInstances);
 
+        const reportsResponse = await getReportsByPatient(patientId);
+        if (!reportsResponse) {
+          throw new Error("Failed to fetch laboratory tests");
+        }
+        setReports(reportsResponse);
+
         const consultations = dmeInstances.map(dme => {
           const doctor = doctorsMap[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
           return {
@@ -871,7 +862,16 @@ const PatientConsultations = () => {
                   name: typeof med === 'string' ? med : med.name || '',
                 }))
               : [],
-            tests: dme.laboTest || [],
+            tests: Array.isArray(dme.laboTest)
+              ? dme.laboTest.map(test => ({
+                  id: test.id || Math.random(),
+                  name: test.name || test,
+                  date: test.date || new Date(dme.dateConsultation).toLocaleDateString(),
+                  lab: test.lab || 'Unknown Lab',
+                  result: test.result || 'Pending',
+                  reportUrl: test.reportUrl || '#'
+                }))
+              : [],
             images: dme.imgTest || [],
             notes: dme.notes || ""
           };
@@ -912,14 +912,14 @@ const PatientConsultations = () => {
         );
 
       } catch (error) {
-        console.error("Error loading DME records:", error);
+        console.error("Error loading data:", error);
         setError(error.message || "An unknown error occurred");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchDME();
+    fetchData();
   }, []);
 
   if (loading) {
@@ -962,7 +962,16 @@ const PatientConsultations = () => {
               name: typeof med === 'string' ? med : med.name || '',
             }))
           : [],
-        tests: dme.laboTest || [],
+        tests: Array.isArray(dme.laboTest)
+          ? dme.laboTest.map(test => ({
+              id: test.id || Math.random(),
+              name: test.name || test,
+              date: test.date || new Date(dme.dateConsultation).toLocaleDateString(),
+              lab: test.lab || 'Unknown Lab',
+              result: test.result || 'Pending',
+              reportUrl: test.reportUrl || '#'
+            }))
+          : [],
         images: dme.imgTest || [],
         notes: dme.notes || ''
       };
@@ -1082,7 +1091,7 @@ const PatientConsultations = () => {
             )}
           </Box>
 
-          <Box>
+          <Box mb={4}>
             {consultationsToDisplay.length > 0 ? (
               consultationsToDisplay.map((consultation) => (
                 <ConsultationCard
@@ -1094,6 +1103,36 @@ const PatientConsultations = () => {
             ) : (
               <SoftTypography variant="body1" color={darkMode ? "white" : "dark"}>
                 No consultation records found for this patient.
+              </SoftTypography>
+            )}
+          </Box>
+
+          <Box mb={4}>
+            <Typography 
+              variant="h5" 
+              fontWeight="bold" 
+              gutterBottom
+              color={darkMode ? "white" : "dark"}
+            >
+              <ScienceIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
+              Laboratory Tests
+            </Typography>
+            <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"} paragraph>
+              {user?.role === "patient"
+                ? "View your laboratory test results."
+                : "View the laboratory test results of the patient."}
+            </Typography>
+            {reports.length > 0 ? (
+              reports.map((report) => (
+                <LabTestCard
+                  key={report.id}
+                  test={report}
+                  darkMode={darkMode}
+                />
+              ))
+            ) : (
+              <SoftTypography variant="body1" color={darkMode ? "white" : "dark"}>
+                No laboratory tests found for this patient.
               </SoftTypography>
             )}
           </Box>
@@ -1119,7 +1158,7 @@ const PatientConsultations = () => {
             
             <SoftBox 
               sx={{
-                background: darkMode ? 'rgba(255, 255, 819, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                background: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
                 borderRadius: '8px',
                 padding: '8px 12px',
                 textAlign: 'right'
