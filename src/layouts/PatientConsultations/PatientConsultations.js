@@ -419,76 +419,113 @@ ImagingStudyCard.propTypes = {
 };
 
 const LabTestCard = ({ test, darkMode }) => {
+  const [openPdfModal, setOpenPdfModal] = useState(false);
+
   const handleViewReport = (e) => {
+    e.preventDefault();
     if (!test.filePath) {
-      e.preventDefault();
+      console.log('No PDF file available');
       return;
     }
-    console.log('Opening PDF:', test.filePath); // Debug log
-    window.open(test.filePath, '_blank');
+    console.log('Opening PDF in modal:', test.filePath);
+    setOpenPdfModal(true);
+  };
+
+  const handleClosePdfModal = () => {
+    setOpenPdfModal(false);
   };
 
   return (
-    <Card sx={{
-      mb: 2,
-      borderRadius: "12px",
-      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-      background: darkMode ? "#34495e" : "#f8f9fa",
-      transition: "transform 0.2s",
-      '&:hover': {
-        transform: "translateY(-2px)",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)"
-      }
-    }}>
-      <CardContent>
-        <Box display="flex" alignItems="center" mb={1}>
-          <ScienceIcon color={darkMode ? "secondary" : "secondary"} sx={{ mr: 1 }} />
-          <Typography variant="h6" fontWeight="bold" color={darkMode ? "white" : "dark"}>
-            {test.labTest}
-          </Typography>
-        </Box>
-        
-        <Box mb={1}>
-          <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-            <strong>Test Date:</strong> {new Date(test.timestamp).toLocaleDateString()}
-          </Typography>
-          <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-            <strong>Result:</strong> 
-            <span style={{ 
-              color: test.description === "Normal" ? 
-                (darkMode ? "#81c784" : "#2e7d32") : 
-                (darkMode ? "#ff8a65" : "#d84315"),
-              fontWeight: "bold",
-              marginLeft: "4px"
-            }}>
-              {test.description}
-            </span>
-          </Typography>
-        </Box>
-        
-        <Button
-          fullWidth
-          variant="contained"
-          size="small"
-          startIcon={<ReportIcon />}
-          onClick={handleViewReport}
-          disabled={!test.filePath}
-          sx={{
-            mt: 1,
-            backgroundColor: darkMode ? "#005F73" : "#0077b6",
-            '&:hover': {
-              backgroundColor: darkMode ? "#004b5d" : "#005f8c"
-            },
-            '&.Mui-disabled': {
-              backgroundColor: darkMode ? "#4b5e6f" : "#b0bec5",
-              color: darkMode ? "#78909c" : "#90a4ae"
-            }
-          }}
-        >
-          View Lab Report
-        </Button>
-      </CardContent>
-    </Card>
+    <>
+      <Card sx={{
+        mb: 2,
+        borderRadius: "12px",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        background: darkMode ? "#34495e" : "#f8f9fa",
+        transition: "transform 0.2s",
+        '&:hover': {
+          transform: "translateY(-2px)",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)"
+        }
+      }}>
+        <CardContent>
+          <Box display="flex" alignItems="center" mb={1}>
+            <ScienceIcon color={darkMode ? "secondary" : "secondary"} sx={{ mr: 1 }} />
+            <Typography variant="h6" fontWeight="bold" color={darkMode ? "white" : "dark"}>
+              {test.labTest}
+            </Typography>
+          </Box>
+          
+          <Box mb={1}>
+            <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+              <strong>Test Date:</strong> {new Date(test.timestamp).toLocaleDateString()}
+            </Typography>
+            <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+              <strong>Result:</strong> 
+              <span style={{ 
+                color: test.description === "Normal" ? 
+                  (darkMode ? "#81c784" : "#2e7d32") : 
+                  (darkMode ? "#ff8a65" : "#d84315"),
+                fontWeight: "bold",
+                marginLeft: "4px"
+              }}>
+                {test.description}
+              </span>
+            </Typography>
+          </Box>
+          
+          <Button
+            fullWidth
+            variant="contained"
+            size="small"
+            startIcon={<ReportIcon />}
+            onClick={handleViewReport}
+            disabled={!test.filePath}
+            sx={{
+              mt: 1,
+              backgroundColor: darkMode ? "#005F73" : "#0077b6",
+              '&:hover': {
+                backgroundColor: darkMode ? "#004b5d" : "#005f8c"
+              },
+              '&.Mui-disabled': {
+                backgroundColor: darkMode ? "#4b5e6f" : "#b0bec5",
+                color: darkMode ? "#78909c" : "#90a4ae"
+              }
+            }}
+          >
+            View Lab Report
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Dialog
+        open={openPdfModal}
+        onClose={handleClosePdfModal}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogContent sx={{ p: 0, height: '80vh' }}>
+          {test.filePath ? (
+            <iframe
+              src={test.filePath}
+              title="Lab Report PDF"
+              style={{ width: '100%', height: '100%', border: 'none' }}
+            />
+          ) : (
+            <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+              <Typography variant="h6" color={darkMode ? "white" : "dark"}>
+                No PDF available
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePdfModal} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
@@ -759,7 +796,7 @@ const PatientConsultations = () => {
         diagnostiques: formData.diagnosis.split(",").map(d => d.trim()).filter(Boolean),
         ordonnances: formData.treatments.split("\n").map(t => t.trim()).filter(Boolean),
         laboTest: formData.laboTest.split(",").map(t => t.trim()).filter(Boolean),
-        imgTest: formData.imgTest.split(",").map(i => t.trim()).filter(Boolean),
+        imgTest: formData.imgTest.split(",").map(i => i.trim()).filter(Boolean),
         notes: formData.notes
       };
       
