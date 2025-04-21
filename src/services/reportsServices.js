@@ -13,7 +13,6 @@ export const submitReport = async (formData) => {
         throw new Error(`Missing required field: ${field}`);
       }
     }
-
     // Debug log FormData contents
     console.log("Service layer FormData contents:");
     for (let [key, value] of formData.entries()) {
@@ -42,15 +41,18 @@ export const submitReport = async (formData) => {
 export const getReportsByPatient = async (patientId) => {
   try {
     const response = await axios.get(`${JSON_SERVER_URL}/reports?patientId=${patientId}`);
-    console.log("Fetched reports for patient", patientId, ":", response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching reports:', {
-      message: error.message,
-      response: error.response?.data,
-      status: error.response?.status,
+    const reports = response.data.map(async (report) => {
+      if (report.filePath) {
+        report.filePath = report.filePath.startsWith('http')
+          ? report.filePath.replace('http://localhost:3000', 'http://localhost:3002')
+          : `http://localhost:3002${report.filePath}`;
+      }
+      return report;
     });
-    throw new Error(error.response?.data?.message || 'Failed to fetch reports. Please try again.');
+    return await Promise.all(reports);
+  } catch (error) {
+    console.error('Error fetching reports:', error);
+    throw new Error(error.response?.data?.message || 'Failed to fetch reports.');
   }
 };
 

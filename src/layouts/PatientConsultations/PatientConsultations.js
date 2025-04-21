@@ -419,6 +419,15 @@ ImagingStudyCard.propTypes = {
 };
 
 const LabTestCard = ({ test, darkMode }) => {
+  const handleViewReport = (e) => {
+    if (!test.filePath) {
+      e.preventDefault();
+      return;
+    }
+    console.log('Opening PDF:', test.filePath); // Debug log
+    window.open(test.filePath, '_blank');
+  };
+
   return (
     <Card sx={{
       mb: 2,
@@ -435,24 +444,24 @@ const LabTestCard = ({ test, darkMode }) => {
         <Box display="flex" alignItems="center" mb={1}>
           <ScienceIcon color={darkMode ? "secondary" : "secondary"} sx={{ mr: 1 }} />
           <Typography variant="h6" fontWeight="bold" color={darkMode ? "white" : "dark"}>
-            {test.name}
+            {test.labTest}
           </Typography>
         </Box>
         
         <Box mb={1}>
           <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-            <strong>Test Date:</strong> {test.date}
+            <strong>Test Date:</strong> {new Date(test.timestamp).toLocaleDateString()}
           </Typography>
           <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-            <strong>Description:</strong> 
+            <strong>Result:</strong> 
             <span style={{ 
-              color: test.result === "Normal" ? 
+              color: test.description === "Normal" ? 
                 (darkMode ? "#81c784" : "#2e7d32") : 
                 (darkMode ? "#ff8a65" : "#d84315"),
               fontWeight: "bold",
               marginLeft: "4px"
             }}>
-              {test.result}
+              {test.description}
             </span>
           </Typography>
         </Box>
@@ -462,13 +471,17 @@ const LabTestCard = ({ test, darkMode }) => {
           variant="contained"
           size="small"
           startIcon={<ReportIcon />}
-          href={test.reportUrl}
-          target="_blank"
+          onClick={handleViewReport}
+          disabled={!test.filePath}
           sx={{
             mt: 1,
             backgroundColor: darkMode ? "#005F73" : "#0077b6",
             '&:hover': {
               backgroundColor: darkMode ? "#004b5d" : "#005f8c"
+            },
+            '&.Mui-disabled': {
+              backgroundColor: darkMode ? "#4b5e6f" : "#b0bec5",
+              color: darkMode ? "#78909c" : "#90a4ae"
             }
           }}
         >
@@ -482,11 +495,10 @@ const LabTestCard = ({ test, darkMode }) => {
 LabTestCard.propTypes = {
   test: PropTypes.shape({
     id: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    date: PropTypes.string.isRequired,
-    lab: PropTypes.string.isRequired,
-    result: PropTypes.string.isRequired,
-    reportUrl: PropTypes.string.isRequired
+    labTest: PropTypes.string.isRequired,
+    timestamp: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    filePath: PropTypes.string
   }).isRequired,
   darkMode: PropTypes.bool.isRequired
 };
@@ -663,7 +675,15 @@ ConsultationCard.propTypes = {
         name: PropTypes.string.isRequired,
       })
     ).isRequired,
-    tests: PropTypes.array.isRequired,
+    tests: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        labTest: PropTypes.string.isRequired,
+        timestamp: PropTypes.string.isRequired,
+        description: PropTypes.string.isRequired,
+        filePath: PropTypes.string
+      })
+    ).isRequired,
     images: PropTypes.array.isRequired,
     notes: PropTypes.string
   }).isRequired,
@@ -739,7 +759,7 @@ const PatientConsultations = () => {
         diagnostiques: formData.diagnosis.split(",").map(d => d.trim()).filter(Boolean),
         ordonnances: formData.treatments.split("\n").map(t => t.trim()).filter(Boolean),
         laboTest: formData.laboTest.split(",").map(t => t.trim()).filter(Boolean),
-        imgTest: formData.imgTest.split(",").map(i => i.trim()).filter(Boolean),
+        imgTest: formData.imgTest.split(",").map(i => t.trim()).filter(Boolean),
         notes: formData.notes
       };
       
@@ -787,7 +807,6 @@ const PatientConsultations = () => {
         if (!user) {
           throw new Error("No connected user found");
         }
-
         let patientId = null;
         if (user.role === "patient") {
           patientId = user.id;
@@ -798,16 +817,13 @@ const PatientConsultations = () => {
           }
           patientId = scannedPatient.id;
         }
-
         if (!patientId) {
           throw new Error("No patient ID found");
         }
-
         const response = await getDMEByPatientId(patientId);
         if (!response) {
           throw new Error("Failed to fetch DME records");
         }
-
         const dmeInstances = response.map(dme => new DME(
           dme.id,
           dme.patientId,
@@ -820,7 +836,6 @@ const PatientConsultations = () => {
           dme.imgTest,
           dme.notes
         ));
-
         const uniqueMedecinIds = [...new Set(dmeInstances.map(dme => dme.medecinId))];
         const doctorPromises = uniqueMedecinIds.map(async (id) => {
           try {
@@ -838,18 +853,25 @@ const PatientConsultations = () => {
           }
           return acc;
         }, {});
-
         setDoctors(doctorsMap);
         setDmeRecords(dmeInstances);
-
         const reportsResponse = await getReportsByPatient(patientId);
         if (!reportsResponse) {
           throw new Error("Failed to fetch laboratory tests");
         }
-        setReports(reportsResponse);
-
+        // Ensure filePath uses port 3002
+        const modifiedReports = reportsResponse.map(report => ({
+          ...report,
+          filePath: report.filePath && !report.filePath.startsWith('http')
+            ? `http://localhost:3002${report.filePath}`
+            : report.filePath.replace('http://localhost:3000', 'http://localhost:3002')
+        }));
+        setReports(modifiedReports);
         const consultations = dmeInstances.map(dme => {
           const doctor = doctorsMap[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
+          const associatedReports = modifiedReports.filter(report => 
+            dme.laboTest.includes(report.labTest)
+          );
           return {
             id: dme.id,
             date: new Date(dme.dateConsultation).toLocaleDateString(),
@@ -862,21 +884,19 @@ const PatientConsultations = () => {
                   name: typeof med === 'string' ? med : med.name || '',
                 }))
               : [],
-            tests: Array.isArray(dme.laboTest)
-              ? dme.laboTest.map(test => ({
-                  id: test.id || Math.random(),
-                  name: test.name || test,
-                  date: test.date || new Date(dme.dateConsultation).toLocaleDateString(),
-                  lab: test.lab || 'Unknown Lab',
-                  result: test.result || 'Pending',
-                  reportUrl: test.reportUrl || '#'
+            tests: Array.isArray(associatedReports)
+              ? associatedReports.map(report => ({
+                  id: report.id || Math.random(),
+                  labTest: report.labTest || 'Unknown Test',
+                  timestamp: report.timestamp || new Date(dme.dateConsultation).toISOString(),
+                  description: report.description || 'Pending',
+                  filePath: report.filePath
                 }))
               : [],
             images: dme.imgTest || [],
             notes: dme.notes || ""
           };
         });
-
         const totalConsultations = dmeInstances.length;
         const lastVisit = totalConsultations > 0
           ? new Date(dmeInstances[0].dateConsultation).toLocaleDateString()
@@ -888,13 +908,11 @@ const PatientConsultations = () => {
         const mostVisitedSpecialty = Object.keys(specialtyCounts).length > 0
           ? Object.entries(specialtyCounts).sort((a, b) => b[1] - a[1])[0][0]
           : "None";
-
         setStatsData({
           totalConsultations: totalConsultations.toString(),
           lastVisit,
           mostVisitedSpecialty
         });
-
         const monthlyCounts = dmeInstances.reduce((acc, record) => {
           try {
             const month = new Date(record.dateConsultation).toLocaleString('default', { month: 'short' });
@@ -904,13 +922,11 @@ const PatientConsultations = () => {
           }
           return acc;
         }, {});
-
         setConsultationTrends(
           Object.entries(monthlyCounts)
             .map(([month, count]) => ({ month, consultations: count }))
             .sort((a, b) => new Date(`1 ${a.month} 2023`) - new Date(`1 ${b.month} 2023`))
         );
-
       } catch (error) {
         console.error("Error loading data:", error);
         setError(error.message || "An unknown error occurred");
@@ -918,7 +934,6 @@ const PatientConsultations = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
@@ -950,6 +965,9 @@ const PatientConsultations = () => {
     .sort((a, b) => new Date(b.dateConsultation) - new Date(a.dateConsultation))
     .map(dme => {
       const doctor = doctors[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
+      const associatedReports = reports.filter(report => 
+        dme.laboTest.includes(report.labTest)
+      );
       return {
         id: dme.id,
         date: new Date(dme.dateConsultation).toLocaleDateString(),
@@ -962,14 +980,13 @@ const PatientConsultations = () => {
               name: typeof med === 'string' ? med : med.name || '',
             }))
           : [],
-        tests: Array.isArray(dme.laboTest)
-          ? dme.laboTest.map(test => ({
-              id: test.id || Math.random(),
-              name: test.name || test,
-              date: test.date || new Date(dme.dateConsultation).toLocaleDateString(),
-              lab: test.lab || 'Unknown Lab',
-              result: test.result || 'Pending',
-              reportUrl: test.reportUrl || '#'
+        tests: Array.isArray(associatedReports)
+          ? associatedReports.map(report => ({
+              id: report.id || Math.random(),
+              labTest: report.labTest || 'Unknown Test',
+              timestamp: report.timestamp || new Date(dme.dateConsultation).toISOString(),
+              description: report.description || 'Pending',
+              filePath: report.filePath
             }))
           : [],
         images: dme.imgTest || [],
@@ -1103,36 +1120,6 @@ const PatientConsultations = () => {
             ) : (
               <SoftTypography variant="body1" color={darkMode ? "white" : "dark"}>
                 No consultation records found for this patient.
-              </SoftTypography>
-            )}
-          </Box>
-
-          <Box mb={4}>
-            <Typography 
-              variant="h5" 
-              fontWeight="bold" 
-              gutterBottom
-              color={darkMode ? "white" : "dark"}
-            >
-              <ScienceIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
-              Laboratory Tests
-            </Typography>
-            <Typography variant="body2" color={darkMode ? "gray" : "text.secondary"} paragraph>
-              {user?.role === "patient"
-                ? "View your laboratory test results."
-                : "View the laboratory test results of the patient."}
-            </Typography>
-            {reports.length > 0 ? (
-              reports.map((report) => (
-                <LabTestCard
-                  key={report.id}
-                  test={report}
-                  darkMode={darkMode}
-                />
-              ))
-            ) : (
-              <SoftTypography variant="body1" color={darkMode ? "white" : "dark"}>
-                No laboratory tests found for this patient.
               </SoftTypography>
             )}
           </Box>
