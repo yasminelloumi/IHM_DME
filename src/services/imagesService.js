@@ -1,45 +1,33 @@
-// imageApi.js
-const API_URL = "http://localhost:3001/images";
+import axios from "axios";
 
-export const getImages = async () => {
+const BASE_URL = "http://localhost:3002";
+
+// Fetch images by patientId
+export const getImages = async (patientId) => {
   try {
-    const response = await fetch(API_URL);
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to fetch images");
-    }
-    
-    return data;
+    const response = await axios.get(`${BASE_URL}/images`, {
+      params: { patientId },
+    });
+    return response.data;
   } catch (error) {
     console.error("Error fetching images:", error);
     throw error;
   }
 };
 
-export const uploadImage = async (imageData) => {
+// Upload an image
+export const uploadImage = async (formData) => {
   try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: Date.now().toString(),
-        patientId: imageData.patientId,
-        description: imageData.description,
-        url: imageData.url, // Temporary URL for json-server
-        dateCreated: imageData.dateCreated || new Date().toISOString(),
-      }),
-    });
-
-    const result = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(result.error || "Upload failed");
+    if (!formData.get("image")) {
+      throw new Error("No image file provided");
     }
-    
-    return result;
+
+    const response = await axios.post(`${BASE_URL}/images`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
   } catch (error) {
     console.error("Error uploading image:", error);
     throw error;
@@ -49,18 +37,18 @@ export const uploadImage = async (imageData) => {
 export const deleteImage = async (id) => {
   try {
     const response = await fetch(`${API_URL}/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
-    
+
     const result = await response.json();
-    
+
     if (!response.ok) {
-      throw new Error(result.error || "Failed to delete image");
+      throw new Error(result.error || 'Failed to delete image');
     }
-    
+
     return result;
   } catch (error) {
-    console.error("Error deleting image:", error);
+    console.error('Error deleting image:', error);
     throw error;
   }
 };
