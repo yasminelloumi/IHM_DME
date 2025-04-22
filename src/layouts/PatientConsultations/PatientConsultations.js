@@ -12,8 +12,7 @@ import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import { getDMEByPatientId, createDME } from "../../services/dmeService";
 import { getById } from "../../services/medecinService";
-import { getReportsByPatient } from "../../services/reportsServices";
-import DME from "../../models/DME";
+import DME from '../../models/DME';
 import {
   Event as EventIcon,
   MedicalServices as MedicalServicesIcon,
@@ -188,7 +187,7 @@ TrendsCard.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
       month: PropTypes.string.isRequired,
-      consultations: PropTypes.number.isRequired,
+      consultations: PropTypes.number.isRequired
     })
   ).isRequired
 };
@@ -704,13 +703,12 @@ const PatientConsultations = () => {
   const [showModal, setShowModal] = useState(false);
   const [dmeRecords, setDmeRecords] = useState([]);
   const [doctors, setDoctors] = useState({});
-  const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statsData, setStatsData] = useState({
     totalConsultations: "0",
     lastVisit: "No visits",
-    mostVisitedSpecialty: "None",
+    mostVisitedSpecialty: "None"
   });
   const [consultationTrends, setConsultationTrends] = useState([]);
   const [formData, setFormData] = useState({
@@ -720,7 +718,7 @@ const PatientConsultations = () => {
     treatments: "",
     laboTest: "",
     imgTest: "",
-    notes: "",
+    notes: ""
   });
   const [submitStatus, setSubmitStatus] = useState(null);
   const [page, setPage] = useState(1);
@@ -736,7 +734,7 @@ const PatientConsultations = () => {
       treatments: "",
       laboTest: "",
       imgTest: "",
-      notes: "",
+      notes: ""
     });
     setSubmitStatus(null);
   };
@@ -744,7 +742,7 @@ const PatientConsultations = () => {
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value
     });
   };
 
@@ -756,21 +754,9 @@ const PatientConsultations = () => {
       const user = JSON.parse(localStorage.getItem("connectedUser")) || {};
       const scannedPatient = JSON.parse(localStorage.getItem("scannedPatient")) || {};
 
-      // Validate date
       const dateConsultation = formData.dateConsultation
-        ? new Date(formData.dateConsultation)
+        ? new Date(formData.dateConsultation).toISOString()
         : null;
-      if (!dateConsultation || isNaN(dateConsultation)) {
-        throw new Error("Invalid consultation date");
-      }
-
-      // Validate required fields
-      if (!formData.reason.trim()) {
-        throw new Error("Reason for visit is required");
-      }
-      if (!formData.diagnosis.trim()) {
-        throw new Error("Diagnosis is required");
-      }
 
       const dmeData = {
         patientId: scannedPatient.id,
@@ -785,28 +771,24 @@ const PatientConsultations = () => {
       };
 
       const result = await createDME(dmeData);
-      if (!result) {
-        throw new Error("Failed to create DME");
+      if (result) {
+        console.log("DME created:", result);
+      } else {
+        console.error("Failed to create DME");
       }
-
       const refreshedRecords = await getDMEByPatientId(scannedPatient.id);
-      setDmeRecords(
-        refreshedRecords.map(
-          (dme) =>
-            new DME(
-              dme.id,
-              dme.patientId,
-              dme.medecinId,
-              dme.dateConsultation,
-              dme.reason,
-              dme.diagnostiques,
-              dme.ordonnances,
-              dme.laboTest,
-              dme.imgTest,
-              dme.notes
-            )
-        )
-      );
+      setDmeRecords(refreshedRecords.map(dme => new DME(
+        dme.id,
+        dme.patientId,
+        dme.medecinId,
+        dme.dateConsultation,
+        dme.reason,
+        dme.diagnostiques,
+        dme.ordonnances,
+        dme.laboTest,
+        dme.imgTest,
+        dme.notes
+      )));
 
       setSubmitStatus("success");
       setFormData({
@@ -816,23 +798,17 @@ const PatientConsultations = () => {
         treatments: "",
         laboTest: "",
         imgTest: "",
-        notes: "",
+        notes: ""
       });
       setTimeout(handleCloseModal, 1500);
     } catch (error) {
       console.error("Error submitting DME:", error);
       setSubmitStatus("error");
-      setError(error.message || "Failed to save consultation");
     }
   };
 
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-
+    const fetchDME = async () => {
       try {
         const user = JSON.parse(localStorage.getItem("connectedUser"));
         if (!user) {
@@ -854,30 +830,25 @@ const PatientConsultations = () => {
           throw new Error("No patient ID found");
         }
 
-        // Fetch DME records
-        const dmeResponse = await getDMEByPatientId(patientId);
-        if (!dmeResponse) {
+        const response = await getDMEByPatientId(patientId);
+        if (!response) {
           throw new Error("Failed to fetch DME records");
         }
 
-        const dmeInstances = dmeResponse.map(
-          (dme) =>
-            new DME(
-              dme.id,
-              dme.patientId,
-              dme.medecinId,
-              dme.dateConsultation,
-              dme.reason,
-              dme.diagnostiques,
-              dme.ordonnances,
-              dme.laboTest,
-              dme.imgTest,
-              dme.notes
-            )
-        );
+        const dmeInstances = response.map(dme => new DME(
+          dme.id,
+          dme.patientId,
+          dme.medecinId,
+          dme.dateConsultation,
+          dme.reason,
+          dme.diagnostiques,
+          dme.ordonnances,
+          dme.laboTest,
+          dme.imgTest,
+          dme.notes
+        ));
 
-        // Fetch doctors
-        const uniqueMedecinIds = [...new Set(dmeInstances.map((dme) => dme.medecinId))];
+        const uniqueMedecinIds = [...new Set(dmeInstances.map(dme => dme.medecinId))];
         const doctorPromises = uniqueMedecinIds.map(async (id) => {
           try {
             const doctor = await getById(id);
@@ -895,40 +866,11 @@ const PatientConsultations = () => {
           return acc;
         }, {});
 
-        // Fetch reports
-        const reportsResponse = await getReportsByPatient(patientId);
-        if (!reportsResponse) {
-          throw new Error("Failed to fetch laboratory tests");
-        }
-
-        // Use environment variable for API base URL
-        const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:3002";
-        const modifiedReports = reportsResponse.map((report) => ({
-          ...report,
-          filePath: report.filePath
-            ? report.filePath.startsWith("http")
-              ? report.filePath
-              : `${API_BASE_URL}${report.filePath}`
-            : null,
-        }));
-
-        if (!isMounted) return;
-
-        // Update state
         setDoctors(doctorsMap);
         setDmeRecords(dmeInstances);
-        setReports(modifiedReports);
 
-        // Process consultations
-        const consultations = dmeInstances.map((dme) => {
-          const doctor = doctorsMap[dme.medecinId] || {
-            prenom: "Unknown",
-            nom: "Doctor",
-            specialite: "Unknown",
-          };
-          const associatedReports = modifiedReports.filter((report) =>
-            dme.laboTest.includes(report.labTest)
-          );
+        const consultations = dmeInstances.map(dme => {
+          const doctor = doctorsMap[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
           return {
             id: dme.id,
             date: new Date(dme.dateConsultation).toLocaleDateString(),
@@ -937,8 +879,8 @@ const PatientConsultations = () => {
             reason: dme.reason,
             diagnosis: dme.diagnostiques.join(", "),
             treatments: Array.isArray(dme.ordonnances)
-              ? dme.ordonnances.map((med) => ({
-                  name: typeof med === "string" ? med : med.name || "",
+              ? dme.ordonnances.map(med => ({
+                  name: typeof med === 'string' ? med : med.name || '',
                 }))
               : [],
             tests: Array.isArray(dme.laboTest) ? dme.laboTest : [],
@@ -947,66 +889,49 @@ const PatientConsultations = () => {
           };
         });
 
-        // Calculate stats
         const totalConsultations = dmeInstances.length;
-        const lastVisit =
-          totalConsultations > 0
-            ? new Date(dmeInstances[0].dateConsultation).toLocaleDateString()
-            : "No visits";
+        const lastVisit = totalConsultations > 0
+          ? new Date(dmeInstances[0].dateConsultation).toLocaleDateString()
+          : "No visits";
         const specialtyCounts = consultations.reduce((acc, curr) => {
           acc[curr.specialty] = (acc[curr.specialty] || 0) + 1;
           return acc;
         }, {});
-        const mostVisitedSpecialty =
-          Object.keys(specialtyCounts).length > 0
-            ? Object.entries(specialtyCounts).sort((a, b) => b[1] - a[1])[0][0]
-            : "None";
+        const mostVisitedSpecialty = Object.keys(specialtyCounts).length > 0
+          ? Object.entries(specialtyCounts).sort((a, b) => b[1] - a[1])[0][0]
+          : "None";
 
         setStatsData({
           totalConsultations: totalConsultations.toString(),
           lastVisit,
-          mostVisitedSpecialty,
+          mostVisitedSpecialty
         });
 
-        // Calculate trends
         const monthlyCounts = dmeInstances.reduce((acc, record) => {
           try {
-            const date = new Date(record.dateConsultation);
-            if (isNaN(date)) throw new Error("Invalid date");
-            const month = date.toLocaleString("default", { month: "short" });
+            const month = new Date(record.dateConsultation).toLocaleString('default', { month: 'short' });
             acc[month] = (acc[month] || 0) + 1;
           } catch (e) {
-            console.warn("Error processing date:", record.dateConsultation, e);
+            console.error("Error processing date:", record.dateConsultation);
           }
           return acc;
         }, {});
+
         setConsultationTrends(
           Object.entries(monthlyCounts)
             .map(([month, count]) => ({ month, consultations: count }))
-            .sort(
-              (a, b) =>
-                new Date(`1 ${a.month} 2023`) - new Date(`1 ${b.month} 2023`)
-            )
+            .sort((a, b) => new Date(`1 ${a.month} 2023`) - new Date(`1 ${b.month} 2023`))
         );
+
       } catch (error) {
-        if (isMounted) {
-          setError(
-            error.message ||
-              "Failed to load patient data. Please try again later."
-          );
-        }
+        console.error("Error loading DME records:", error);
+        setError(error.message || "An unknown error occurred");
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
 
-    fetchData();
-
-    return () => {
-      isMounted = false;
-    };
+    fetchDME();
   }, []);
 
   if (loading) {
@@ -1026,9 +951,7 @@ const PatientConsultations = () => {
       <DashboardLayout>
         <DashboardNavbar />
         <SoftBox display="flex" justifyContent="center" alignItems="center" height="80vh">
-          <SoftTypography variant="h5" color="error">
-            Error: {error}
-          </SoftTypography>
+          <SoftTypography variant="h5" color="error">Error: {error}</SoftTypography>
         </SoftBox>
         <Footer />
       </DashboardLayout>
@@ -1037,15 +960,8 @@ const PatientConsultations = () => {
 
   const consultationsToDisplay = dmeRecords
     .sort((a, b) => new Date(b.dateConsultation) - new Date(a.dateConsultation))
-    .map((dme) => {
-      const doctor = doctors[dme.medecinId] || {
-        prenom: "Unknown",
-        nom: "Doctor",
-        specialite: "Unknown",
-      };
-      const associatedReports = reports.filter((report) =>
-        dme.laboTest.includes(report.labTest)
-      );
+    .map(dme => {
+      const doctor = doctors[dme.medecinId] || { prenom: 'Unknown', nom: 'Doctor', specialite: 'Unknown' };
       return {
         id: dme.id,
         date: new Date(dme.dateConsultation).toLocaleDateString(),
@@ -1054,8 +970,8 @@ const PatientConsultations = () => {
         reason: dme.reason,
         diagnosis: dme.diagnostiques.join(", "),
         treatments: Array.isArray(dme.ordonnances)
-          ? dme.ordonnances.map((med) => ({
-              name: typeof med === "string" ? med : med.name || "",
+          ? dme.ordonnances.map(med => ({
+              name: typeof med === 'string' ? med : med.name || '',
             }))
           : [],
         tests: Array.isArray(dme.laboTest) ? dme.laboTest : [],
@@ -1093,7 +1009,7 @@ const PatientConsultations = () => {
             sx={{
               background: "rgba(255, 255, 255, 0.9)",
               borderRadius: "16px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)"
             }}
           >
             <Box display="flex" alignItems="center" gap={2}>
@@ -1363,7 +1279,7 @@ const PatientConsultations = () => {
                 {submitStatus === "submitting" ? "Saving..." : "Save Consultation"}
               </SoftButton>
             </SoftBox>
-          </Box>
+          </form>
         </Box>
       </Modal>
 
