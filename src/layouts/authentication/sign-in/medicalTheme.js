@@ -1,10 +1,9 @@
 export const medicalTheme = {
-
   palette: {
     primary: {
-      main: '#1976d2',
-      light: '#64b5f6',
-      dark: '#0d47a1',
+      main: '#0288d1',
+      light: '#5eb8ff',
+      dark: '#005b9f',
       contrastText: '#ffffff',
     },
     secondary: {
@@ -33,6 +32,9 @@ export const medicalTheme = {
       fontSize: '2.2rem',
       fontWeight: 700,
       lineHeight: 1.3,
+      background: 'linear-gradient(135deg, #0288d1 0%, #0288d1 0%)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
     },
     h2: {
       fontSize: '1.8rem',
@@ -71,7 +73,7 @@ export const medicalTheme = {
               backgroundColor: 'rgba(227, 242, 253, 0.5)',
             },
             '& .MuiInputAdornment-root': {
-              color: '#1976d2',
+              color: '#0288d1',
             },
           },
         },
@@ -83,10 +85,10 @@ export const medicalTheme = {
           '& .MuiSwitch-switchBase': {
             color: '#f5f5f5',
             '&.Mui-checked': {
-              color: '#1976d2',
+              color: '#0288d1',
             },
             '&.Mui-checked + .MuiSwitch-track': {
-              backgroundColor: 'rgba(25, 118, 210, 0.5)',
+              backgroundColor: 'rgba(2, 136, 209, 0.5)',
             },
           },
           '& .MuiSwitch-track': {
@@ -117,7 +119,7 @@ export const signInStyles = {
     maxWidth: '500px',
     backgroundColor: 'rgba(255, 255, 255, 0.98)',
     borderRadius: '16px',
-    boxShadow: '0 8px 32px rgba(25, 118, 210, 0.15)',
+    boxShadow: '0 8px 32px rgba(2, 136, 209, 0.15)',
     overflow: 'hidden',
     backdropFilter: 'blur(4px)',
     border: '1px solid rgba(255, 255, 255, 0.5)',
@@ -127,10 +129,6 @@ export const signInStyles = {
   header: {
     padding: '2rem 2rem 1rem',
     textAlign: 'center',
-    '& .MuiSvgIcon-root': {
-      fontSize: '3rem',
-      marginBottom: '1rem',
-    },
   },
   toggleContainer: {
     display: 'flex',
@@ -138,19 +136,20 @@ export const signInStyles = {
     borderRadius: '12px',
     overflow: 'hidden',
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-    backgroundColor: 'rgba(25, 118, 210, 0.08)',
+    backgroundColor: 'rgba(2, 136, 209, 0.08)',
   },
   toggleButton: (active) => ({
     flex: 1,
     padding: '12px',
-    backgroundColor: active ? 'white' : 'transparent',
-    color: active ? '#1976d2' : '#455a64',
+    backgroundColor: active ? 'transparent' : 'transparent',
+    color: 'white',
     fontWeight: active ? 600 : 500,
     border: 'none',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
+    background: active ? 'linear-gradient(135deg, #0288d1 0%, #0288d1 0%)' : 'transparent',
     '&:hover': {
-      backgroundColor: active ? 'white' : 'rgba(25, 118, 210, 0.05)',
+      background: active ? 'linear-gradient(135deg, #0277bd 0%, #0288d1 0%)' : 'rgba(255, 255, 255, 0.1)',
     },
   }),
   formContent: {
@@ -179,20 +178,15 @@ export const signInStyles = {
     fontSize: '1rem',
     fontWeight: 600,
     marginTop: '1rem',
-    background: 'linear-gradient(135deg, #1976d2 0%,rgb(238, 241, 246) 100%)',
-    color: 'white', // Garde cette ligne pour le texte blanc
+    background: 'linear-gradient(135deg, #0288d1 0%, #0288d1)',
+    color: 'white',
     '&:hover': {
-      background: 'linear-gradient(135deg, #1565c0 0%, #0b3d91 100%)',
+      background: 'linear-gradient(135deg, #0277bd 0%,  #0277bd 0%)',
     },
     '&:disabled': {
       background: '#e0e0e0',
       color: '#9e9e9e'
     },
-    // Ajoute cette partie pour forcer la couleur du texte
-    '& .MuiButton-label': {
-      color: 'white !important',
-    }
-  
   },
   footer: {
     padding: '1.5rem 2rem',
@@ -200,7 +194,7 @@ export const signInStyles = {
     borderTop: '1px solid rgba(0, 0, 0, 0.08)',
   },
   footerLink: {
-    color: '#1976d2',
+    color: '#0288d1',
     fontWeight: 600,
     textDecoration: 'none',
     '&:hover': {
@@ -209,11 +203,11 @@ export const signInStyles = {
   },
   icon: {
     primary: {
-      color: '#1976d2',
+      color: '#0288d1',
       fontSize: '1.5rem',
     },
     secondary: {
-      color: '#00796b',
+      color: '#0288d1',
       fontSize: '1.5rem',
     },
   }
