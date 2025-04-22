@@ -173,9 +173,9 @@ app.post('/reports', pdfUpload.single('file'), async (req, res) => {
       id: Date.now().toString(),
       patientId,
       description,
-      laboTest: sanitizedLabTest, // Renamed to match frontend expectation
-      url: `/Uploads/pdfFiles/${req.file.filename}`, // Changed filePath to url to match frontend
-      dateCreated: new Date().toISOString(), // Changed timestamp to dateCreated to match frontend
+      labTest: sanitizedLabTest, // Renamed to match frontend expectation
+      filePath: `/Uploads/pdfFiles/${req.file.filename}`, // Changed filePath to url to match frontend
+      timestamp: new Date().toISOString(), // Changed timestamp to dateCreated to match frontend
       dmeId,
     };
 

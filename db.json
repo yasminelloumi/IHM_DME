@@ -207,6 +207,16 @@
       "fileName": "Screenshot 2024-09-03 210851.png",
       "url": "/uploads/images/image-1745274317511-95396880.png",
       "dateCreated": "2025-04-21T22:25:17.535Z"
+    },
+    {
+      "id": "1745321914477",
+      "patientId": "4024",
+      "description": "test final",
+      "fileName": "image-1745321914476-856636091.jpg",
+      "url": "/uploads/images/image-1745321914476-856636091.jpg",
+      "dateCreated": "2025-04-22T11:38:34.478Z",
+      "dmeId": "4f17",
+      "imgTest": "Chest X-ray"
     }
   ],
  
@@ -667,6 +677,33 @@
       "fileName": "report-1745264458277-460241925.pdf",
       "filePath": "/Uploads/pdfFiles/report-1745264458277-460241925.pdf",
       "timestamp": "2025-04-21T19:40:58.284Z",
+      "dmeId": "e3fc"
+    },
+    {
+      "id": "1745319705154",
+      "patientId": "4024",
+      "description": "report final final final",
+      "laboTest": "Fasting blood glucose",
+      "url": "/Uploads/pdfFiles/report-1745319705152-445399966.pdf",
+      "dateCreated": "2025-04-22T11:01:45.154Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745320662886",
+      "patientId": "4024",
+      "description": "test final mte3 l final",
+      "laboTest": "Kidney function test",
+      "url": "/Uploads/pdfFiles/report-1745320662882-130123066.pdf",
+      "dateCreated": "2025-04-22T11:17:42.886Z",
+      "dmeId": "91af"
+    },
+    {
+      "id": "1745320839520",
+      "patientId": "4024",
+      "description": "final mte3 l version final",
+      "labTest": "Fasting blood glucose",
+      "filePath": "/Uploads/pdfFiles/report-1745320839513-285590519.pdf",
+      "timestamp": "2025-04-22T11:20:39.520Z",
       "dmeId": "e3fc"
     }
   ]
