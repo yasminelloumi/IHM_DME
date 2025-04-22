@@ -4,6 +4,7 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftButton from "components/SoftButton";
 import { submitReport, getReportsByPatient } from "services/reportsServices";
+import { Typography } from '@mui/material';
 import {
   Avatar,
   Switch,
@@ -13,11 +14,9 @@ import {
   Card,
   CardContent,
   Box,
-  Select,
-  MenuItem,
-  InputLabel,
   FormControl,
   CircularProgress,
+  Autocomplete,
 } from "@mui/material";
 import {
   Bloodtype,
@@ -271,6 +270,19 @@ function LaboratoryWorkspace({ labName }) {
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [submittedTests, setSubmittedTests] = useState(() => {
+    const saved = localStorage.getItem(`submittedTests_${patient?.id || 'default'}`);
+    console.log("Loaded submittedTests from localStorage:", saved);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Save submittedTests to localStorage whenever it changes
+  useEffect(() => {
+    if (patient?.id) {
+      console.log("Saving submittedTests to localStorage:", submittedTests);
+      localStorage.setItem(`submittedTests_${patient.id}`, JSON.stringify(submittedTests));
+    }
+  }, [submittedTests, patient?.id]);
 
   // Fetch patient data, reports, and DME data on component mount
   useEffect(() => {
@@ -303,7 +315,7 @@ function LaboratoryWorkspace({ labName }) {
         // Fetch reports for the patient
         if (patientDataToUse.id) {
           const fetchedReports = await getReportsByPatient(patientDataToUse.id);
-          console.log("Setting reports state:", fetchedReports);
+          console.log("Fetched reports:", fetchedReports);
           setReports(fetchedReports);
         } else {
           setReports([]);
@@ -312,8 +324,8 @@ function LaboratoryWorkspace({ labName }) {
         // Fetch DME data for the patient
         if (patientDataToUse.id) {
           const fetchedDMEs = await getDMEByPatientId(patientDataToUse.id);
-          // Filter DMEs with non-empty laboTest
           const validDMEs = fetchedDMEs.filter(dme => dme.laboTest && dme.laboTest.length > 0);
+          console.log("Fetched DMEs:", validDMEs);
 
           if (validDMEs.length > 0) {
             setDmeList(validDMEs);
@@ -323,17 +335,39 @@ function LaboratoryWorkspace({ labName }) {
             const validStoredDME = storedDME && validDMEs.find(dme => dme.id === storedDME.id && dme.patientId === patientDataToUse.id);
 
             if (validStoredDME && validStoredDME.laboTest && validStoredDME.laboTest.length > 0) {
-              setSelectedDME(validStoredDME);
-              setSelectedLabTest(validStoredDME.laboTest[0]);
-              localStorage.setItem("selectedLabTest", validStoredDME.laboTest[0]);
-              localStorage.setItem("scannedDME", JSON.stringify(validStoredDME));
+              const firstUnsubmittedTest = validStoredDME.laboTest.find(test => !submittedTests.includes(`${validStoredDME.id}|${test}`));
+              if (firstUnsubmittedTest) {
+                console.log("Using stored DME with unsubmitted test:", firstUnsubmittedTest);
+                setSelectedDME(validStoredDME);
+                setSelectedLabTest(firstUnsubmittedTest);
+                localStorage.setItem("selectedLabTest", firstUnsubmittedTest);
+                localStorage.setItem("scannedDME", JSON.stringify(validStoredDME));
+              } else {
+                console.log("Stored DME has no unsubmitted tests, clearing selection");
+                setSelectedDME(null);
+                setSelectedLabTest("");
+                localStorage.removeItem("selectedLabTest");
+                localStorage.removeItem("scannedDME");
+              }
             } else {
-              // Default to the first valid DME and its first lab test
-              const defaultDME = validDMEs[0];
-              setSelectedDME(defaultDME);
-              setSelectedLabTest(defaultDME.laboTest[0]);
-              localStorage.setItem("selectedLabTest", defaultDME.laboTest[0]);
-              localStorage.setItem("scannedDME", JSON.stringify(defaultDME));
+              // Find the first DME with an unsubmitted lab test
+              const defaultDME = validDMEs.find(dme =>
+                dme.laboTest.some(test => !submittedTests.includes(`${dme.id}|${test}`))
+              );
+              if (defaultDME) {
+                const unsubmittedTest = defaultDME.laboTest.find(test => !submittedTests.includes(`${defaultDME.id}|${test}`));
+                console.log("Selecting default DME with unsubmitted test:", unsubmittedTest);
+                setSelectedDME(defaultDME);
+                setSelectedLabTest(unsubmittedTest);
+                localStorage.setItem("selectedLabTest", unsubmittedTest);
+                localStorage.setItem("scannedDME", JSON.stringify(defaultDME));
+              } else {
+                console.log("No unsubmitted tests available, clearing selection");
+                setSelectedDME(null);
+                setSelectedLabTest("");
+                localStorage.removeItem("selectedLabTest");
+                localStorage.removeItem("scannedDME");
+              }
             }
           } else {
             setDmeList([]);
@@ -358,27 +392,35 @@ function LaboratoryWorkspace({ labName }) {
       }
     };
     fetchData();
-  }, []);
+  }, [submittedTests]);
 
   // Handle DME and lab test selection
-  const handleDMEChange = (event) => {
-    const [dmeId, labTest] = event.target.value.split("|");
-    const selected = dmeList.find(dme => dme.id === dmeId);
-    setSelectedDME(selected);
-    setSelectedLabTest(labTest);
-    localStorage.setItem("selectedLabTest", labTest);
-    localStorage.setItem("scannedDME", JSON.stringify(selected));
-    setError(null);
-    console.log("Selected lab test:", labTest, "Stored in localStorage:", localStorage.getItem("selectedLabTest"));
+  const handleDMEChange = (event, newValue) => {
+    if (newValue && newValue.value !== "default") {
+      const [dmeId, labTest] = newValue.value.split("|");
+      const selected = dmeList.find(dme => dme.id === dmeId);
+      console.log("Selected DME and lab test:", { dmeId, labTest });
+      setSelectedDME(selected);
+      setSelectedLabTest(labTest);
+      localStorage.setItem("selectedLabTest", labTest);
+      localStorage.setItem("scannedDME", JSON.stringify(selected));
+      setError(null);
+    } else {
+      console.log("Cleared DME and lab test selection");
+      setSelectedDME(null);
+      setSelectedLabTest("");
+      localStorage.removeItem("selectedLabTest");
+      localStorage.removeItem("scannedDME");
+    }
   };
 
   // Handle report file upload
   const handleReportUpload = (event) => {
     const file = event.target.files[0];
     if (file && file.type === "application/pdf") {
+      console.log("Uploaded file:", file.name);
       setNewReportFile(file);
       setError(null);
-      console.log("Uploaded file:", file.name);
     } else {
       setError("Please select a valid PDF file.");
       setNewReportFile(null);
@@ -389,6 +431,7 @@ function LaboratoryWorkspace({ labName }) {
   const handleReportSubmit = async () => {
     if (!newReportFile || !newReportDescription.trim() || !patient?.id || !selectedLabTest || !selectedDME?.id) {
       setError("Please select a PDF file, add a description, choose a lab test, select a DME, and ensure patient data is available.");
+      console.log("Submission blocked due to missing data");
       return;
     }
 
@@ -396,18 +439,16 @@ function LaboratoryWorkspace({ labName }) {
     setError(null);
 
     try {
-      // Retrieve selectedLabTest from localStorage
       const labTestName = localStorage.getItem("selectedLabTest")?.replace(/\.pdf$/i, '').trim();
 
       if (!labTestName) {
         throw new Error("No valid lab test name found in localStorage.");
       }
 
-      // Debug log to verify values
       console.log("Submitting report with:", {
         labTestName,
         selectedLabTest,
-        localStorageSelectedLabTest: localStorage.getItem("selectedLabTest"),
+        dmeId: selectedDME.id,
         uploadedFileName: newReportFile.name,
       });
 
@@ -418,12 +459,12 @@ function LaboratoryWorkspace({ labName }) {
       formData.append("dmeId", selectedDME.id);
       formData.append("labTest", selectedLabTest);
 
-      // Log FormData contents (for debugging)
       for (let [key, value] of formData.entries()) {
         console.log(`FormData: ${key}=${value}`);
       }
 
       const response = await submitReport(formData);
+      console.log("Report submitted successfully:", response);
 
       const newReport = {
         id: response.id,
@@ -436,6 +477,15 @@ function LaboratoryWorkspace({ labName }) {
         labTest: response.labTest || selectedLabTest,
       };
 
+      // Add the submitted DME-lab test to submittedTests
+      const submittedTestId = `${selectedDME.id}|${selectedLabTest}`;
+      setSubmittedTests(prev => {
+        const updated = [...prev, submittedTestId];
+        console.log("Updated submittedTests:", updated);
+        return updated;
+      });
+
+      // Update reports and reset form
       setReports([newReport, ...reports]);
       setNewReportFile(null);
       setNewReportDescription("");
@@ -443,6 +493,7 @@ function LaboratoryWorkspace({ labName }) {
       setSelectedDME(null);
       localStorage.removeItem("selectedLabTest");
       localStorage.removeItem("scannedDME");
+      console.log("Form reset after submission");
     } catch (error) {
       console.error("Error submitting report:", error);
       setError(error.message || "Failed to submit report. Please try again.");
@@ -455,6 +506,20 @@ function LaboratoryWorkspace({ labName }) {
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
+
+  // Prepare options for Autocomplete, excluding submitted tests
+  const autocompleteOptions = [
+    { label: "--Select a choice--", value: "default" },
+    ...dmeList.flatMap((dme) =>
+      dme.laboTest
+        .filter(labTest => !submittedTests.includes(`${dme.id}|${labTest}`))
+        .map((labTest) => ({
+          label: `${labTest} - (${new Date(dme.dateConsultation).toLocaleDateString()})`,
+          value: `${dme.id}|${labTest}`,
+        }))
+    ),
+  ];
+  console.log("Generated autocompleteOptions:", autocompleteOptions);
 
   // Render loading or error states
   if (loading) {
@@ -486,7 +551,7 @@ function LaboratoryWorkspace({ labName }) {
           minHeight: "100vh",
           display: "flex",
           justifyContent: "center",
-          alignItems: "center",
+          alignItems:"center",
           background: darkMode
             ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
             : "url('https://via.placeholder.com/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
@@ -611,36 +676,65 @@ function LaboratoryWorkspace({ labName }) {
               <SoftTypography variant="h6" fontWeight="bold" mb={2} color={darkMode ? "white" : "dark"}>
                 Add Laboratory Report
               </SoftTypography>
-              <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel sx={{ color: darkMode ? "#e0e0e0" : "#333" }}>
-                Select Test
-                </InputLabel>
-                <Select
-                  value={selectedDME && selectedLabTest ? `${selectedDME.id}|${selectedLabTest}` : ""}
-                  onChange={handleDMEChange}
-                  label="Select DME and Lab Test"
+              <Box sx={{ mb: 3 }}>
+
+                <FormControl
+                  fullWidth
                   sx={{
-                    borderRadius: "12px",
-                    backgroundColor: darkMode ? "#34495e" : "#fff",
-                    color: darkMode ? "#e0e0e0" : "#333",
-                    "& .MuiSelect-icon": {
-                      color: darkMode ? "#e0e0e0" : "#333",
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "16px",
+                      height: "60px",
+                      fontSize: "1.25rem",
+                      padding: "10px 14px",
                     },
                   }}
                 >
-                  {dmeList.length === 0 ? (
-                    <MenuItem disabled>No DMEs with valid lab tests available</MenuItem>
-                  ) : (
-                    dmeList.flatMap(dme =>
-                      dme.laboTest.map(labTest => (
-                        <MenuItem key={`${dme.id}|${labTest}`} value={`${dme.id}|${labTest}`}>
-                         {labTest} - ({new Date(dme.dateConsultation).toLocaleDateString()})
-                        </MenuItem>
-                      ))
-                    )
-                  )}
-                </Select>
-              </FormControl>
+                  <Autocomplete
+                    options={autocompleteOptions}
+                    getOptionLabel={(option) => option.label}
+                    value={selectedDME && selectedLabTest ? autocompleteOptions.find(option => option.value === `${selectedDME.id}|${selectedLabTest}`) || autocompleteOptions[0] : autocompleteOptions[0]}
+                    onChange={handleDMEChange}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="--Select a choice--"
+                        sx={{
+                          "& .MuiInputBase-input": {
+                            color: darkMode ? "#e0e0e0" : "#333",
+                            fontSize: "1.25rem",
+                          },
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)",
+                          },
+                          "&:hover .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#0077b6",
+                          },
+                          "& .MuiSvgIcon-root": {
+                            color: darkMode ? "#e0e0e0" : "#333",
+                          },
+                        }}
+                      />
+                    )}
+                    renderOption={(props, option) => (
+                      <li {...props} style={{ color: "#000", fontSize: "1.1rem", padding: "12px 16px" }}>
+                        {option.label}
+                      </li>
+                    )}
+                    noOptionsText="No DMEs with valid lab tests available"
+                    sx={{
+                      borderRadius: "16px",
+                      backgroundColor: darkMode ? "#34495e" : "#fff",
+                      boxShadow: darkMode ? "0 4px 6px rgba(0, 0, 0, 0.1)" : "0 4px 6px rgba(0, 0, 0, 0.1)",
+                      "& .MuiAutocomplete-inputRoot": {
+                        height: "60px",
+                        padding: "0 14px",
+                      },
+                    }}
+                    disableClearable
+                    isOptionEqualToValue={(option, value) => option.value === value.value}
+                  />
+                </FormControl>
+              </Box>
               <SoftBox
                 component="label"
                 display="flex"

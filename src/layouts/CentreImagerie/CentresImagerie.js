@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
@@ -110,6 +110,7 @@ function ImagingCenterWorkspace({ centerName }) {
   const [uploadError, setUploadError] = useState(null);
   const [newImageFile, setNewImageFile] = useState(null);
   const [uploadLoading, setUploadLoading] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Fetch DME records and images on component mount
   useEffect(() => {
@@ -140,7 +141,7 @@ function ImagingCenterWorkspace({ centerName }) {
         setUserData({
           name: `${scannedPatient.prenom} ${scannedPatient.nom}`,
           id: patientId,
-          CIN: scannedPatient.CIN || "Not provided", // Include CIN
+          CIN: scannedPatient.CIN || "Not provided",
           heartRate: patientData.heartRate,
         });
 
@@ -215,12 +216,12 @@ function ImagingCenterWorkspace({ centerName }) {
       setUploadError("Please select an image, DME, and imaging test.");
       return;
     }
-  
+
     console.log("Submitting image:", newImageFile); // Debug log
-  
+
     setUploadLoading(true);
     setUploadError(null);
-  
+
     try {
       const formData = new FormData();
       formData.append("image", newImageFile);
@@ -228,15 +229,15 @@ function ImagingCenterWorkspace({ centerName }) {
       formData.append("description", newComment || `Image: ${newImageFile.name}`);
       formData.append("dmeId", selectedDme);
       formData.append("imgTest", selectedImgTest);
-  
+
       // Log formData entries for debugging
       for (let [key, value] of formData.entries()) {
         console.log(`formData ${key}:`, value);
       }
-  
+
       const uploadedImage = await uploadImage(formData);
       setImages((prev) => [uploadedImage, ...prev]);
-  
+
       if (newComment.trim()) {
         setComments((prev) => [
           ...prev,
@@ -247,7 +248,7 @@ function ImagingCenterWorkspace({ centerName }) {
           },
         ]);
       }
-  
+
       // Reset form
       setNewImageFile(null);
       setNewComment("");
@@ -255,6 +256,9 @@ function ImagingCenterWorkspace({ centerName }) {
       setSelectedImgTest("");
       localStorage.removeItem("selectedImgTest");
       localStorage.removeItem("scannedDMEImaging");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (error) {
       console.error("Image upload error:", error);
       setUploadError(error.message || "Failed to upload image. Please try again.");
@@ -265,6 +269,18 @@ function ImagingCenterWorkspace({ centerName }) {
 
   // Toggle dark mode
   const toggleDarkMode = () => setDarkMode(!darkMode);
+
+  // Filter available imaging tests by excluding those already used
+  const usedTests = images.map((image) => `${image.dmeId}|${image.imgTest}`);
+  const availableTests = dmeRecords.flatMap((dme) =>
+    dme.imgTest
+      .map((test) => ({
+        dmeId: dme.id,
+        imgTest: test,
+        date: dme.dateConsultation,
+      }))
+      .filter((test) => !usedTests.includes(`${test.dmeId}|${test.imgTest}`))
+  );
 
   // Render loading or error states
   if (isLoadingDme) {
@@ -382,16 +398,17 @@ function ImagingCenterWorkspace({ centerName }) {
                     color: darkMode ? "#e0e0e0" : "#333",
                   }}
                 >
-                  {dmeRecords.length === 0 ? (
+                  {availableTests.length === 0 ? (
                     <MenuItem disabled>No imaging tests available</MenuItem>
                   ) : (
-                    dmeRecords.flatMap((dme) =>
-                      dme.imgTest.map((test) => (
-                        <MenuItem key={`${dme.id}|${test}`} value={`${dme.id}|${test}`}>
-                        {test} - ({new Date(dme.dateConsultation).toLocaleDateString()})
-                        </MenuItem>
-                      ))
-                    )
+                    availableTests.map((test) => (
+                      <MenuItem
+                        key={`${test.dmeId}|${test.imgTest}`}
+                        value={`${test.dmeId}|${test.imgTest}`}
+                      >
+                        {test.imgTest} - ({new Date(test.date).toLocaleDateString()})
+                      </MenuItem>
+                    ))
                   )}
                 </Select>
               </FormControl>
@@ -415,7 +432,13 @@ function ImagingCenterWorkspace({ centerName }) {
                 <SoftTypography variant="body1" color={darkMode ? "gray" : "text.secondary"}>
                   {newImageFile ? newImageFile.name : "Click to upload an image"}
                 </SoftTypography>
-                <input type="file" accept="image/*" hidden onChange={handleImageUpload} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={handleImageUpload}
+                  ref={fileInputRef}
+                />
               </SoftBox>
 
               {/* Comment Input */}
@@ -464,7 +487,6 @@ function ImagingCenterWorkspace({ centerName }) {
               </SoftBox>
             </CardContent>
           </Card>
-
         </SoftBox>
 
         {/* Right Section */}

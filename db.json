@@ -219,14 +219,24 @@
       "imgTest": "Chest X-ray"
     },
     {
-      "id": "1745337935725",
-      "patientId": "4024",
-      "description": "fjfgklflfkfofofkfk,ghohp",
-      "fileName": "image-1745337935717-830065276.png",
-      "url": "/uploads/images/image-1745337935717-830065276.png",
-      "dateCreation": "2025-04-22T16:05:35.725Z",
-      "dmeId": "91af",
-      "imgTest": "Chest X-ray"
+      "id": "1745351660503",
+      "patientId": "1a04",
+      "description": "plz work plz",
+      "fileName": "image-1745351660483-306199607.jpg",
+      "url": "/uploads/images/image-1745351660483-306199607.jpg",
+      "dateCreation": "2025-04-22T19:54:20.503Z",
+      "dmeId": "efc3",
+      "imgTest": "Abdominal ultrasound"
+    },
+    {
+      "id": "1745351966463",
+      "patientId": "1a04",
+      "description": "eye test successfully ",
+      "fileName": "image-1745351966458-386457238.jpg",
+      "url": "/uploads/images/image-1745351966458-386457238.jpg",
+      "dateCreation": "2025-04-22T19:59:26.463Z",
+      "dmeId": "efc3",
+      "imgTest": "Eye fundus examination"
     }
   ],
   "centreImagerie": [
@@ -602,6 +612,30 @@
         "X_ray"
       ],
       "notes": "La patiente présente des symptômes compatibles avec une anémie légère. Recommandé de suivre un régime équilibré, riche en légumes verts et en protéines animales. Un suivi est prévu dans 6 semaines pour réévaluer les taux de fer et de vitamine D."
+    },
+    {
+      "id": "a61b",
+      "patientId": "4024",
+      "medecinId": "2",
+      "dateConsultation": "2025-04-24T00:00:00.000Z",
+      "reason": "Persistent cough and shortness of breath",
+      "diagnostiques": [
+        "Acute Bronchitis",
+        "Mild Peripheral Neuropathy"
+      ],
+      "ordonnances": [
+        "Salbutamol inhaler 100mcg As needed",
+        "Rest and hydration",
+        "Paracetamol 500mg Every 6 hours if fever"
+      ],
+      "laboTest": [
+        "HbA1c",
+        "Fasting blood glucose"
+      ],
+      "imgTest": [
+        "Foot ultrasound"
+      ],
+      "notes": "Patient's glucose levels improving. Encouraged to maintain diet and activity plan. Will reassess in 3 months."
     }
   ],
   "reports": [
@@ -740,6 +774,60 @@
       "filePath": "/Uploads/pdfFiles/report-1745337772777-976063565.pdf",
       "timestamp": "2025-04-22T16:02:52.795Z",
       "dmeId": "91af"
+    },
+    {
+      "id": "1745349589402",
+      "patientId": "4024",
+      "description": "fkflfmfmfmpffmfmmmfmfmf",
+      "labTest": "Kidney function test",
+      "filePath": "/Uploads/pdfFiles/report-1745349589387-449735766.pdf",
+      "timestamp": "2025-04-22T19:19:49.402Z",
+      "dmeId": "91af"
+    },
+    {
+      "id": "1745350052203",
+      "patientId": "4024",
+      "description": "this is the desc of the report.",
+      "labTest": "Kidney function test",
+      "filePath": "/Uploads/pdfFiles/report-1745350052201-189926713.pdf",
+      "timestamp": "2025-04-22T19:27:32.203Z",
+      "dmeId": "91af"
+    },
+    {
+      "id": "1745350710198",
+      "patientId": "4024",
+      "description": "final report",
+      "labTest": "Kidney function test",
+      "filePath": "/Uploads/pdfFiles/report-1745350710192-582724433.pdf",
+      "timestamp": "2025-04-22T19:38:30.198Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745350975154",
+      "patientId": "4024",
+      "description": "final report",
+      "labTest": "Kidney function test",
+      "filePath": "/Uploads/pdfFiles/report-1745350975151-254929888.pdf",
+      "timestamp": "2025-04-22T19:42:55.154Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745352264674",
+      "patientId": "4024",
+      "description": "final report",
+      "labTest": "Fasting blood glucose",
+      "filePath": "/Uploads/pdfFiles/report-1745352264669-635797794.pdf",
+      "timestamp": "2025-04-22T20:04:24.674Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745352289153",
+      "patientId": "4024",
+      "description": "fkfmflfki fifkflkflflflkfkgm",
+      "labTest": "Fasting blood glucose",
+      "filePath": "/Uploads/pdfFiles/report-1745352289151-889294744.pdf",
+      "timestamp": "2025-04-22T20:04:49.153Z",
+      "dmeId": "2"
     }
   ]
 }
