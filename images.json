@@ -73,6 +73,16 @@
       "dateCreation": "2025-04-22T13:45:01.999Z",
       "dmeId": "91af",
       "imgTest": "Chest X-ray"
+    },
+    {
+      "id": "1745353620850",
+      "patientId": "1a04",
+      "description": "tyerqw",
+      "fileName": "image-1745353620845-550551430.png",
+      "url": "/uploads/images/image-1745353620845-550551430.png",
+      "dateCreation": "2025-04-22T20:27:00.850Z",
+      "dmeId": "fb96",
+      "imgTest": "Chest X-ray"
     }
   ]
 }

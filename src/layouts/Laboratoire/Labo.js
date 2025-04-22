@@ -270,19 +270,6 @@ function LaboratoryWorkspace({ labName }) {
   const [loading, setLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [submittedTests, setSubmittedTests] = useState(() => {
-    const saved = localStorage.getItem(`submittedTests_${patient?.id || 'default'}`);
-    console.log("Loaded submittedTests from localStorage:", saved);
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  // Save submittedTests to localStorage whenever it changes
-  useEffect(() => {
-    if (patient?.id) {
-      console.log("Saving submittedTests to localStorage:", submittedTests);
-      localStorage.setItem(`submittedTests_${patient.id}`, JSON.stringify(submittedTests));
-    }
-  }, [submittedTests, patient?.id]);
 
   // Fetch patient data, reports, and DME data on component mount
   useEffect(() => {
@@ -335,39 +322,21 @@ function LaboratoryWorkspace({ labName }) {
             const validStoredDME = storedDME && validDMEs.find(dme => dme.id === storedDME.id && dme.patientId === patientDataToUse.id);
 
             if (validStoredDME && validStoredDME.laboTest && validStoredDME.laboTest.length > 0) {
-              const firstUnsubmittedTest = validStoredDME.laboTest.find(test => !submittedTests.includes(`${validStoredDME.id}|${test}`));
-              if (firstUnsubmittedTest) {
-                console.log("Using stored DME with unsubmitted test:", firstUnsubmittedTest);
-                setSelectedDME(validStoredDME);
-                setSelectedLabTest(firstUnsubmittedTest);
-                localStorage.setItem("selectedLabTest", firstUnsubmittedTest);
-                localStorage.setItem("scannedDME", JSON.stringify(validStoredDME));
-              } else {
-                console.log("Stored DME has no unsubmitted tests, clearing selection");
-                setSelectedDME(null);
-                setSelectedLabTest("");
-                localStorage.removeItem("selectedLabTest");
-                localStorage.removeItem("scannedDME");
-              }
+              const firstAvailableTest = validStoredDME.laboTest[0];
+              console.log("Using stored DME with first available test:", firstAvailableTest);
+              setSelectedDME(validStoredDME);
+              setSelectedLabTest(firstAvailableTest);
+              localStorage.setItem("selectedLabTest", firstAvailableTest);
+              localStorage.setItem("scannedDME", JSON.stringify(validStoredDME));
             } else {
-              // Find the first DME with an unsubmitted lab test
-              const defaultDME = validDMEs.find(dme =>
-                dme.laboTest.some(test => !submittedTests.includes(`${dme.id}|${test}`))
-              );
-              if (defaultDME) {
-                const unsubmittedTest = defaultDME.laboTest.find(test => !submittedTests.includes(`${defaultDME.id}|${test}`));
-                console.log("Selecting default DME with unsubmitted test:", unsubmittedTest);
-                setSelectedDME(defaultDME);
-                setSelectedLabTest(unsubmittedTest);
-                localStorage.setItem("selectedLabTest", unsubmittedTest);
-                localStorage.setItem("scannedDME", JSON.stringify(defaultDME));
-              } else {
-                console.log("No unsubmitted tests available, clearing selection");
-                setSelectedDME(null);
-                setSelectedLabTest("");
-                localStorage.removeItem("selectedLabTest");
-                localStorage.removeItem("scannedDME");
-              }
+              // Select the first DME with an available lab test
+              const defaultDME = validDMEs[0];
+              const firstTest = defaultDME.laboTest[0];
+              console.log("Selecting default DME with first test:", firstTest);
+              setSelectedDME(defaultDME);
+              setSelectedLabTest(firstTest);
+              localStorage.setItem("selectedLabTest", firstTest);
+              localStorage.setItem("scannedDME", JSON.stringify(defaultDME));
             }
           } else {
             setDmeList([]);
@@ -392,7 +361,7 @@ function LaboratoryWorkspace({ labName }) {
       }
     };
     fetchData();
-  }, [submittedTests]);
+  }, []);
 
   // Handle DME and lab test selection
   const handleDMEChange = (event, newValue) => {
@@ -477,14 +446,6 @@ function LaboratoryWorkspace({ labName }) {
         labTest: response.labTest || selectedLabTest,
       };
 
-      // Add the submitted DME-lab test to submittedTests
-      const submittedTestId = `${selectedDME.id}|${selectedLabTest}`;
-      setSubmittedTests(prev => {
-        const updated = [...prev, submittedTestId];
-        console.log("Updated submittedTests:", updated);
-        return updated;
-      });
-
       // Update reports and reset form
       setReports([newReport, ...reports]);
       setNewReportFile(null);
@@ -507,12 +468,15 @@ function LaboratoryWorkspace({ labName }) {
     setDarkMode(!darkMode);
   };
 
-  // Prepare options for Autocomplete, excluding submitted tests
+  // Derive used lab tests from reports
+  const usedTests = reports.map((report) => `${report.dmeId}|${report.labTest}`);
+
+  // Prepare options for Autocomplete, excluding used tests
   const autocompleteOptions = [
     { label: "--Select a choice--", value: "default" },
     ...dmeList.flatMap((dme) =>
       dme.laboTest
-        .filter(labTest => !submittedTests.includes(`${dme.id}|${labTest}`))
+        .filter((labTest) => !usedTests.includes(`${dme.id}|${labTest}`))
         .map((labTest) => ({
           label: `${labTest} - (${new Date(dme.dateConsultation).toLocaleDateString()})`,
           value: `${dme.id}|${labTest}`,
@@ -677,7 +641,6 @@ function LaboratoryWorkspace({ labName }) {
                 Add Laboratory Report
               </SoftTypography>
               <Box sx={{ mb: 3 }}>
-
                 <FormControl
                   fullWidth
                   sx={{
