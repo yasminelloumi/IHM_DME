@@ -613,7 +613,7 @@ function LaboratoryWorkspace({ labName }) {
               </SoftTypography>
               <FormControl fullWidth sx={{ mb: 2 }}>
                 <InputLabel sx={{ color: darkMode ? "#e0e0e0" : "#333" }}>
-                  Select DME and Lab Test
+                Select Test
                 </InputLabel>
                 <Select
                   value={selectedDME && selectedLabTest ? `${selectedDME.id}|${selectedLabTest}` : ""}
@@ -634,7 +634,7 @@ function LaboratoryWorkspace({ labName }) {
                     dmeList.flatMap(dme =>
                       dme.laboTest.map(labTest => (
                         <MenuItem key={`${dme.id}|${labTest}`} value={`${dme.id}|${labTest}`}>
-                          DME {dme.id} ({labTest})
+                         {labTest} - ({new Date(dme.dateConsultation).toLocaleDateString()})
                         </MenuItem>
                       ))
                     )
@@ -743,27 +743,11 @@ function LaboratoryWorkspace({ labName }) {
                           color={darkMode ? "gray" : "text.secondary"}
                           mt={0.5}
                         >
-                          {new Date(report.timestamp).toLocaleString()}
+                          Test Creation's Date: {new Date(report.timestamp).toLocaleString()}
                         </SoftTypography>
                         <SoftTypography variant="body1" color={darkMode ? "white" : "dark"} mt={0.5}>
-                          {report.description}
+                         Description: {report.description}
                         </SoftTypography>
-                        <SoftTypography
-                          variant="body2"
-                          color={darkMode ? "gray" : "text.secondary"}
-                          mt={0.5}
-                        >
-                          File: {report.fileName}
-                        </SoftTypography>
-                        {report.dmeId && (
-                          <SoftTypography
-                            variant="body2"
-                            color={darkMode ? "gray" : "text.secondary"}
-                            mt={0.5}
-                          >
-                            DME ID: {report.dmeId}
-                          </SoftTypography>
-                        )}
                         <Divider sx={{ my: 1, borderColor: darkMode ? "#444" : "#e0e0e0" }} />
                       </SoftBox>
                     );

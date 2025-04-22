@@ -23,6 +23,16 @@
       "fileName": "Screenshot 2024-09-03 210851.png",
       "url": "/uploads/images/image-1745274317511-95396880.png",
       "dateCreated": "2025-04-21T22:25:17.535Z"
+    },
+    {
+      "id": "1745329501999",
+      "patientId": "4024",
+      "description": "aaaaaaaaa",
+      "filename": "image-1745329501997-649038349.png",
+      "url": "/uploads/images/image-1745329501997-649038349.png",
+      "dateCreation": "2025-04-22T13:45:01.999Z",
+      "dmeId": "91af",
+      "imgTest": "Chest X-ray"
     }
   ]
 }

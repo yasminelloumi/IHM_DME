@@ -152,7 +152,7 @@ app.post('/reports', pdfUpload.single('file'), async (req, res) => {
         patientId,
         description,
         dmeId,
-        labTest,
+        labTest
       });
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -173,9 +173,9 @@ app.post('/reports', pdfUpload.single('file'), async (req, res) => {
       id: Date.now().toString(),
       patientId,
       description,
-      laboTest: sanitizedLabTest, // Renamed to match frontend expectation
-      url: `/Uploads/pdfFiles/${req.file.filename}`, // Changed filePath to url to match frontend
-      dateCreated: new Date().toISOString(), // Changed timestamp to dateCreated to match frontend
+      labTest: sanitizedLabTest,
+      filePath: `/Uploads/pdfFiles/${req.file.filename}`,
+      timestamp: new Date().toISOString(), 
       dmeId,
     };
 

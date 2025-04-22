@@ -372,7 +372,7 @@ function ImagingCenterWorkspace({ centerName }) {
               {/* DME Dropdown */}
               <FormControl fullWidth sx={{ mb: 3 }}>
                 <InputLabel sx={{ color: darkMode ? "#e0e0e0" : "text.secondary" }}>
-                  Select DME and Imaging Test
+                  Select Test
                 </InputLabel>
                 <Select
                   value={selectedDme && selectedImgTest ? `${selectedDme}|${selectedImgTest}` : ""}
@@ -388,7 +388,7 @@ function ImagingCenterWorkspace({ centerName }) {
                     dmeRecords.flatMap((dme) =>
                       dme.imgTest.map((test) => (
                         <MenuItem key={`${dme.id}|${test}`} value={`${dme.id}|${test}`}>
-                          DME {dme.id} - {test} ({new Date(dme.dateConsultation).toLocaleDateString()})
+                        {test} - ({new Date(dme.dateConsultation).toLocaleDateString()})
                         </MenuItem>
                       ))
                     )
@@ -465,27 +465,6 @@ function ImagingCenterWorkspace({ centerName }) {
             </CardContent>
           </Card>
 
-          {/* Comments Section */}
-          <Card sx={{ background: darkMode ? "#2c3e50" : "#fff" }}>
-            <CardContent>
-              <SoftTypography variant="h6" color={darkMode ? "white" : "dark"} mb={2}>
-                Comments & Notes
-              </SoftTypography>
-              <SoftBox maxHeight="200px" sx={{ overflowY: "auto" }}>
-                {comments.map((comment) => (
-                  <SoftBox key={comment.id} mb={2}>
-                    <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-                      {comment.timestamp}
-                    </SoftTypography>
-                    <SoftTypography variant="body1" color={darkMode ? "white" : "dark"}>
-                      {comment.text}
-                    </SoftTypography>
-                    <Divider sx={{ my: 1 }} />
-                  </SoftBox>
-                ))}
-              </SoftBox>
-            </CardContent>
-          </Card>
         </SoftBox>
 
         {/* Right Section */}
