@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import PropTypes from "prop-types";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
@@ -7,301 +6,82 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import {
   Card,
-  Button,
+  Divider,
+  Chip,
   CircularProgress,
   Box,
-  Avatar,
-  Stack,
-  Modal,
-  IconButton,
-  Divider,
-  Grid,
+  Button,
+  IconButton
 } from "@mui/material";
 import {
-  Description as DescriptionIcon,
-  Close as CloseIcon,
+  MedicalServices as RadiologyIcon,
+  Biotech as LabIcon,
   Person as PersonIcon,
-  Event as EventIcon,
-  InsertDriveFile as FileIcon,
-  Notes as NotesIcon,
+  CalendarToday as DateIcon,
+  Description as DescriptionIcon,
+  Assignment as ReportIcon,
+  PictureAsPdf as PdfIcon,
+  Image as ImageIcon,
+  Visibility as ViewIcon
 } from "@mui/icons-material";
 
-// Mock data - replace with your real data
-const mockReports = [
-  {
-    id: "1",
-    patientId: "PAT-00123",
-    fileName: "Annual Medical Report",
-    description: "Complete health checkup with blood analysis",
-    timestamp: "2023-05-15T10:30:00Z",
-    fileUrl: "#",
-  },
-  {
-    id: "2",
-    patientId: "PAT-00123",
-    fileName: "Chest X-ray Report",
-    description: "Radiological examination of lungs - normal results",
-    timestamp: "2023-03-22T14:15:00Z",
-    fileUrl: "#",
-  },
-  {
-    id: "3",
-    patientId: "PAT-00123",
-    fileName: "Blood Test Results",
-    description: "Complete blood count analysis",
-    timestamp: "2023-01-10T09:45:00Z",
-    fileUrl: "#",
-  },
-];
-
-// Style constants
-const cardStyle = {
-  borderRadius: "12px",
-  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
-  background: "#ffffff",
-  transition: "all 0.3s ease",
-  "&:hover": {
-    transform: "translateY(-4px)",
-    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
-  },
-};
-
-const headerStyle = {
-  p: 2,
-  bgcolor: "#1976d2",
-  color: "white",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  flexWrap: "wrap",
-  borderRadius: "12px 12px 0 0",
-};
-
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: { xs: "90%", md: "600px" },
-  bgcolor: "background.paper",
-  boxShadow: 24,
-  borderRadius: "12px",
-  p: 4,
-  outline: "none",
-};
-
-const ReportCard = ({ report, onViewClick }) => (
-  <Card sx={{ ...cardStyle, minHeight: "250px" }}>
-    <Box sx={headerStyle}>
-      <Box display="flex" alignItems="center">
-        <DescriptionIcon sx={{ mr: 1, color: "white" }} />
-        <SoftTypography variant="h6" fontWeight="bold" color="white">
-          {report.fileName}
-        </SoftTypography>
-      </Box>
-      <SoftTypography variant="body2" color="white">
-        {new Date(report.timestamp).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })}
-      </SoftTypography>
-    </Box>
-
-    <SoftBox p={2}>
-      <Card
-        sx={{
-          borderRadius: "8px",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-          mb: 2,
-          borderLeft: "4px solid",
-          borderLeftColor: "primary.main",
-        }}
-      >
-        <SoftBox p={2}>
-          <SoftBox display="flex" alignItems="center" mb={2}>
-            <DescriptionIcon
-              sx={{
-                color: "primary.main",
-                mr: 2,
-                width: 24,
-                height: 24,
-              }}
-            />
-            <SoftTypography variant="h6" fontWeight="bold" color="dark">
-              Document Info
-            </SoftTypography>
-          </SoftBox>
-
-          <SoftTypography
-            variant="body2"
-            color="dark"
-            mb={2}
-            sx={{ minHeight: "40px" }}
-          >
-            {report.description || "No description available."}
-          </SoftTypography>
-
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<DescriptionIcon />}
-            onClick={() => onViewClick(report)}
-            sx={{ borderRadius: "8px" }}
-          >
-            View Report
-          </Button>
-        </SoftBox>
-      </Card>
-    </SoftBox>
-  </Card>
-);
-
-ReportCard.propTypes = {
-  report: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    patientId: PropTypes.string.isRequired,
-    fileName: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    timestamp: PropTypes.string.isRequired,
-    fileUrl: PropTypes.string,
-  }).isRequired,
-  onViewClick: PropTypes.func.isRequired,
-};
-
-const ReportModal = ({ report, open, onClose }) => {
-  if (!report) return null;
-
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="report-modal-title"
-      aria-describedby="report-modal-description"
-    >
-      <Box sx={modalStyle}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <SoftTypography id="report-modal-title" variant="h4" fontWeight="bold">
-            Document Info
-          </SoftTypography>
-          <IconButton onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-
-        <Divider sx={{ my: 2 }} />
-
-        <Stack spacing={2}>
-          <Box display="flex" alignItems="center">
-            <PersonIcon color="primary" sx={{ mr: 2 }} />
-            <Box>
-              <SoftTypography variant="caption" color="textSecondary">
-                Patient ID
-              </SoftTypography>
-              <SoftTypography variant="body1">{report.patientId}</SoftTypography>
-            </Box>
-          </Box>
-
-          <Box display="flex" alignItems="center">
-            <FileIcon color="primary" sx={{ mr: 2 }} />
-            <Box>
-              <SoftTypography variant="caption" color="textSecondary">
-                Report Name
-              </SoftTypography>
-              <SoftTypography variant="body1">{report.fileName}</SoftTypography>
-            </Box>
-          </Box>
-
-          <Box display="flex" alignItems="center">
-            <EventIcon color="primary" sx={{ mr: 2 }} />
-            <Box>
-              <SoftTypography variant="caption" color="textSecondary">
-                Date Generated
-              </SoftTypography>
-              <SoftTypography variant="body1">
-                {new Date(report.timestamp).toLocaleString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </SoftTypography>
-            </Box>
-          </Box>
-
-          <Box display="flex" alignItems="flex-start">
-            <NotesIcon color="primary" sx={{ mr: 2, mt: 1 }} />
-            <Box>
-              <SoftTypography variant="caption" color="textSecondary">
-                Description
-              </SoftTypography>
-              <SoftTypography variant="body1">
-                {report.description || "No description provided."}
-              </SoftTypography>
-            </Box>
-          </Box>
-        </Stack>
-
-        <Divider sx={{ my: 3 }} />
-
-        <Box display="flex" justifyContent="flex-end" mt={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<DescriptionIcon />}
-            href={report.fileUrl || `#${report.fileName}`}
-            target="_blank"
-            sx={{ mr: 2 }}
-          >
-            Open Full Report
-          </Button>
-          <Button variant="outlined" color="secondary" onClick={onClose}>
-            Close
-          </Button>
-        </Box>
-      </Box>
-    </Modal>
-  );
-};
-
-ReportModal.propTypes = {
-  report: PropTypes.object,
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
-
 const Reports = () => {
-  const [reports, setReports] = useState([]);
+  const [radiologyData, setRadiologyData] = useState([]);
+  const [labData, setLabData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedReport, setSelectedReport] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
-    const fetchReports = async () => {
+    const fetchData = async () => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setReports(mockReports);
-      } catch (err) {
-        console.error("Error loading reports:", err);
-        setError(err.message || "An unknown error occurred");
+        // Sample data with image URL
+        const mockData = {
+          images: [
+            {
+              id: "1",
+              patientId: "4024",
+              description: "Chest X-ray showing mild pulmonary congestion",
+              dateCreated: "2025-04-22",
+              imgTest: "Chest X-ray",
+              imageUrl: "https://example.com/path/to/xray.jpg", // Added image URL
+              pdfUrl: "https://example.com/path/to/report.pdf" // Added PDF URL
+            }
+          ],
+          reports: [
+            {
+              id: "1",
+              patientId: "4024",
+              description: "Complete blood count with normal results",
+              timestamp: "2025-04-21",
+              labTest: "Complete Blood Count",
+              pdfUrl: "https://example.com/path/to/lab-report.pdf" // Added PDF URL
+            }
+          ]
+        };
+
+        setRadiologyData(mockData.images);
+        setLabData(mockData.reports);
+        
+      } catch (error) {
+        console.error("Loading error:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchReports();
+    fetchData();
   }, []);
 
-  const handleViewReport = (report) => {
-    setSelectedReport(report);
-    setModalOpen(true);
+  const handleViewImage = (imageUrl) => {
+    setSelectedImage(imageUrl);
   };
 
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setSelectedReport(null);
+  const handleCloseImage = () => {
+    setSelectedImage(null);
+  };
+
+  const handleOpenPdf = (pdfUrl) => {
+    window.open(pdfUrl, '_blank');
   };
 
   if (loading) {
@@ -309,21 +89,7 @@ const Reports = () => {
       <DashboardLayout>
         <DashboardNavbar />
         <SoftBox display="flex" justifyContent="center" alignItems="center" height="80vh">
-          <CircularProgress size={60} />
-        </SoftBox>
-        <Footer />
-      </DashboardLayout>
-    );
-  }
-
-  if (error) {
-    return (
-      <DashboardLayout>
-        <DashboardNavbar />
-        <SoftBox display="flex" justifyContent="center" alignItems="center" height="80vh">
-          <SoftTypography variant="h5" color="error">
-            {error}
-          </SoftTypography>
+          <CircularProgress size={60} color="primary" />
         </SoftBox>
         <Footer />
       </DashboardLayout>
@@ -333,83 +99,223 @@ const Reports = () => {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <SoftBox
-        sx={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%)",
-          padding: { xs: 2, md: 3 },
-        }}
-      >
-        <SoftBox px={2}>
-          {/* Page header */}
-          <Box
-            display="flex"
-            alignItems="center"
-            mb={3}
-            p={2}
-            sx={{
-              background: "rgba(255, 255, 255, 0.95)",
-              borderRadius: "12px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-            }}
-          >
-            <Avatar
-              sx={{
-                bgcolor: "#1565c0",
-                color: "#ffffff",
-                border: "2px solid white",
-                width: 40,
-                height: 40,
-                mr: 2,
-              }}
-            >
-              <DescriptionIcon fontSize="medium" />
-            </Avatar>
-            <Box>
-              <SoftTypography variant="h6" color="textSecondary">
-                Medical Records
-              </SoftTypography>
-              <SoftTypography variant="h4" fontWeight="bold" color="dark">
-                Reports
-              </SoftTypography>
-            </Box>
-          </Box>
-
-          {/* Content section */}
-          <SoftBox mb={3}>
-            <SoftTypography variant="h5" fontWeight="bold" gutterBottom color="dark">
-              <DescriptionIcon color="primary" sx={{ verticalAlign: "middle", mr: 1 }} />
-              Report History
-            </SoftTypography>
-            <SoftTypography variant="body2" color="textSecondary" paragraph>
-              View and manage your medical reports and documents.
+      <SoftBox p={2}>
+        {/* Radiology Section */}
+        <Card sx={{ mb: 3, borderRadius: "12px" }}>
+          <SoftBox sx={{ 
+            p: 2,
+            bgcolor: "#1976d2",
+            color: "white",
+            display: "flex",
+            alignItems: "center",
+            borderRadius: "12px 12px 0 0"
+          }}>
+            <RadiologyIcon sx={{ mr: 2, color: "white" }} />
+            <SoftTypography variant="h6" color="white">
+              Medical Radiology Center
             </SoftTypography>
           </SoftBox>
+          
+          <SoftBox p={2}>
+            {radiologyData.map(report => (
+              <Box key={report.id} sx={{ 
+                p: 2, 
+                mb: 2, 
+                border: "1px solid #eee", 
+                borderRadius: "8px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 1
+              }}>
+                <Box display="flex" alignItems="center">
+                  <ReportIcon color="primary" sx={{ mr: 1 }} />
+                  <SoftTypography variant="h6" color="primary">
+                    {report.imgTest}
+                  </SoftTypography>
+                </Box>
 
-          {/* Reports list */}
-          <Box>
-            {reports.length > 0 ? (
-              <Grid container spacing={2}>
-                {reports.map((report) => (
-                  <Grid item xs={12} sm={6} key={report.id}>
-                    <ReportCard report={report} onViewClick={handleViewReport} />
-                  </Grid>
-                ))}
-              </Grid>
-            ) : (
-              <Card sx={{ p: 3, textAlign: "center", ...cardStyle }}>
-                <SoftTypography variant="body1" color="text">
-                  No reports found for this patient.
-                </SoftTypography>
-              </Card>
-            )}
+                <Box display="flex" alignItems="center">
+                  <PersonIcon fontSize="small" sx={{ mr: 1, color: "action.active" }} />
+                  <SoftTypography variant="body2">
+                    <strong>Patient ID:</strong> {report.patientId}
+                  </SoftTypography>
+                </Box>
+
+                <Box display="flex" alignItems="center">
+                  <DateIcon fontSize="small" sx={{ mr: 1, color: "action.active" }} />
+                  <SoftTypography variant="body2">
+                    <strong>Date:</strong> {report.dateCreated}
+                  </SoftTypography>
+                </Box>
+
+                <Divider sx={{ my: 1 }} />
+
+                <Box display="flex">
+                  <DescriptionIcon fontSize="small" sx={{ mr: 1, mt: 0.5, color: "action.active" }} />
+                  <Box>
+                    <SoftTypography variant="body2" fontWeight="bold">
+                      Findings:
+                    </SoftTypography>
+                    <SoftTypography variant="body2">
+                      {report.description}
+                    </SoftTypography>
+                  </Box>
+                </Box>
+
+                {/* Action Buttons for Radiology - Only View Image button remains */}
+                {report.imageUrl && (
+                  <SoftBox display="flex" justifyContent="flex-end" mt={2}>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      startIcon={<ImageIcon />}
+                      onClick={() => handleViewImage(report.imageUrl)}
+                    >
+                      View Image
+                    </Button>
+                  </SoftBox>
+                )}
+              </Box>
+            ))}
+          </SoftBox>
+        </Card>
+
+        {/* Laboratory Section */}
+        <Card sx={{ mb: 3, borderRadius: "12px" }}>
+          <SoftBox sx={{ 
+            p: 2,
+            bgcolor: "#1976d2",
+            color: "white",
+            display: "flex",
+            alignItems: "center",
+            borderRadius: "12px 12px 0 0"
+          }}>
+            <LabIcon sx={{ mr: 2, color: "white" }} />
+            <SoftTypography variant="h6" color="white">
+              Laboratory Results
+            </SoftTypography>
+          </SoftBox>
+          
+          <SoftBox p={2}>
+            {labData.map(report => (
+              <Box key={report.id} sx={{ 
+                p: 2, 
+                mb: 2, 
+                border: "1px solid #eee", 
+                borderRadius: "8px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 1
+              }}>
+                <Box display="flex" alignItems="center">
+                  <ReportIcon color="primary" sx={{ mr: 1 }} />
+                  <SoftTypography variant="h6" color="primary">
+                    {report.labTest}
+                  </SoftTypography>
+                </Box>
+
+                <Box display="flex" alignItems="center">
+                  <PersonIcon fontSize="small" sx={{ mr: 1, color: "action.active" }} />
+                  <SoftTypography variant="body2">
+                    <strong>Patient ID:</strong> {report.patientId}
+                  </SoftTypography>
+                </Box>
+
+                <Box display="flex" alignItems="center">
+                  <DateIcon fontSize="small" sx={{ mr: 1, color: "action.active" }} />
+                  <SoftTypography variant="body2">
+                    <strong>Date:</strong> {report.timestamp}
+                  </SoftTypography>
+                </Box>
+
+                <Divider sx={{ my: 1 }} />
+
+                <Box display="flex">
+                  <DescriptionIcon fontSize="small" sx={{ mr: 1, mt: 0.5, color: "action.active" }} />
+                  <Box>
+                    <SoftTypography variant="body2" fontWeight="bold">
+                      Results:
+                    </SoftTypography>
+                    <SoftTypography variant="body2">
+                      {report.description}
+                    </SoftTypography>
+                  </Box>
+                </Box>
+
+                {/* Action Button for Lab Reports */}
+                {report.pdfUrl && (
+                  <SoftBox display="flex" justifyContent="flex-end" mt={2}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      startIcon={<PdfIcon />}
+                      onClick={() => handleOpenPdf(report.pdfUrl)}
+                    >
+                      View PDF Report
+                    </Button>
+                  </SoftBox>
+                )}
+              </Box>
+            ))}
+          </SoftBox>
+        </Card>
+      </SoftBox>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <SoftBox
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999
+          }}
+          onClick={handleCloseImage}
+        >
+          <Box
+            sx={{
+              maxWidth: '90%',
+              maxHeight: '90%',
+              position: 'relative'
+            }}
+          >
+            <IconButton
+              sx={{
+                position: 'absolute',
+                top: 10,
+                right: 10,
+                color: 'white',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                '&:hover': {
+                  backgroundColor: 'rgba(0,0,0,0.7)'
+                }
+              }}
+              onClick={handleCloseImage}
+            >
+              <ViewIcon />
+            </IconButton>
+            <img
+              src={selectedImage}
+              alt="Medical Imaging"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '90vh',
+                display: 'block'
+              }}
+            />
           </Box>
         </SoftBox>
-      </SoftBox>
-      <Footer />
+      )}
 
-      {/* Report Modal */}
-      <ReportModal report={selectedReport} open={modalOpen} onClose={handleCloseModal} />
+      <Footer />
     </DashboardLayout>
   );
 };

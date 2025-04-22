@@ -92,6 +92,17 @@ const routes = [
     noCollapse: true,
   }] : []),
   
+  // Reports moved under Patient Management
+  ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ? [{
+    type: "collapse",
+    name: "Reports",
+    key: "reports",
+    route: "/reports",
+    icon: <Description size="12px" />,
+    component: <Reports />,
+    noCollapse: true,
+  }] : []),
+  
   ...(getUserRole() !== 'patient' && getUserRole() !== 'centreImagerie' && getUserRole() !== 'medecins' ? [{
     type: "collapse",
     name: "Laboratory",
@@ -128,18 +139,6 @@ const routes = [
     noCollapse: true,
   }] : []),
   
-  // Reports section - accessible to patients and doctors
-  ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ? [{
-    type: "collapse",
-    name: "Reports",
-    key: "reports",
-    route: "/Reports",
-    icon: <Description size="12px" />,
-    component: <Reports />,
-    noCollapse: true,
-  }] : []),
-  
- 
   {
     name: "Sign Up",
     key: "sign-up",
