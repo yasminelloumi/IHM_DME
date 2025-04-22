@@ -150,15 +150,15 @@ export default function App() {
 
   const configsButton = (
     <SoftBox
-      display="flex"
-      justifyContent="center"
+      //display="flex"
+     // justifyContent="center"
       alignItems="center"
-      width="3.5rem"
-      height="3.5rem"
-      bgColor="white"
-      shadow="sm"
-      borderRadius="50%"
-      position="fixed"
+      //width="3.5rem"
+      //height="3.5rem"
+     // bgColor="white"
+      //shadow="sm"
+      //borderRadius="50%"
+      //position="fixed"
       right="2rem"
       bottom="2rem"
       zIndex={99}
@@ -166,9 +166,7 @@ export default function App() {
       sx={{ cursor: "pointer" }}
       onClick={handleConfiguratorOpen}
     >
-      <Icon fontSize="default" color="inherit">
-        settings
-      </Icon>
+      
     </SoftBox>
   );
 
@@ -179,7 +177,7 @@ export default function App() {
         <Sidenav
           color={sidenavColor}
           brand={brand}
-          brandName="Dossier Médical Électronique"
+          brandName="Electronic Medical Record"
           routes={routes}
           onMouseEnter={handleOnMouseEnter}
           onMouseLeave={handleOnMouseLeave}
