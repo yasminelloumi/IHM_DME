@@ -216,7 +216,7 @@ app.post('/images', imageUpload.single('image'), async (req, res) => {
       description,
       fileName: req.file.filename,
       url: `/uploads/images/${req.file.filename}`,
-      dateCreated: new Date().toISOString(),
+      dateCreation: new Date().toISOString(),
       dmeId,
       imgTest: sanitizedImgTest,
     };

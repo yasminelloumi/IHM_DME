@@ -1,11 +1,12 @@
 export class Image {
-  constructor(id, dateCreation, patientId, url, description, fileName) {
+  constructor(id, dateCreation, patientId, url, description, fileName,imgTest) {
     this.id = id;
     this.dateCreation = dateCreation;
     this.patientId = patientId;
     this.url = url;
     this.description = description;
     this.fileName = fileName;
+    this.imgTest = imgTest;
   }
 
   static ajouterImage(imageData) {
@@ -14,12 +15,13 @@ export class Image {
     
     // Create new image object
     const newImage = new Image(
-      Date.now(), // Using timestamp as ID
+      Date.now(),
       new Date().toISOString(),
       imageData.patientId,
       imageData.url,
       imageData.description,
-      imageData.fileName )
+      imageData.fileName,
+      imageData.imgTest)
     
     // Add to array and save back to localStorage
     images.push(newImage);
