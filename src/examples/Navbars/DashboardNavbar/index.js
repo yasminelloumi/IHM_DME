@@ -53,8 +53,8 @@ import {
   setMiniSidenav,
 } from "context";
 
-// Import LanguageIcon, Visibility, Edit, and ArrowBack from MUI
-import { Language as LanguageIcon, Visibility, Edit, ArrowBack } from "@mui/icons-material";
+// Import LanguageIcon, Visibility, Edit, ArrowBack, and ZoomIn from MUI
+import { Language as LanguageIcon, Visibility, Edit, ArrowBack, ZoomIn } from "@mui/icons-material";
 
 // Import logout service
 import { logout } from "services/authService";
@@ -68,23 +68,27 @@ export const LanguageProvider = ({ children }) => {
   const translations = {
     en: {
       profile: "Profile",
-      viewProfile: "See Profile", // Changed from "View Profile"
-      editProfile: "Modify Profile", // Changed from "Edit Profile"
+      viewProfile: "See Profile",
+      editProfile: "Modify Profile",
       logout: "Log Out",
       changeLanguage: "Change Language",
       openMenu: "Open Menu",
       closeMenu: "Close Menu",
       goBack: "Go Back",
+      zoomLevel: "Zoom Level",
+      selectZoom: "Select Zoom Level",
     },
     fr: {
       profile: "Profil",
-      viewProfile: "Voir Profil", // Changed from "Voir le Profil"
-      editProfile: "Modifier Profil", // Changed from "Modifier le Profil"
+      viewProfile: "Voir Profil",
+      editProfile: "Modifier Profil",
       logout: "Déconnexion",
       changeLanguage: "Changer de Langue",
       openMenu: "Ouvrir le Menu",
       closeMenu: "Fermer le Menu",
       goBack: "Retour",
+      zoomLevel: "Niveau de Zoom",
+      selectZoom: "Sélectionner le Niveau de Zoom",
     },
   };
 
@@ -102,8 +106,8 @@ const enhancedNavbarStyles = {
   navbar: (theme, { transparentNavbar, absolute, light }) => ({
     ...navbar(theme, { transparentNavbar, absolute, light }),
     background: transparentNavbar
-      ? "rgba(255, 255, 255, 0.2)" // Transparent at the top
-      : "linear-gradient(90deg, rgba(230, 240, 250, 0.9), rgba(179, 205, 224, 0.9))", // Gradient when scrolling
+      ? "rgba(255, 255, 255, 0.2)"
+      : "linear-gradient(90deg, rgba(230, 240, 250, 0.9), rgba(179, 205, 224, 0.9))",
     backdropFilter: "blur(8px)",
     boxShadow: transparentNavbar
       ? "0 4px 12px rgba(0, 0, 0, 0.05)"
@@ -210,6 +214,9 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const { miniSidenav, transparentNavbar, fixedNavbar } = controller;
   const [languageMenuAnchor, setLanguageMenuAnchor] = useState(null);
   const [profileMenuAnchor, setProfileMenuAnchor] = useState(null);
+  const [zoomMenuAnchor, setZoomMenuAnchor] = useState(null);
+  const [zoomLevel, setZoomLevel] = useState(1); // Default zoom level (100%)
+  const zoomOptions = [0.5, 0.75, 1, 1.25, 1.5]; // Zoom levels: 50%, 75%, 100%, 125%, 150%
   const route = useLocation().pathname.split("/").slice(1);
   const navigate = useNavigate();
 
@@ -222,6 +229,15 @@ function DashboardNavbar({ absolute, light, isMini }) {
   };
 
   const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
+
+  // Apply zoom level to the document body
+  useEffect(() => {
+    document.body.style.zoom = zoomLevel;
+    return () => {
+      // Reset zoom when component unmounts
+      document.body.style.zoom = 1;
+    };
+  }, [zoomLevel]);
 
   useEffect(() => {
     // Set navbar type based on fixedNavbar prop
@@ -284,6 +300,20 @@ function DashboardNavbar({ absolute, light, isMini }) {
     handleLanguageMenuClose();
   };
 
+  // Zoom menu handlers
+  const handleZoomMenuOpen = (event) => {
+    setZoomMenuAnchor(event.currentTarget);
+  };
+
+  const handleZoomMenuClose = () => {
+    setZoomMenuAnchor(null);
+  };
+
+  const handleZoomLevelChange = (level) => {
+    setZoomLevel(level);
+    handleZoomMenuClose();
+  };
+
   return (
     <ErrorBoundary>
       <AppBar
@@ -341,7 +371,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
             />
           </SoftBox>
 
-          {/* Right Side: Profile, Logout, Language Switcher */}
+          {/* Right Side: Profile, Logout, Language Switcher, Zoom Control */}
           <SoftBox sx={(theme) => enhancedNavbarStyles.navbarRow(theme, { isMini })}>
             <SoftBox color={light ? "white" : "inherit"} display="flex" alignItems="center" gap={2}>
               {/* Profile Link (for patients) with Dropdown */}
@@ -455,6 +485,45 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   <SoftTypography sx={enhancedNavbarStyles.flag}>🇫🇷</SoftTypography>
                   Français
                 </MenuItem>
+              </Menu>
+
+              {/* Zoom Control (Single Icon with Dropdown) */}
+              <Tooltip title={t("selectZoom")} placement="bottom">
+                <IconButton
+                  size="small"
+                  color="inherit"
+                  sx={enhancedNavbarStyles.navbarIconButton}
+                  onClick={handleZoomMenuOpen}
+                  aria-label={t("selectZoom")}
+                >
+                  <ZoomIn
+                    sx={({ palette: { dark, white } }) => ({
+                      color: light ? white.main : dark.main,
+                    })}
+                  />
+                  <SoftTypography
+                    variant="button"
+                    fontWeight="medium"
+                    color={light ? "white" : "dark"}
+                  >
+                    {Math.round(zoomLevel * 100)}%
+                  </SoftTypography>
+                </IconButton>
+              </Tooltip>
+              <Menu
+                anchorEl={zoomMenuAnchor}
+                open={Boolean(zoomMenuAnchor)}
+                onClose={handleZoomMenuClose}
+              >
+                {zoomOptions.map((level) => (
+                  <MenuItem
+                    key={level}
+                    onClick={() => handleZoomLevelChange(level)}
+                    sx={enhancedNavbarStyles.menuItem}
+                  >
+                    {Math.round(level * 100)}%
+                  </MenuItem>
+                ))}
               </Menu>
             </SoftBox>
           </SoftBox>
