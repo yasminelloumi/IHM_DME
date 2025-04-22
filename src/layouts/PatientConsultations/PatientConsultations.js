@@ -721,8 +721,8 @@ const PatientConsultations = () => {
     notes: ""
   });
   const [submitStatus, setSubmitStatus] = useState(null);
-  const [page, setPage] = useState(1);
-  const consultationsPerPage = 5;
+  const [currentPage, setCurrentPage] = useState(1);
+  const consultationsPerPage = 1;
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => {
@@ -958,6 +958,7 @@ const PatientConsultations = () => {
     );
   }
 
+  // Préparer les données des consultations
   const consultationsToDisplay = dmeRecords
     .sort((a, b) => new Date(b.dateConsultation) - new Date(a.dateConsultation))
     .map(dme => {
@@ -980,12 +981,11 @@ const PatientConsultations = () => {
       };
     });
 
-  const totalPages = Math.ceil(consultationsToDisplay.length / consultationsPerPage);
-  const startIndex = (page - 1) * consultationsPerPage;
-  const paginatedConsultations = consultationsToDisplay.slice(startIndex, startIndex + consultationsPerPage);
+  const totalPages = consultationsToDisplay.length;
+  const currentConsultation = consultationsToDisplay[currentPage - 1];
 
-  const handlePageChange = (event, value) => {
-    setPage(value);
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage);
   };
 
   return (
@@ -1031,25 +1031,19 @@ const PatientConsultations = () => {
                 </Typography>
               </Box>
             </Box>
-            {totalPages > 1 && (
-              <Pagination
-                count={totalPages}
-                page={page}
-                onChange={handlePageChange}
-                color="primary"
-                size="small"
-              />
-            )}
           </Box>
 
-          <Grid container spacing={3} mb={4}>
-            <Grid item xs={12} md={6}>
-              <TrendsCard data={consultationTrends} />
+          {/* Afficher les statistiques seulement sur la première page */}
+          {currentPage === 1 && (
+            <Grid container spacing={3} mb={4}>
+              <Grid item xs={12} md={6}>
+                <TrendsCard data={consultationTrends} />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <StatsCard stats={statsData} />
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={6}>
-              <StatsCard stats={statsData} />
-            </Grid>
-          </Grid>
+          )}
 
           <Box mb={4}>
             <Typography
@@ -1059,12 +1053,12 @@ const PatientConsultations = () => {
               color="dark"
             >
               <EventIcon color="primary" sx={{ verticalAlign: 'middle', mr: 1 }} />
-              Consultation History
+              Consultation Details
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
               {user?.role === "patient"
-                ? "Review your complete consultation history with detailed visit information."
-                : "Review the complete consultation of the patient's history with detailed visit information."}
+                ? "Detailed information about your consultation."
+                : "Detailed information about the patient's consultation."}
             </Typography>
             {user?.role !== "patient" && (
               <SoftButton
@@ -1079,13 +1073,11 @@ const PatientConsultations = () => {
           </Box>
 
           <Box>
-            {paginatedConsultations.length > 0 ? (
-              paginatedConsultations.map((consultation) => (
-                <ConsultationCard
-                  key={consultation.id}
-                  consultation={consultation}
-                />
-              ))
+            {currentConsultation ? (
+              <ConsultationCard
+                key={currentConsultation.id}
+                consultation={currentConsultation}
+              />
             ) : (
               <SoftTypography variant="body1" color="dark">
                 No consultation records found for this patient.
@@ -1093,29 +1085,35 @@ const PatientConsultations = () => {
             )}
           </Box>
 
-          {consultationsToDisplay.length > 0 && totalPages > 1 && (
-            <Box
-              display="flex"
-              justifyContent="center"
+          {totalPages > 1 && (
+            <SoftBox 
+              display="flex" 
+              justifyContent="center" 
               mt={4}
-              p={2}
               sx={{
-                background: "rgba(255, 255, 255, 0.9)",
-                borderRadius: "8px",
-                border: "1px solid #e0e0e0",
-                boxShadow: " testimonial of rgba(0, 0, 0, 0.1)"
+                '& .MuiPaginationItem-root': {
+                  color: '#1976d2',
+                  '&.Mui-selected': {
+                    backgroundColor: '#1976d2',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: '#1565c0',
+                    }
+                  },
+                  '&:hover': {
+                    backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                  }
+                }
               }}
             >
               <Pagination
                 count={totalPages}
-                page={page}
+                page={currentPage}
                 onChange={handlePageChange}
                 color="primary"
-                size="large"
-                showFirstButton
-                showLastButton
+                shape="rounded"
               />
-            </Box>
+            </SoftBox>
           )}
         </Box>
       </Box>

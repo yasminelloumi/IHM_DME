@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   Card,
-  Icon,
   Collapse,
   Stack,
   Modal,
@@ -12,19 +11,22 @@ import {
   InputLabel,
   Box,
   Pagination,
+  IconButton,
 } from "@mui/material";
 import {
   Description,
   Vaccines,
   CalendarMonth,
-  Favorite,
-  Sick,
-  Coronavirus,
+  MonitorHeart,
+  HealthAndSafety,
+  LocalHospital,
   ReportProblem,
   WarningAmber,
   CheckCircle,
   SignalCellularAlt,
-  AddCircle,
+  Add as AddIcon,
+  ExpandLess,
+  ExpandMore,
 } from "@mui/icons-material";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
@@ -34,7 +36,6 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import { getConditionsByPatientId, createCondition } from "services/conditionService";
 
-// Modal style
 const modalStyle = {
   position: 'absolute',
   top: '50%',
@@ -47,7 +48,6 @@ const modalStyle = {
   borderRadius: 2,
 };
 
-// Badge rendering by severity level
 const renderSeverityBadge = (severity) => {
   const badgeProps = {
     Mild: { color: "success", icon: <CheckCircle sx={{ fontSize: 16, mr: 0.5 }} /> },
@@ -58,29 +58,25 @@ const renderSeverityBadge = (severity) => {
   };
 
   const badge = badgeProps[severity];
-  return (
-    badge && (
-      <SoftBadge
-        color={badge.color}
-        size="sm"
-        icon={badge.icon}
-        badgeContent={severity}
-      />
-    )
+  return badge && (
+    <SoftBadge
+      color={badge.color}
+      size="sm"
+      icon={badge.icon}
+      badgeContent={severity}
+    />
   );
 };
 
 const DiseaseItem = ({ disease }) => (
-  <Card
-    sx={{
-      mb: 3,
-      p: 3,
-      borderRadius: 3,
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-      background: "#fff",
-      transition: "all 0.3s ease",
-    }}
-  >
+  <Card sx={{
+    mb: 3,
+    p: 3,
+    borderRadius: 3,
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+    background: "#fff",
+    transition: "all 0.3s ease",
+  }}>
     <Stack spacing={1}>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <SoftTypography variant="h6" fontWeight="bold" color="dark">
@@ -125,72 +121,60 @@ DiseaseItem.propTypes = {
 
 const DiseaseCategory = ({ category, onAddDisease }) => {
   const [expanded, setExpanded] = useState(true);
+  const connectedUser = JSON.parse(localStorage.getItem("connectedUser")) || {};
+  const isMedecin = connectedUser.role === "medecins";
 
-  // Retrieve connected user from localStorage
-  const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
-  const isMedecin = connectedUser?.role === "medecins";
-
-  // Assign specific icons based on category
   const categoryIcons = {
-    Chronic: <Favorite sx={{ fontSize: 24, color: "#0077b6" }} />,
-    Allergy: <Sick sx={{ fontSize: 24, color: "#0077b6" }} />,
-    Infectious: <Coronavirus sx={{ fontSize: 24, color: "#0077b6" }} />,
+    Chronic: <MonitorHeart sx={{ fontSize: 24, color: "#1976d2" }} />,
+    Allergy: <HealthAndSafety sx={{ fontSize: 24, color: "#1976d2" }} />,
+    Infectious: <LocalHospital sx={{ fontSize: 24, color: "#1976d2" }} />,
   };
 
   return (
-    <Card
-      sx={{
-        mb: 4,
-        borderRadius: 3,
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        background: "#fff",
-      }}
-    >
+    <Card sx={{ mb: 4, borderRadius: 3, boxShadow: 3 }}>
       <SoftBox
         display="flex"
         justifyContent="space-between"
         alignItems="center"
         p={2}
         onClick={() => setExpanded(!expanded)}
-        sx={{
-          cursor: "pointer",
-          "&:hover": {
-            backgroundColor: "rgba(0, 119, 182, 0.1)",
-          },
-        }}
+        sx={{ cursor: "pointer" }}
       >
         <SoftBox display="flex" alignItems="center" gap={1}>
-          {categoryIcons[category.name] || <Favorite sx={{ fontSize: 24, color: "#0077b6" }} />}
-          <SoftTypography variant="h5" fontWeight="medium" color="dark">
+          {categoryIcons[category.name]}
+          <SoftTypography variant="h5" fontWeight="medium">
             {category.name} ({category.items.length})
           </SoftTypography>
         </SoftBox>
+        
         <Stack direction="row" alignItems="center" spacing={1}>
           {isMedecin && (
-            <Icon
-              color="action"
+            <IconButton
               onClick={(e) => {
                 e.stopPropagation();
                 onAddDisease(category.name.toLowerCase());
               }}
-              sx={{ cursor: "pointer" }}
+              sx={{ 
+                color: "white",
+                backgroundColor: "primary.main",
+                '&:hover': {
+                  backgroundColor: "primary.dark",
+                }
+              }}
+              size="small"
             >
-              <AddCircle />
-            </Icon>
+              <AddIcon />
+            </IconButton>
           )}
-          <Icon color="action">
-            {expanded ? "expand_less" : "expand_more"}
-          </Icon>
+          {expanded ? <ExpandLess /> : <ExpandMore />}
         </Stack>
       </SoftBox>
 
-      <Collapse in={expanded} timeout="auto" unmountOnExit>
+      <Collapse in={expanded}>
         <SoftBox p={2}>
-          <Stack spacing={3}>
-            {category.items.map((disease, index) => (
-              <DiseaseItem key={index} disease={disease} />
-            ))}
-          </Stack>
+          {category.items.map((disease, index) => (
+            <DiseaseItem key={index} disease={disease} />
+          ))}
         </SoftBox>
       </Collapse>
     </Card>
@@ -213,8 +197,8 @@ const PatientDiseases = () => {
     description: "",
     treatment: "",
   });
-  const [page, setPage] = useState(1);
-  const itemsPerPage = 5; // Number of diseases per page
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 1; // 1 catégorie par page
 
   useEffect(() => {
     const fetchConditions = async () => {
@@ -246,11 +230,8 @@ const PatientDiseases = () => {
           console.error("No patient ID found.");
           return;
         }
-        console.log("scannedPatient:", scannedPatient);
-        console.log("patientId:", patientId);
 
         const conditions = await getConditionsByPatientId(patientId);
-        console.log("Fetched conditions:", conditions);
 
         const grouped = {
           Allergy: [],
@@ -265,10 +246,13 @@ const PatientDiseases = () => {
           else if (type === "infectious") grouped.Infectious.push(condition);
         });
 
-        const categorized = Object.keys(grouped).map((key) => ({
-          name: key,
-          items: grouped[key],
-        }));
+        // Filtrer les catégories vides
+        const categorized = Object.keys(grouped)
+          .filter(key => grouped[key].length > 0)
+          .map(key => ({
+            name: key,
+            items: grouped[key],
+          }));
 
         setCategories(categorized);
       } catch (error) {
@@ -278,6 +262,10 @@ const PatientDiseases = () => {
 
     fetchConditions();
   }, []);
+
+  // Obtenir la catégorie actuelle à afficher
+  const currentCategory = categories[currentPage] || null;
+  const totalPages = categories.length;
 
   const handleOpenModal = (type) => {
     setNewDisease({
@@ -326,7 +314,6 @@ const PatientDiseases = () => {
 
       const createdDisease = await createCondition(diseaseToCreate);
 
-      // Update the categories state with the new disease
       setCategories((prevCategories) => {
         return prevCategories.map((category) => {
           if (category.name.toLowerCase() === newDisease.type.toLowerCase()) {
@@ -345,16 +332,9 @@ const PatientDiseases = () => {
     }
   };
 
-  // Pagination logic
-  const allDiseases = categories.flatMap(category => category.items);
-  const totalPages = Math.ceil(allDiseases.length / itemsPerPage);
-  const paginatedDiseases = allDiseases.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-
-  // Group paginated diseases back into categories
-  const paginatedCategories = categories.map(category => ({
-    ...category,
-    items: paginatedDiseases.filter(disease => disease.type.toLowerCase() === category.name.toLowerCase())
-  })).filter(category => category.items.length > 0);
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage - 1); // Pagination commence à 1, notre état commence à 0
+  };
 
   return (
     <DashboardLayout>
@@ -385,41 +365,49 @@ const PatientDiseases = () => {
         </SoftBox>
 
         <SoftBox>
-          {paginatedCategories.length === 0 ? (
-            <SoftTypography
-              variant="h6"
-              color="text"
-              textAlign="center"
-              mt={5}
-            >
+          {totalPages === 0 ? (
+            <SoftTypography variant="h6" color="text" textAlign="center" mt={5}>
               You have no recorded medical conditions at the moment.
             </SoftTypography>
-          ) : (
-            categories.map((category, index) => (
-              category.items.length > 0 && (
-                <DiseaseCategory
-                  key={index}
-                  category={category}
-                  onAddDisease={handleOpenModal}
-                />
-              )
-            ))
-          )}
+          ) : currentCategory ? (
+            <DiseaseCategory
+              category={currentCategory}
+              onAddDisease={handleOpenModal}
+            />
+          ) : null}
         </SoftBox>
 
-        {/* Pagination */}
         {totalPages > 1 && (
-          <SoftBox display="flex" justifyContent="center" mt={4}>
+          <SoftBox 
+            display="flex" 
+            justifyContent="center" 
+            mt={4}
+            sx={{
+              '& .MuiPaginationItem-root': {
+                color: '#1976d2',
+                '&.Mui-selected': {
+                  backgroundColor: '#1976d2',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: '#1565c0',
+                  }
+                },
+                '&:hover': {
+                  backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                }
+              }
+            }}
+          >
             <Pagination
               count={totalPages}
-              page={page}
-              onChange={(event, value) => setPage(value)}
+              page={currentPage + 1} // Pagination commence à 1
+              onChange={handlePageChange}
               color="primary"
+              shape="rounded"
             />
           </SoftBox>
         )}
 
-        {/* Add Disease Modal */}
         <Modal
           open={openModal}
           onClose={handleCloseModal}
@@ -451,12 +439,9 @@ const PatientDiseases = () => {
               />
 
               <FormControl fullWidth>
-                <InputLabel id="severity-label" htmlFor="severity-select">
-                  Severity
-                </InputLabel>
+                <InputLabel id="severity-label">Severity</InputLabel>
                 <Box
                   component="select"
-                  id="severity-select"
                   name="severity"
                   value={newDisease.severity || ""}
                   onChange={handleInputChange}
@@ -467,19 +452,11 @@ const PatientDiseases = () => {
                     borderRadius: "4px",
                     border: "1px solid #ccc",
                     backgroundColor: "white",
-                    zIndex: 1300,
-                    pointerEvents: "auto",
-                    "&:focus": {
-                      outline: "2px solid #0077b6",
-                      borderColor: "#0077b6",
-                    },
                     marginTop: "16px",
                     height: "40px",
                   }}
                 >
-                  <option value="" disabled>
-                    Select Severity
-                  </option>
+                  <option value="" disabled>Select Severity</option>
                   <option value="Mild">Mild</option>
                   <option value="Moderate">Moderate</option>
                   <option value="Severe">Severe</option>
