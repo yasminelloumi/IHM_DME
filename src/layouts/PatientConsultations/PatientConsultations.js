@@ -1027,7 +1027,7 @@ const PatientConsultations = () => {
                   Medical History
                 </Typography>
                 <Typography variant="h4" fontWeight="bold" color="dark">
-                  My Consultations
+                  {user?.role !== "patient" ? "Patient's Consultations" : "My Consultations"}
                 </Typography>
               </Box>
             </Box>
@@ -1067,14 +1067,21 @@ const PatientConsultations = () => {
                 : "Review the complete consultation of the patient's history with detailed visit information."}
             </Typography>
             {user?.role !== "patient" && (
-              <SoftButton
-                variant="outlined"
-                size="small"
-                color="primary"
-                onClick={handleOpenModal}
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="10vh" // Use full viewport height to center vertically
               >
-                Add Consultation
-              </SoftButton>
+                <SoftButton
+                  variant="outlined"
+                  size="small"
+                  color="primary"
+                  onClick={handleOpenModal}
+                >
+                  Add Consultation
+                </SoftButton>
+              </Box>
             )}
           </Box>
 
