@@ -247,6 +247,26 @@
       "dateCreation": "2025-04-22T20:27:00.850Z",
       "dmeId": "fb96",
       "imgTest": "Chest X-ray"
+    },
+    {
+      "id": "1745361166784",
+      "patientId": "4024",
+      "description": "fkkfkkkkkkk",
+      "fileName": "image-1745361166783-451181766.jpg",
+      "url": "/uploads/images/image-1745361166783-451181766.jpg",
+      "dateCreation": "2025-04-22T22:32:46.784Z",
+      "dmeId": "91af",
+      "imgTest": "Chest X-ray"
+    },
+    {
+      "id": "1745361341432",
+      "patientId": "4024",
+      "description": "gmgmgmg^gùg!",
+      "fileName": "image-1745361341430-303895514.jpg",
+      "url": "/uploads/images/image-1745361341430-303895514.jpg",
+      "dateCreation": "2025-04-22T22:35:41.432Z",
+      "dmeId": "4f17",
+      "imgTest": "Chest X-ray"
     }
   ],
   "centreImagerie": [
@@ -838,7 +858,15 @@
       "filePath": "/Uploads/pdfFiles/report-1745352289151-889294744.pdf",
       "timestamp": "2025-04-22T20:04:49.153Z",
       "dmeId": "2"
+    },
+    {
+      "id": "1745361390347",
+      "patientId": "4024",
+      "description": "g;glgmgmgùg",
+      "labTest": "HbA1c",
+      "filePath": "/Uploads/pdfFiles/report-1745361390341-888442619.pdf",
+      "timestamp": "2025-04-22T22:36:30.347Z",
+      "dmeId": "91af"
     }
-
   ]
 }
