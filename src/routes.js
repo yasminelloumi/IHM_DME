@@ -11,25 +11,24 @@ import MedicalServices from "@mui/icons-material/MedicalServices";
 import CalendarToday from "@mui/icons-material/CalendarToday";
 import Science from "@mui/icons-material/Science";
 import Collections from "@mui/icons-material/Collections";
+import Description from "@mui/icons-material/Description";
 
 import PatientT from "layouts/TablePatient";
 import PatientConsultations from "layouts/PatientConsultations/PatientConsultations";  
 import CentreImage from "layouts/CentreImagerie";
 import Labo from "layouts/Laboratoire";
-import ProtectedRoute from './components/ProtectedRoute';
 import ListPatientData from "layouts/ListPatientData/data/ListPatientData";
 import Overview from "layouts/profile";
 import ListDatas from "layouts/ListPatientData";
-
-
+import Reports from "layouts/Reports";
 
 const getUserRole = () => {
-  // Retrieve the connected user's role from localStorage (or session)
   const connectedUser = JSON.parse(localStorage.getItem('connectedUser'));
   return connectedUser?.role || null;
 };
+
 const routes = [
-  ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
+  ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ? [{
     type: "collapse",
     name: "Dashboard",
     key: "dashboard",
@@ -38,12 +37,14 @@ const routes = [
     component: <Dashboard />,
     noCollapse: true,
   }] : []),
+  
   { 
     type: "title", 
     title: "Patient Management", 
     key: "patient-management" 
   },
-  ...(getUserRole() !== 'patient' && getUserRole() !== 'medecins'? [{
+  
+  ...(getUserRole() !== 'patient' && getUserRole() !== 'medecins' ? [{
     type: "collapse",
     name: "Scan QR Code",
     key: "ListPatientData",
@@ -51,8 +52,9 @@ const routes = [
     icon: <Shop size="12px" />,
     component: <ListDatas />,
     noCollapse: true,
-}] : []),
-  ...(getUserRole() !== 'patient' && getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
+  }] : []),
+  
+  ...(getUserRole() !== 'patient' && getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ? [{
     type: "collapse",
     name: "Patients List",
     key: "TablePatient",
@@ -61,8 +63,8 @@ const routes = [
     component: <PatientT />,
     noCollapse: true,
   }] : []),
-  ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
   
+  ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ? [{
     type: "collapse",
     name: "Diseases",
     key: "patient-diseases",
@@ -72,7 +74,7 @@ const routes = [
     noCollapse: true,
   }] : []),
 
-  ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
+  ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ? [{
     type: "collapse",
     name: "Consultations",
     key: "patient-consultations",
@@ -81,7 +83,8 @@ const routes = [
     component: <PatientConsultations />,
     noCollapse: true,
   }] : []),
-  ...(getUserRole() !== 'patient' && getUserRole() !== 'centreImagerie' && getUserRole() !== 'medecins'? [{
+  
+  ...(getUserRole() !== 'patient' && getUserRole() !== 'centreImagerie' && getUserRole() !== 'medecins' ? [{
     type: "collapse",
     name: "Laboratory",
     key: "patient-laboratory",
@@ -90,7 +93,8 @@ const routes = [
     component: <Labo />,
     noCollapse: true,
   }] : []),
-  ...(getUserRole() !== 'patient'&& getUserRole() !== 'laboratoire' && getUserRole() !== 'medecins' ? [{
+  
+  ...(getUserRole() !== 'patient' && getUserRole() !== 'laboratoire' && getUserRole() !== 'medecins' ? [{
     type: "collapse",
     name: "Medical Imaging",
     key: "patient-imaging",
@@ -99,19 +103,31 @@ const routes = [
     component: <CentreImage />,
     noCollapse: true,
   }] : []),
+  
   ...(getUserRole() !== 'laboratoire' && getUserRole() !== 'medecins' && getUserRole() !== 'centreImagerie' ? [{
- 
     type: "title", 
     title: "Account Page", 
     key: "account-pages" 
   }] : []),
-  ...(getUserRole() !== 'medecins'  && getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire'?[{
+  
+  ...(getUserRole() !== 'medecins' && getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ? [{
     type: "collapse",
     name: "Profile",
     key: "profile",
     route: "/profile",
     icon: <MedicalServices size="12px" />,
     component: <Overview />,
+    noCollapse: true,
+  }] : []),
+  
+  // Reports section - accessible to patients and doctors
+  ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ? [{
+    type: "collapse",
+    name: "Reports",
+    key: "reports",
+    route: "/Reports",
+    icon: <Description size="12px" />,
+    component: <Reports />,
     noCollapse: true,
   }] : []),
   
@@ -123,6 +139,7 @@ const routes = [
     component: <SignIn />,
     noCollapse: true,
   },
+ 
   {
     name: "Sign Up",
     key: "sign-up",
@@ -132,4 +149,5 @@ const routes = [
     noCollapse: true,
   },
 ];
+
 export default routes;

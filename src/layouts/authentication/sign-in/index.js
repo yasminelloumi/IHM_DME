@@ -7,17 +7,16 @@ import {
   IconButton,
   CircularProgress
 } from "@mui/material";
-// Corrigez les imports des icônes comme ceci :
 import {
-  MedicalServices as MedicalServicesIcon,
   Badge as BadgeIcon,
-  Lock as LockIcon, // Icône de cadenas pour le mot de passe
-  Person as PersonIcon, // Icône de personne
-  Groups as GroupsIcon, // Icône de groupe
-  Visibility, // Icône œil ouvert
-  VisibilityOff, // Icône œil barré
-  ErrorOutline as ErrorOutlineIcon
-} from '@mui/icons-material'; // Cette ligne importe toutes les icônes nécessaires
+  Lock as LockIcon,
+  Person as PersonIcon,
+  Groups as GroupsIcon,
+  Visibility,
+  VisibilityOff,
+  ErrorOutline as ErrorOutlineIcon,
+  Fingerprint as FingerprintIcon
+} from '@mui/icons-material';
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftInput from "components/SoftInput";
@@ -25,8 +24,7 @@ import SoftButton from "components/SoftButton";
 import { authenticatePatient, authenticateStaff } from "services/authService";
 import medicalBg from "../../../assets/images/medical-bg.jpg";
 import { signInStyles } from "./medicalTheme";
-
-// ... (le reste de votre code reste inchangé)
+import brand from "assets/images/logo3.png";
 
 function SignIn() {
   const navigate = useNavigate();
@@ -56,16 +54,14 @@ function SignIn() {
         throw new Error("Invalid credentials.");
       }
 
-      // Store user data in localStorage
       localStorage.setItem("connectedUser", JSON.stringify({
         ...user,
         type: userType,
         rememberMe
       }));
 
-      // Redirect based on role with page refresh
       const redirectPath = getRedirectPath(userType, user.role);
-      window.location.href = redirectPath; // Full page refresh to ensure routes update
+      window.location.href = redirectPath;
 
     } catch (err) {
       setError(err.message || "Failed to authenticate. Please try again.");
@@ -98,13 +94,22 @@ function SignIn() {
   return (
     <Box sx={{
       ...signInStyles.pageContainer,
-      backgroundImage: `url(${medicalBg})`
+      backgroundImage: `url(${medicalBg})`,
+      backdropFilter: 'blur(8px)' // Added blur effect
     }}>
       <Box sx={signInStyles.formContainer}>
         <Box sx={signInStyles.header}>
-          <MedicalServicesIcon sx={{ ...signInStyles.icon.primary, fontSize: 40 }} />
-          <SoftTypography variant="h1" color="primary" fontWeight="bold" gutterBottom>
-            Welcome Back
+          <Box 
+            component="img" 
+            src={brand} 
+            alt="Logo" 
+            sx={{ 
+              height: '60px',
+              mb: 2 
+            }} 
+          />
+          <SoftTypography variant="h1" fontWeight="bold" gutterBottom>
+            Electronic Medical Record
           </SoftTypography>
           <SoftTypography variant="body1" color="text.secondary">
             Access your medical portal
@@ -113,16 +118,30 @@ function SignIn() {
 
         <Box sx={signInStyles.toggleContainer}>
           <SoftButton
-            sx={signInStyles.toggleButton(userType === "patient")}
-            onClick={() => setUserType("patient")}
-            startIcon={<PersonIcon sx={signInStyles.icon.primary} />}
+            sx={{
+              ...signInStyles.toggleButton(userType === "patient"),
+              backgroundColor: userType === "patient" ? '#0288d1' : '#ffffff',
+              color: userType === "patient" ? '#ffffff' : '#0288d1',
+              '&:hover': {
+                backgroundColor: userType === "patient" ? '#0277bd' : '#f5f9ff'
+              }
+            }}
+            onClick={() => handleUserTypeChange("patient")}
+            startIcon={<PersonIcon sx={{ color: userType === "patient" ? '#ffffff' : '#0288d1' }} />}
           >
             Patient
           </SoftButton>
           <SoftButton
-            sx={signInStyles.toggleButton(userType === "staff")}
-            onClick={() => setUserType("staff")}
-            startIcon={<GroupsIcon sx={signInStyles.icon.primary} />}
+            sx={{
+              ...signInStyles.toggleButton(userType === "staff"),
+              backgroundColor: userType === "staff" ? '#0288d1' : '#ffffff',
+              color: userType === "staff" ? '#ffffff' : '#0288d1',
+              '&:hover': {
+                backgroundColor: userType === "staff" ? '#0277bd' : '#f5f9ff'
+              }
+            }}
+            onClick={() => handleUserTypeChange("staff")}
+            startIcon={<GroupsIcon sx={{ color: userType === "staff" ? '#ffffff' : '#0288d1' }} />}
           >
             Medical Staff
           </SoftButton>
@@ -130,6 +149,12 @@ function SignIn() {
 
         <Box component="form" onSubmit={handleSignIn} sx={signInStyles.formContent}>
           <SoftBox sx={signInStyles.inputField}>
+            <SoftBox display="flex" alignItems="center" mb={1}>
+              <FingerprintIcon sx={{ color: '#0288d1', mr: 1 }} />
+              <SoftTypography variant="body2" color="text.secondary">
+                {userType === "staff" ? "Your staff ID number" : "Your CIN"}
+              </SoftTypography>
+            </SoftBox>
             <SoftInput
               fullWidth
               autoFocus
@@ -141,7 +166,7 @@ function SignIn() {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <BadgeIcon color="primary" />
+                    <BadgeIcon sx={{ color: '#0288d1' }} />
                   </InputAdornment>
                 ),
               }}
@@ -149,6 +174,12 @@ function SignIn() {
           </SoftBox>
 
           <SoftBox sx={signInStyles.inputField}>
+            <SoftBox display="flex" alignItems="center" mb={1}>
+              <LockIcon sx={{ color: '#0288d1', mr: 1 }} />
+              <SoftTypography variant="body2" color="text.secondary">
+                Your Password
+              </SoftTypography>
+            </SoftBox>
             <SoftInput
               fullWidth
               type={showPassword ? "text" : "password"}
@@ -160,7 +191,7 @@ function SignIn() {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <LockIcon color="primary" />
+                    <LockIcon sx={{ color: '#0288d1' }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -182,7 +213,14 @@ function SignIn() {
             <Switch
               checked={rememberMe}
               onChange={() => setRememberMe(!rememberMe)}
-              color="primary"
+              sx={{
+                '& .MuiSwitch-switchBase.Mui-checked': {
+                  color: '#0288d1',
+                },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                  backgroundColor: '#0288d1',
+                }
+              }}
             />
             <SoftTypography variant="body2" color="text.secondary">
               Remember me
@@ -201,26 +239,12 @@ function SignIn() {
             disabled={loading || !identifier || !password}
             sx={{
               ...signInStyles.submitButton,
-              backgroundColor: 'white',
-              color: '#1976d2',
-              border: '1px solid #1976d2',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                color: '#1565c0',
-                borderColor: '#1565c0'
-              },
-              '&:disabled': {
-                backgroundColor: '#e0e0e0',
-                color: '#9e9e9e',
-                borderColor: '#bdbdbd'
-              }
+              color: '#ffffff' // Set text color to white
             }}
             startIcon={
               loading ? (
                 <CircularProgress size={20} color="inherit" />
-              ) : (
-                <MedicalServicesIcon sx={{ color: '#1976d2' }} />
-              )
+              ) : null
             }
           >
             {loading ? "Signing In..." : "Sign In"}

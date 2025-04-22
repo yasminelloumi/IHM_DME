@@ -10,7 +10,6 @@ import {
 import {
   Fingerprint as FingerprintIcon,
   Person as PersonIcon,
-  Badge as BadgeIcon,
   Phone as PhoneIcon,
   Cake as CakeIcon,
   Public as PublicIcon,
@@ -28,6 +27,7 @@ import { registerPatient } from "services/registerService";
 import QRCode from "react-qr-code";
 import medicalBg from "../../../assets/images/medical-bg.jpg";
 import { signInStyles } from "../sign-in/medicalTheme";
+import brand from "assets/images/logo3.png";
 
 function SignUp() {
   const qrRef = useRef();
@@ -52,7 +52,7 @@ function SignUp() {
     setPatient({ ...patient, [e.target.name]: e.target.value });
   };
 
-  const [success, setSuccess] = useState(null); // Add this line to your state
+  const [success, setSuccess] = useState(null);
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -64,13 +64,12 @@ function SignUp() {
     const emptyFields = requiredFields.filter((field) => !patient[field]?.trim());
   
     if (emptyFields.length > 0) {
-      setError("Please fill in all fields.");
+      setError("Please fill in all required fields.");
       setLoading(false);
       return;
     }
   
     try {
-      // Step 1: Check if CIN already exists in db.json
       const { data: existingPatients } = await axios.get(`http://localhost:3001/patients?CIN=${patient.CIN}`);
       
       if (existingPatients.length > 0) {
@@ -79,7 +78,6 @@ function SignUp() {
         return;
       }
   
-      // Step 2: Register new patient
       const patientWithRole = { ...patient, role: "patient" };
       const response = await registerPatient(patientWithRole);
   
@@ -95,57 +93,71 @@ function SignUp() {
       setLoading(false);
     }
   };
+
   const fieldConfig = [
     { 
       name: "CIN", 
       label: "National ID", 
-      icon: <FingerprintIcon color="primary" />,
-      type: "text"
+      icon: <FingerprintIcon sx={{ color: '#0288d1' }} />,
+      type: "text",
+      helperText: "CIN *",
+      placeholder: "12345678"
     },
     { 
-      name: "nom",  // Changed from lastName to nom
-      label: "Last Name", 
-      icon: <PersonIcon color="primary" />,
-      type: "text"
-    },
-    { 
-      name: "prenom", // Changed from firstName to prenom
+      name: "prenom",
       label: "First Name", 
-      icon: <BadgeIcon color="primary" />,
-      type: "text"
+      icon: <PersonIcon sx={{ color: '#0288d1' }} />,
+      type: "text",
+      helperText: "First Name *",
+      placeholder: "John"
     },
     { 
-      name: "tel", // Changed from phone to tel
+      name: "nom",
+      label: "Last Name", 
+      icon: <PersonIcon sx={{ color: '#0288d1' }} />,
+      type: "text",
+      helperText: "Last Name *",
+      placeholder: "Doe"
+    },
+    { 
+      name: "tel",
       label: "Phone", 
-      icon: <PhoneIcon color="primary" />,
-      type: "tel"
+      icon: <PhoneIcon sx={{ color: '#0288d1' }} />,
+      type: "tel",
+      helperText: "Phone *",
+      placeholder: "+216 12345678"
     },
     { 
-      name: "dateNaissance", // Changed from birthDate to dateNaissance
+      name: "dateNaissance",
       label: "Date of Birth", 
-      icon: <CakeIcon color="primary" />,
+      icon: <CakeIcon sx={{ color: '#0288d1' }} />,
       type: "date",
-      InputLabelProps: { shrink: true }
+      InputLabelProps: { shrink: true },
+      helperText: "Date of Birth *",
+      placeholder: "YYYY-MM-DD"
     },
     { 
-      name: "nationalite", // Changed from nationality to nationalite
+      name: "nationalite",
       label: "Nationality", 
-      icon: <PublicIcon color="primary" />,
-      type: "text"
+      icon: <PublicIcon sx={{ color: '#0288d1' }} />,
+      type: "text",
+      helperText: "Nationality *",
+      placeholder: "Tunisian"
     },
     { 
       name: "password", 
       label: "Password", 
-      icon: <LockIcon color="primary" />,
+      icon: <LockIcon sx={{ color: '#0288d1' }} />,
       type: showPassword ? "text" : "password",
-      helperText: "Minimum 8 characters with uppercase and number",
+      helperText: "Password *",
+      placeholder: "********",
       endAdornment: (
         <InputAdornment position="end">
           <IconButton
             onClick={() => setShowPassword(!showPassword)}
             edge="end"
           >
-            {showPassword ? <VisibilityOff /> : <Visibility />}
+            {showPassword ? <VisibilityOff sx={{ color: '#0288d1' }} /> : <Visibility sx={{ color: '#0288d1' }} />}
           </IconButton>
         </InputAdornment>
       )
@@ -155,14 +167,35 @@ function SignUp() {
   return (
     <Box sx={{
       ...signInStyles.pageContainer,
-      backgroundImage: `url(${medicalBg})`
+      backgroundImage: `url(${medicalBg})`,
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundImage: `url(${medicalBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        zIndex: 0,
+      }
     }}>
       <Box sx={signInStyles.formContainer}>
         <Box sx={signInStyles.header}>
-          <HowToRegIcon color="primary" sx={{ fontSize: 40 }} />
-          <SoftTypography variant="h1" color="primary" fontWeight="bold" gutterBottom>
-            Create Account
+          <Box 
+            component="img" 
+            src={brand} 
+            alt="Logo" 
+            sx={{ 
+              height: '60px',
+              mb: 2 
+            }} 
+          />
+          <SoftTypography variant="h1" fontWeight="bold" gutterBottom>
+            Electronic Medical Record
           </SoftTypography>
+        
           <SoftTypography variant="body1" color="text.secondary">
             Join our medical platform
           </SoftTypography>
@@ -171,11 +204,17 @@ function SignUp() {
         <Box component="form" onSubmit={handleSignUp} sx={signInStyles.formContent}>
           {fieldConfig.map((field) => (
             <SoftBox sx={signInStyles.inputField} key={field.name}>
+              <SoftBox display="flex" alignItems="center" mb={1}>
+                {field.icon}
+                <SoftTypography variant="body2" color="text.secondary" ml={1}>
+                  {field.helperText}
+                </SoftTypography>
+              </SoftBox>
               <SoftInput
                 fullWidth
                 type={field.type}
                 label={field.label}
-                placeholder={`Enter your ${field.label.toLowerCase()}`}
+                placeholder={field.placeholder}
                 name={field.name}
                 value={patient[field.name]}
                 onChange={handleChange}
@@ -188,7 +227,7 @@ function SignUp() {
                   ...(field.endAdornment ? { endAdornment: field.endAdornment } : {})
                 }}
                 InputLabelProps={field.InputLabelProps}
-                helperText={field.helperText}
+                required
               />
             </SoftBox>
           ))}
@@ -214,11 +253,11 @@ function SignUp() {
           <SoftButton 
             type="submit"
             disabled={loading || !rememberMe}
-            variant="gradient"
-            color="primary"
-            fullWidth
-            sx={signInStyles.submitButton}
-            startIcon={!loading && <HowToRegIcon />}
+            sx={{
+              ...signInStyles.submitButton,
+              color: '#ffffff'
+            }}
+            startIcon={!loading && <HowToRegIcon sx={{ color: '#ffffff' }} />}
           >
             {loading ? "Registering..." : "Register Now"}
           </SoftButton>
@@ -245,4 +284,5 @@ function SignUp() {
     </Box>
   );
 }
+
 export default SignUp;
