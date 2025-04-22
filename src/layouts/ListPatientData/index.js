@@ -64,7 +64,7 @@ function ListDatas() {
           startIcon={<QrCodeScanner />}
           sx={{ borderRadius: "12px", px: 3 }}
         >
-          {scannerOpen ? "Fermer le Scanner" : "Scanner un QR Code"}
+      {scannerOpen ? "Close Scanner" : "Scan QR Code"}
         </SoftButton>
 
         {scannerOpen && (

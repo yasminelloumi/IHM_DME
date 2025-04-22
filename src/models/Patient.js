@@ -8,7 +8,6 @@ class Patient {
     this.dateNaissance = dateNaissance;
     this.nationalite = nationalite;
     this.password = password;
-    this.qrCode = qrCode;
     this.role = role;
     this.bloodType = bloodType;
     this.lastVisit = lastVisit;
