@@ -53,6 +53,16 @@
       "dateCreation": "2025-04-22T19:59:26.463Z",
       "dmeId": "efc3",
       "imgTest": "Eye fundus examination"
+    },
+    {
+      "id": "1745353620850",
+      "patientId": "1a04",
+      "description": "tyerqw",
+      "fileName": "image-1745353620845-550551430.png",
+      "url": "/uploads/images/image-1745353620845-550551430.png",
+      "dateCreation": "2025-04-22T20:27:00.850Z",
+      "dmeId": "fb96",
+      "imgTest": "Chest X-ray"
     }
   ]
 }

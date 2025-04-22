@@ -237,6 +237,16 @@
       "dateCreation": "2025-04-22T19:59:26.463Z",
       "dmeId": "efc3",
       "imgTest": "Eye fundus examination"
+    },
+    {
+      "id": "1745353620850",
+      "patientId": "1a04",
+      "description": "tyerqw",
+      "fileName": "image-1745353620845-550551430.png",
+      "url": "/uploads/images/image-1745353620845-550551430.png",
+      "dateCreation": "2025-04-22T20:27:00.850Z",
+      "dmeId": "fb96",
+      "imgTest": "Chest X-ray"
     }
   ],
   "centreImagerie": [
@@ -828,15 +838,7 @@
       "filePath": "/Uploads/pdfFiles/report-1745352289151-889294744.pdf",
       "timestamp": "2025-04-22T20:04:49.153Z",
       "dmeId": "2"
-    },
-    {
-      "id": "1745352933146",
-      "patientId": "4024",
-      "description": "glgmgmùgmgmglglgl",
-      "labTest": "HbA1c",
-      "filePath": "/Uploads/pdfFiles/report-1745352933143-412077922.pdf",
-      "timestamp": "2025-04-22T20:15:33.146Z",
-      "dmeId": "2"
     }
+
   ]
 }
