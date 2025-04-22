@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import SoftButton from "components/SoftButton";
-import { submitReport, getReportsByPatient } from "services/reportsServices";
+import { submitReport, getReportsByPatient } from "services/reportService";
 import {
   Avatar,
   Switch,

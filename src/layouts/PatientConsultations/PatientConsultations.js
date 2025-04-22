@@ -12,7 +12,7 @@ import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import { getDMEByPatientId, createDME } from "../../services/dmeService";
 import { getById } from "../../services/medecinService";
-import { getReportsByPatient } from "../../services/reportsServices";
+import { getReportsByPatient } from "../../services/reportService";
 import DME from "../../models/DME";
 import {
   Event as EventIcon,
