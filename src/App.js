@@ -6,7 +6,6 @@ import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 import rtlPlugin from "stylis-plugin-rtl";
 import { createTheme } from "@mui/material/styles";
-import { Icon } from "@mui/material";
 
 // Polices
 import "@fontsource/roboto/300.css";
@@ -18,6 +17,7 @@ import "@fontsource/roboto/700.css";
 import SoftBox from "components/SoftBox";
 import Sidenav from "examples/Sidenav";
 import Configurator from "examples/Configurator";
+import  { LanguageProvider } from "examples/Navbars/DashboardNavbar";
 
 // Thèmes
 import theme from "assets/theme";
@@ -51,7 +51,7 @@ export default function App() {
     }
   }, [direction]);
 
-  // Routes sans sidebar
+  // Routes sans sidebar ni navbar
   const noSidebarRoutes = useMemo(
     () => ["/authentication/sign-in", "/authentication/sign-up"],
     []
@@ -59,6 +59,11 @@ export default function App() {
 
   const showSidebar = useMemo(
     () => !noSidebarRoutes.includes(pathname),
+    [pathname, noSidebarRoutes]
+  );
+
+  const showNavbar = useMemo(
+    () => !noSidebarRoutes.includes(pathname), // Même logique que pour la sidebar
     [pathname, noSidebarRoutes]
   );
 
@@ -150,15 +155,7 @@ export default function App() {
 
   const configsButton = (
     <SoftBox
-      //display="flex"
-     // justifyContent="center"
       alignItems="center"
-      //width="3.5rem"
-      //height="3.5rem"
-     // bgColor="white"
-      //shadow="sm"
-      //borderRadius="50%"
-      //position="fixed"
       right="2rem"
       bottom="2rem"
       zIndex={99}
@@ -166,13 +163,13 @@ export default function App() {
       sx={{ cursor: "pointer" }}
       onClick={handleConfiguratorOpen}
     >
-      
     </SoftBox>
   );
 
   // Contenu principal
   const appContent = (
     <>
+      {showNavbar } {/* Afficher le navbar conditionnellement */}
       {showSidebar && (
         <Sidenav
           color={sidenavColor}
@@ -183,7 +180,12 @@ export default function App() {
           onMouseLeave={handleOnMouseLeave}
         />
       )}
-      {layout === "dashboard" && <>{configsButton}<Configurator /></>}
+      {layout === "dashboard" && (
+        <>
+          {configsButton}
+          <Configurator />
+        </>
+      )}
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
@@ -196,11 +198,13 @@ export default function App() {
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={mergedTheme}>
         <CssBaseline />
-        {direction === "rtl" && rtlCache ? (
-          <CacheProvider value={rtlCache}>{appContent}</CacheProvider>
-        ) : (
-          appContent
-        )}
+        <LanguageProvider>
+          {direction === "rtl" && rtlCache ? (
+            <CacheProvider value={rtlCache}>{appContent}</CacheProvider>
+          ) : (
+            appContent
+          )}
+        </LanguageProvider>
       </ThemeProvider>
     </StyledEngineProvider>
   );

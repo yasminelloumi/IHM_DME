@@ -63,7 +63,8 @@ import { logout } from "services/authService";
 const LanguageContext = React.createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState("en");
+  // Charger la langue depuis localStorage, ou utiliser "en" par défaut
+  const [language, setLanguage] = useState(localStorage.getItem("language") || "en");
 
   const translations = {
     en: {
@@ -91,6 +92,11 @@ export const LanguageProvider = ({ children }) => {
       selectZoom: "Sélectionner le Niveau de Zoom",
     },
   };
+
+  // Persister la langue dans localStorage lorsque l'état change
+  useEffect(() => {
+    localStorage.setItem("language", language);
+  }, [language]);
 
   const t = (key) => translations[language][key] || key;
 
