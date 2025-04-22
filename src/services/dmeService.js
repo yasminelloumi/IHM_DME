@@ -65,6 +65,33 @@ export const createDME = async (dmeData) => {
     throw error;
   }
 };
+// Remove a specific laboTest from a DME's laboTest array
+export const removeLaboTest = async (dmeId, laboTestToRemove) => {
+  try {
+    // 1. Fetch current DME object
+    const dmeRes = await fetch(`${apiUrl}/dme/${dmeId}`);
+    if (!dmeRes.ok) throw new Error("Failed to fetch DME");
+    const dme = await dmeRes.json();
 
+    // 2. Filter out the laboTest
+    const updatedLaboTests = dme.laboTest.filter(test => test !== laboTestToRemove);
 
+    // 3. Send PATCH request with updated array
+    const patchRes = await fetch(`${apiUrl}/dme/${dmeId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ laboTest: updatedLaboTests }),
+    });
 
+    if (!patchRes.ok) {
+      throw new Error(`Failed to update DME: ${patchRes.status}`);
+    }
+
+    const data = await patchRes.json();
+    console.log(`Updated laboTest for DME ${dmeId}:`, data);
+    return data;
+  } catch (error) {
+    console.error("API Error:", error);
+    throw new Error("Failed to remove laboTest. Please try again.");
+  }
+};

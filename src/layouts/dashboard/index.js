@@ -15,7 +15,8 @@ function Dashboard() {
     diseases: 3,
     consultations: 5,
     laboratory: 8,
-    imaging: 4
+    imaging: 4,
+    reports: 2 // Correction: ajout du compteur pour les reports
   };
 
   const allCards = [
@@ -24,28 +25,35 @@ function Dashboard() {
       count: patientData.diseases,
       icon: "coronavirus",
       color: "error",
-      path: "/patient/diseases"
+      path: "/diseases"
     },
     {
       title: "Consultations",
       count: patientData.consultations,
       icon: "calendar_today",
       color: "info",
-      path: "/patient/consultations"
+      path: "/consultations"
     },
     {
       title: "Laboratory",
       count: patientData.laboratory,
       icon: "biotech",
       color: "success",
-      path: "/patient/laboratory"
+      path: "/laboratory"
     },
     {
       title: "Medical Imaging",
       count: patientData.imaging,
-      icon: "radiology",
+      icon: "collections", // Correction: icône standard Material-UI
       color: "warning",
-      path: "/patient/imaging"
+      path: "/imaging"
+    },
+    {
+      title: "Reports",
+      count: patientData.reports, // Correction: utilisation de la bonne propriété
+      icon: "description", // Correction: icône standard Material-UI
+      color: "primary",
+      path: "/Reports"
     }
   ];
 
@@ -53,13 +61,21 @@ function Dashboard() {
   let allowedCards = allCards;
 
   if (role === "patient") {
-    allowedCards = allCards.filter(card => ["Diseases", "Consultations"].includes(card.title));
+    allowedCards = allCards.filter(card => 
+      ["Diseases", "Consultations", "Reports"].includes(card.title) // Ajout de Reports pour les patients
+    );
   } else if (role === "laboratoire") {
-    allowedCards = allCards.filter(card => card.title !== "Medical Imaging");
+    allowedCards = allCards.filter(card => 
+      card.title !== "Medical Imaging" && card.title !== "Reports" // Reports seulement pour certains rôles
+    );
   } else if (role === "centreImagerie") {
-    allowedCards = allCards.filter(card => card.title !== "Laboratory");
+    allowedCards = allCards.filter(card => 
+      card.title !== "Laboratory" && card.title !== "Reports" // Reports seulement pour certains rôles
+    );
   } else if (role === "medecins") {
-    allowedCards = allCards.filter(card => card.title !== "Laboratory" && card.title !== "Medical Imaging");
+    allowedCards = allCards.filter(card => 
+      card.title !== "Laboratory" && card.title !== "Medical Imaging"
+    );
   }
 
   return (
@@ -109,6 +125,11 @@ function Dashboard() {
               <SoftTypography variant="body2" color="text">
                 - Chest CT scan added, 06/05/2023
               </SoftTypography>
+              {role === "patient" && (
+                <SoftTypography variant="body2" color="text">
+                  - New report available: Annual checkup, 06/18/2023
+                </SoftTypography>
+              )}
             </SoftBox>
           </SoftBox>
         </Card>

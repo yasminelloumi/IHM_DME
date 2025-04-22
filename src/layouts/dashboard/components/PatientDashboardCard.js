@@ -5,59 +5,57 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 import { Link } from "react-router-dom";
 
-function PatientDashboardCard({ title, count }) {
+function PatientDashboardCard({ title, count = 0 }) {
   const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
   const role = connectedUser?.role;
   const isPatient = role === "patient";
 
-  // Restrict visibility for patient role
-  const allowedForPatient = ["Diseases", "Consultations"];
+  // Define cards allowed for patients
+  const allowedForPatient = ["Diseases", "Consultations", "Reports"];
   if (isPatient && !allowedForPatient.includes(title)) {
     return null;
   }
 
   const cardConfig = {
-    "Diseases": {
+    Diseases: {
       color: "#1976d2",
       icon: "healing",
-      path: "/diseases"
+      path: "/diseases",
     },
-    "Consultations": {
+    Consultations: {
       color: "#64b5f6",
       icon: "calendar_today",
-      path: "/consultations"
+      path: "/consultations",
     },
-    "Laboratory": {
+    Laboratory: {
       color: "#0288d1",
       icon: "science",
-      path: "/laboratory"
+      path: "/laboratory",
     },
     "Medical Imaging": {
       color: "#01579b",
       icon: "collections",
-      path: "/imaging"
-    }
+      path: "/imaging",
+    },
+    Reports: {
+      color: "#1976d2", // Changed from #00796b to blue
+      icon: "description",
+      path: "/Reports",
+    },
   };
 
   const config = cardConfig[title] || {
     color: "#607d8b",
     icon: "info",
-    path: "#"
+    path: "#",
   };
 
   const descriptionMap = {
-    "Diseases": isPatient
-      ? "View your medical conditions and diagnoses"
-      : "View the patient's medical conditions and diagnoses",
-    "Consultations": isPatient
-      ? "Your scheduled and past medical visits"
-      : "Scheduled and past medical visits",
-    "Laboratory": isPatient
-      ? "Your lab test results and analysis reports"
-      : "Lab test results and analysis reports",
-    "Medical Imaging": isPatient
-      ? "Your radiology scans and medical imaging"
-      : "Radiology scans and medical imaging"
+    Diseases: "View medical conditions and diagnoses",
+    Consultations: "View scheduled and past medical visits",
+    Laboratory: "View lab test results and analysis reports",
+    "Medical Imaging": "View radiology scans and medical imaging",
+    Reports: "View and download your medical reports",
   };
 
   return (
@@ -102,7 +100,7 @@ function PatientDashboardCard({ title, count }) {
               display: "flex",
               alignItems: "center",
               "&:hover": { textDecoration: "underline" },
-              textDecoration: "none"
+              textDecoration: "none",
             }}
           >
             View Details
@@ -116,7 +114,7 @@ function PatientDashboardCard({ title, count }) {
 
 PatientDashboardCard.propTypes = {
   title: PropTypes.string.isRequired,
-  count: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
+  count: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default PatientDashboardCard;

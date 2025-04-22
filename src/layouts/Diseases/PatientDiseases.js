@@ -4,26 +4,22 @@ import {
   Card,
   Icon,
   Collapse,
-  Switch,
-  FormControlLabel,
   Stack,
   Modal,
   TextField,
   Button,
-  MenuItem,
-  Select,
   FormControl,
   InputLabel,
   Box,
+  Pagination,
 } from "@mui/material";
 import {
-  DarkMode,
-  LightMode,
   Description,
   Vaccines,
   CalendarMonth,
-  LocalHospital,
-  Info,
+  Favorite,
+  Sick,
+  Coronavirus,
   ReportProblem,
   WarningAmber,
   CheckCircle,
@@ -57,7 +53,7 @@ const renderSeverityBadge = (severity) => {
     Mild: { color: "success", icon: <CheckCircle sx={{ fontSize: 16, mr: 0.5 }} /> },
     Moderate: { color: "warning", icon: <WarningAmber sx={{ fontSize: 16, mr: 0.5 }} /> },
     Severe: { color: "error", icon: <ReportProblem sx={{ fontSize: 16, mr: 0.5 }} /> },
-    Controlled: { color: "info", icon: <Info sx={{ fontSize: 16, mr: 0.5 }} /> },
+    Controlled: { color: "info", icon: <CheckCircle sx={{ fontSize: 16, mr: 0.5 }} /> },
     "Stage 1": { color: "primary", icon: <SignalCellularAlt sx={{ fontSize: 16, mr: 0.5 }} /> },
   };
 
@@ -74,25 +70,25 @@ const renderSeverityBadge = (severity) => {
   );
 };
 
-const DiseaseItem = ({ disease, darkMode }) => (
+const DiseaseItem = ({ disease }) => (
   <Card
     sx={{
       mb: 3,
       p: 3,
       borderRadius: 3,
       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-      background: darkMode ? "#2c3e50" : "#fff",
+      background: "#fff",
       transition: "all 0.3s ease",
     }}
   >
     <Stack spacing={1}>
       <Stack direction="row" justifyContent="space-between" alignItems="center">
-        <SoftTypography variant="h6" fontWeight="bold" color={darkMode ? "white" : "dark"}>
+        <SoftTypography variant="h6" fontWeight="bold" color="dark">
           {disease.name}
         </SoftTypography>
         <Stack direction="row" alignItems="center" spacing={1}>
-          <CalendarMonth sx={{ fontSize: 18, color: darkMode ? "#ccc" : "text.secondary" }} />
-          <SoftTypography variant="caption" color={darkMode ? "gray" : "text.secondary"}>
+          <CalendarMonth sx={{ fontSize: 18, color: "text.secondary" }} />
+          <SoftTypography variant="caption" color="text.secondary">
             {disease.diagnosisDate || "Unknown date"}
           </SoftTypography>
         </Stack>
@@ -101,22 +97,22 @@ const DiseaseItem = ({ disease, darkMode }) => (
       {renderSeverityBadge(disease.severity)}
 
       <Stack direction="row" spacing={1} alignItems="center">
-        <Description sx={{ fontSize: 20, color: darkMode ? "#ccc" : "#0077b6" }} />
-        <SoftTypography variant="button" fontWeight="bold" color={darkMode ? "white" : "dark"}>
+        <Description sx={{ fontSize: 20, color: "#0077b6" }} />
+        <SoftTypography variant="button" fontWeight="bold" color="dark">
           Description:
         </SoftTypography>
       </Stack>
-      <SoftTypography variant="body2" color={darkMode ? "gray" : "text"}>
+      <SoftTypography variant="body2" color="text">
         {disease.description || "No description available."}
       </SoftTypography>
 
       <Stack direction="row" spacing={1} alignItems="center" mt={1}>
-        <Vaccines sx={{ fontSize: 20, color: darkMode ? "#ccc" : "#388e3c" }} />
-        <SoftTypography variant="button" fontWeight="bold" color={darkMode ? "white" : "dark"}>
+        <Vaccines sx={{ fontSize: 20, color: "#388e3c" }} />
+        <SoftTypography variant="button" fontWeight="bold" color="dark">
           Treatment:
         </SoftTypography>
       </Stack>
-      <SoftTypography variant="body2" color={darkMode ? "gray" : "text"}>
+      <SoftTypography variant="body2" color="text">
         {disease.treatment || "No treatment specified."}
       </SoftTypography>
     </Stack>
@@ -125,15 +121,21 @@ const DiseaseItem = ({ disease, darkMode }) => (
 
 DiseaseItem.propTypes = {
   disease: PropTypes.object.isRequired,
-  darkMode: PropTypes.bool.isRequired,
 };
 
-const DiseaseCategory = ({ category, darkMode, onAddDisease }) => {
+const DiseaseCategory = ({ category, onAddDisease }) => {
   const [expanded, setExpanded] = useState(true);
 
   // Retrieve connected user from localStorage
   const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
   const isMedecin = connectedUser?.role === "medecins";
+
+  // Assign specific icons based on category
+  const categoryIcons = {
+    Chronic: <Favorite sx={{ fontSize: 24, color: "#0077b6" }} />,
+    Allergy: <Sick sx={{ fontSize: 24, color: "#0077b6" }} />,
+    Infectious: <Coronavirus sx={{ fontSize: 24, color: "#0077b6" }} />,
+  };
 
   return (
     <Card
@@ -141,7 +143,7 @@ const DiseaseCategory = ({ category, darkMode, onAddDisease }) => {
         mb: 4,
         borderRadius: 3,
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        background: darkMode ? "#2c3e50" : "#fff",
+        background: "#fff",
       }}
     >
       <SoftBox
@@ -153,20 +155,20 @@ const DiseaseCategory = ({ category, darkMode, onAddDisease }) => {
         sx={{
           cursor: "pointer",
           "&:hover": {
-            backgroundColor: darkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 119, 182, 0.1)",
+            backgroundColor: "rgba(0, 119, 182, 0.1)",
           },
         }}
       >
         <SoftBox display="flex" alignItems="center" gap={1}>
-          <LocalHospital sx={{ fontSize: 24, color: darkMode ? "#e0e0e0" : "#0077b6" }} />
-          <SoftTypography variant="h5" fontWeight="medium" color={darkMode ? "white" : "dark"}>
+          {categoryIcons[category.name] || <Favorite sx={{ fontSize: 24, color: "#0077b6" }} />}
+          <SoftTypography variant="h5" fontWeight="medium" color="dark">
             {category.name} ({category.items.length})
           </SoftTypography>
         </SoftBox>
         <Stack direction="row" alignItems="center" spacing={1}>
           {isMedecin && (
             <Icon
-              color={darkMode ? "inherit" : "action"}
+              color="action"
               onClick={(e) => {
                 e.stopPropagation();
                 onAddDisease(category.name.toLowerCase());
@@ -176,7 +178,7 @@ const DiseaseCategory = ({ category, darkMode, onAddDisease }) => {
               <AddCircle />
             </Icon>
           )}
-          <Icon color={darkMode ? "inherit" : "action"}>
+          <Icon color="action">
             {expanded ? "expand_less" : "expand_more"}
           </Icon>
         </Stack>
@@ -186,7 +188,7 @@ const DiseaseCategory = ({ category, darkMode, onAddDisease }) => {
         <SoftBox p={2}>
           <Stack spacing={3}>
             {category.items.map((disease, index) => (
-              <DiseaseItem key={index} disease={disease} darkMode={darkMode} />
+              <DiseaseItem key={index} disease={disease} />
             ))}
           </Stack>
         </SoftBox>
@@ -197,12 +199,10 @@ const DiseaseCategory = ({ category, darkMode, onAddDisease }) => {
 
 DiseaseCategory.propTypes = {
   category: PropTypes.object.isRequired,
-  darkMode: PropTypes.bool.isRequired,
   onAddDisease: PropTypes.func.isRequired,
 };
 
 const PatientDiseases = () => {
-  const [darkMode, setDarkMode] = useState(false);
   const [categories, setCategories] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [newDisease, setNewDisease] = useState({
@@ -213,6 +213,8 @@ const PatientDiseases = () => {
     description: "",
     treatment: "",
   });
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 5; // Number of diseases per page
 
   useEffect(() => {
     const fetchConditions = async () => {
@@ -233,7 +235,6 @@ const PatientDiseases = () => {
           ["medecins", "laboratoire", "centreImagerie"].includes(user.role)
         ) {
           scannedPatient = JSON.parse(localStorage.getItem("scannedPatient"));
-          console.log("scannedPatient", scannedPatient);
           if (!scannedPatient) {
             console.error("No scanned patient found for medecin/lab/imagerie.");
             return;
@@ -344,6 +345,17 @@ const PatientDiseases = () => {
     }
   };
 
+  // Pagination logic
+  const allDiseases = categories.flatMap(category => category.items);
+  const totalPages = Math.ceil(allDiseases.length / itemsPerPage);
+  const paginatedDiseases = allDiseases.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
+  // Group paginated diseases back into categories
+  const paginatedCategories = categories.map(category => ({
+    ...category,
+    items: paginatedDiseases.filter(disease => disease.type.toLowerCase() === category.name.toLowerCase())
+  })).filter(category => category.items.length > 0);
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -351,9 +363,7 @@ const PatientDiseases = () => {
         py={3}
         px={2}
         sx={{
-          background: darkMode
-            ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
-            : "linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
+          background: "linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
           minHeight: "100vh",
         }}
       >
@@ -364,53 +374,21 @@ const PatientDiseases = () => {
           mb={4}
           p={3}
           sx={{
-            background: darkMode ? "rgba(255, 255, 255, 0.08)" : "#ffffff",
+            background: "#ffffff",
             borderRadius: "16px",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
           }}
         >
-          <SoftTypography variant="h3" fontWeight="bold" color={darkMode ? "white" : "dark"}>
+          <SoftTypography variant="h3" fontWeight="bold" color="dark">
             Medical Conditions
           </SoftTypography>
-
-          <FormControlLabel
-            control={
-              <Switch
-                checked={darkMode}
-                onChange={() => setDarkMode(!darkMode)}
-                color="info"
-                sx={{
-                  "& .MuiSwitch-thumb": {
-                    backgroundColor: darkMode ? "#e0e0e0" : "#0077b6",
-                  },
-                  "& .MuiSwitch-track": {
-                    backgroundColor: darkMode ? "#34495e" : "#b0bec5",
-                  },
-                }}
-              />
-            }
-            label={
-              <SoftBox display="flex" alignItems="center" gap={1}>
-                {darkMode ? (
-                  <DarkMode sx={{ color: "#e0e0e0" }} />
-                ) : (
-                  <LightMode sx={{ color: "#f9a825" }} />
-                )}
-                <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-                  Theme
-                </SoftTypography>
-              </SoftBox>
-            }
-            labelPlacement="start"
-            sx={{ margin: 0 }}
-          />
         </SoftBox>
 
         <SoftBox>
-          {categories.every((cat) => cat.items.length === 0) ? (
+          {paginatedCategories.length === 0 ? (
             <SoftTypography
               variant="h6"
-              color={darkMode ? "gray" : "text"}
+              color="text"
               textAlign="center"
               mt={5}
             >
@@ -422,13 +400,24 @@ const PatientDiseases = () => {
                 <DiseaseCategory
                   key={index}
                   category={category}
-                  darkMode={darkMode}
                   onAddDisease={handleOpenModal}
                 />
               )
             ))
           )}
         </SoftBox>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <SoftBox display="flex" justifyContent="center" mt={4}>
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={(event, value) => setPage(value)}
+              color="primary"
+            />
+          </SoftBox>
+        )}
 
         {/* Add Disease Modal */}
         <Modal
@@ -462,25 +451,43 @@ const PatientDiseases = () => {
               />
 
               <FormControl fullWidth>
-                <InputLabel id="severity-label">Severity</InputLabel>
-                <Select
-                  labelId="severity-label"
+                <InputLabel id="severity-label" htmlFor="severity-select">
+                  Severity
+                </InputLabel>
+                <Box
+                  component="select"
+                  id="severity-select"
                   name="severity"
-                  value={newDisease.severity}
+                  value={newDisease.severity || ""}
                   onChange={handleInputChange}
-                  label="Severity"
+                  sx={{
+                    width: "100%",
+                    padding: "10px",
+                    fontSize: "16px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                    backgroundColor: "white",
+                    zIndex: 1300,
+                    pointerEvents: "auto",
+                    "&:focus": {
+                      outline: "2px solid #0077b6",
+                      borderColor: "#0077b6",
+                    },
+                    marginTop: "16px",
+                    height: "40px",
+                  }}
                 >
-                  <MenuItem value="" disabled>
+                  <option value="" disabled>
                     Select Severity
-                  </MenuItem>
-                  <MenuItem value="Mild">Mild</MenuItem>
-                  <MenuItem value="Moderate">Moderate</MenuItem>
-                  <MenuItem value="Severe">Severe</MenuItem>
-                  <MenuItem value="Controlled">Controlled</MenuItem>
-                  <MenuItem value="Stage 1">Stage 1</MenuItem>
-                </Select>
+                  </option>
+                  <option value="Mild">Mild</option>
+                  <option value="Moderate">Moderate</option>
+                  <option value="Severe">Severe</option>
+                  <option value="Controlled">Controlled</option>
+                  <option value="Stage 1">Stage 1</option>
+                </Box>
               </FormControl>
-
+              
               <TextField
                 fullWidth
                 label="Description"
