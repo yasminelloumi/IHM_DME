@@ -81,33 +81,6 @@
       "filePath": "/Uploads/pdfFiles/report-1745264458277-460241925.pdf",
       "timestamp": "2025-04-21T19:40:58.284Z",
       "dmeId": "e3fc"
-    },
-    {
-      "id": "1745319705154",
-      "patientId": "4024",
-      "description": "report final final final",
-      "laboTest": "Fasting blood glucose",
-      "url": "/Uploads/pdfFiles/report-1745319705152-445399966.pdf",
-      "dateCreated": "2025-04-22T11:01:45.154Z",
-      "dmeId": "4f17"
-    },
-    {
-      "id": "1745320662886",
-      "patientId": "4024",
-      "description": "test final mte3 l final",
-      "laboTest": "Kidney function test",
-      "url": "/Uploads/pdfFiles/report-1745320662882-130123066.pdf",
-      "dateCreated": "2025-04-22T11:17:42.886Z",
-      "dmeId": "91af"
-    },
-    {
-      "id": "1745320839520",
-      "patientId": "4024",
-      "description": "final mte3 l version final",
-      "labTest": "Fasting blood glucose",
-      "filePath": "/Uploads/pdfFiles/report-1745320839513-285590519.pdf",
-      "timestamp": "2025-04-22T11:20:39.520Z",
-      "dmeId": "e3fc"
     }
   ]
 }
