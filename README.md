@@ -49,21 +49,21 @@ Tout le personnel médical doit **scanner un QR code** pour accéder au DME d’
    cd IHM_DME
    
 2. **Installez les dépendances**
-   
+    ```bash
    npm install
 
 
 4. **Lancez le JSON Server **
- 
-npm run json-server
+     ```bash
+   npm run json-server
 
 5. ** Lancez le Node.js **
-
-node server.js    
+    ```bash
+   node server.js    
 
 6.** Lancez l'application React**
- 
-npm start
+  ```bash
+   npm start
 
 
 
