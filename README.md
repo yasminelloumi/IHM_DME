@@ -57,8 +57,9 @@ Tout le personnel médical doit **scanner un QR code** pour accéder au DME d’
      ```bash
    npm run json-server
 
+
 5. ** Lancez le Node.js **
-    ```bash
+    
    node server.js    
 
 6.** Lancez l'application React**
