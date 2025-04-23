@@ -377,7 +377,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
             />
           </SoftBox>
 
-          {/* Right Side: Profile, Logout, Language Switcher, Zoom Control */}
+          {/* Right Side: Profile, Language Switcher, Zoom Control, Logout */}
           <SoftBox sx={(theme) => enhancedNavbarStyles.navbarRow(theme, { isMini })}>
             <SoftBox color={light ? "white" : "inherit"} display="flex" alignItems="center" gap={2}>
               {/* Profile Link (for patients) with Dropdown */}
@@ -429,32 +429,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 </>
               )}
 
-              {/* Log Out */}
-              <Tooltip title={t("logout")} placement="bottom">
-                <IconButton
-                  size="small"
-                  color="inherit"
-                  sx={enhancedNavbarStyles.navbarIconButton}
-                  onClick={handleLogout}
-                  aria-label={t("logout")}
-                >
-                  <Icon
-                    sx={({ palette: { dark, white } }) => ({
-                      color: light ? white.main : dark.main,
-                    })}
-                  >
-                    logout
-                  </Icon>
-                  <SoftTypography
-                    variant="button"
-                    fontWeight="medium"
-                    color={light ? "white" : "dark"}
-                  >
-                    {t("logout")}
-                  </SoftTypography>
-                </IconButton>
-              </Tooltip>
-
               {/* Language Switcher */}
               <Tooltip title={t("changeLanguage")} placement="bottom">
                 <IconButton
@@ -493,7 +467,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 </MenuItem>
               </Menu>
 
-              {/* Zoom Control (Single Icon with Dropdown) */}
+              {/* Zoom Control (Single Icon with Dropdown) - MOVED UP */}
               <Tooltip title={t("selectZoom")} placement="bottom">
                 <IconButton
                   size="small"
@@ -531,6 +505,32 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   </MenuItem>
                 ))}
               </Menu>
+
+              {/* Log Out - MOVED DOWN */}
+              <Tooltip title={t("logout")} placement="bottom">
+                <IconButton
+                  size="small"
+                  color="inherit"
+                  sx={enhancedNavbarStyles.navbarIconButton}
+                  onClick={handleLogout}
+                  aria-label={t("logout")}
+                >
+                  <Icon
+                    sx={({ palette: { dark, white } }) => ({
+                      color: light ? white.main : dark.main,
+                    })}
+                  >
+                    logout
+                  </Icon>
+                  <SoftTypography
+                    variant="button"
+                    fontWeight="medium"
+                    color={light ? "white" : "dark"}
+                  >
+                    {t("logout")}
+                  </SoftTypography>
+                </IconButton>
+              </Tooltip>
             </SoftBox>
           </SoftBox>
         </Toolbar>
