@@ -7,8 +7,6 @@ import { submitReport, getReportsByPatient } from "services/reportsServices";
 import { Typography } from '@mui/material';
 import {
   Avatar,
-  Switch,
-  FormControlLabel,
   TextField,
   Divider,
   Card,
@@ -17,15 +15,19 @@ import {
   FormControl,
   CircularProgress,
   Autocomplete,
+  InputAdornment,
 } from "@mui/material";
 import {
   Bloodtype,
   Description,
   Person,
-  DarkMode,
-  LightMode,
   UploadFile,
   Science,
+  CheckCircle,
+  CloudUpload,
+  Timeline,
+  Assignment,
+  History,
 } from "@mui/icons-material";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getDMEByPatientId } from "services/dmeService";
@@ -59,8 +61,72 @@ const labTrends = [
   { date: "2025-02-10", value: 5.0 },
 ];
 
+// Define global styles for consistency (light theme only)
+const styles = {
+  card: {
+    borderRadius: "16px",
+    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+    background: "#fff",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      boxShadow: "0 6px 24px rgba(0, 0, 0, 0.15)",
+      transform: "translateY(-2px)",
+    },
+  },
+  sectionTitle: {
+    display: "flex",
+    alignItems: "center",
+    gap: 1,
+    mb: 2,
+    color: "dark",
+  },
+  textField: {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "12px",
+      backgroundColor: "#fff",
+      "& fieldset": {
+        borderColor: "rgba(0, 0, 0, 0.23)",
+      },
+      "&:hover fieldset": {
+        borderColor: "rgba(0, 0, 0, 0.87)",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#0077b6",
+      },
+    },
+    "& .MuiInputBase-input": {
+      color: "#333",
+    },
+    "& .MuiInputLabel-root": {
+      color: "rgba(0, 0, 0, 0.54)",
+    },
+    "& .MuiInputLabel-root.Mui-focused": {
+      color: "#0077b6",
+    },
+  },
+  submitButton: {
+    background: "linear-gradient(135deg, #28a745 0%, #218838 100%)",
+    color: "#fff",
+    borderRadius: "12px",
+    mt: 2,
+    px: 4,
+    py: 1.5,
+    fontWeight: "bold",
+    "&:hover": {
+      background: "linear-gradient(135deg, #218838 0%, #1e7e34 100%)",
+      transform: "translateY(-2px)",
+      boxShadow: "0 4px 12px rgba(33, 136, 56, 0.3)",
+    },
+    "&:disabled": {
+      background: "linear-gradient(135deg, #cccccc 0%, #b3b3b3 100%)",
+      color: "#666",
+    },
+    transition: "all 0.3s ease",
+  },
+};
+
 // Component for displaying patient information
-function PatientInfoCard({ patient, darkMode }) {
+function PatientInfoCard({ patient }) {
   const pulse = `
     @keyframes pulse {
       0% { transform: scale(1); }
@@ -69,15 +135,15 @@ function PatientInfoCard({ patient, darkMode }) {
     }
   `;
   return (
-    <Card
-      sx={{
-        borderRadius: "16px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        background: darkMode ? "#2c3e50" : "#fff",
-      }}
-    >
+    <Card sx={styles.card}>
       <CardContent>
         <style>{pulse}</style>
+        <SoftBox sx={styles.sectionTitle}>
+          <Person sx={{ color: "#0077b6", fontSize: "1.8rem" }} />
+          <SoftTypography variant="h6" fontWeight="bold">
+            Patient Information
+          </SoftTypography>
+        </SoftBox>
         <SoftBox display="flex" alignItems="center" gap={2} mb={2}>
           <Avatar
             sx={{
@@ -90,39 +156,39 @@ function PatientInfoCard({ patient, darkMode }) {
             <Person fontSize="large" />
           </Avatar>
           <SoftBox>
-            <SoftTypography variant="h6" fontWeight="bold" color={darkMode ? "white" : "dark"}>
+            <SoftTypography variant="h6" fontWeight="bold" color="dark">
               {patient.name}
             </SoftTypography>
-            <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
+            <SoftTypography variant="body2" color="text.secondary">
               Patient ID: {patient.id}
             </SoftTypography>
           </SoftBox>
         </SoftBox>
         <SoftBox display="grid" gridTemplateColumns="1fr 1fr" gap={2}>
           <SoftBox display="flex" alignItems="center" gap={1}>
-            <Bloodtype sx={{ color: darkMode ? "#e0e0e0" : "#0077b6", fontSize: "1.5rem" }} />
+            <Bloodtype sx={{ color: "#0077b6", fontSize: "1.5rem" }} />
             <SoftBox>
-              <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"} textTransform="uppercase">
+              <SoftTypography variant="body2" color="text.secondary" textTransform="uppercase">
                 Blood Type
               </SoftTypography>
-              <SoftTypography variant="body1" fontWeight="medium" color={darkMode ? "white" : "dark"}>
+              <SoftTypography variant="body1" fontWeight="medium" color="dark">
                 {patient.bloodType}
               </SoftTypography>
             </SoftBox>
           </SoftBox>
           <SoftBox display="flex" alignItems="center" gap={1}>
-            <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"} textTransform="uppercase">
+            <SoftTypography variant="body2" color="text.secondary" textTransform="uppercase">
               Age
             </SoftTypography>
-            <SoftTypography variant="body1" fontWeight="medium" color={darkMode ? "white" : "dark"}>
+            <SoftTypography variant="body1" fontWeight="medium" color="dark">
               {patient.age} years
             </SoftTypography>
           </SoftBox>
           <SoftBox display="flex" alignItems="center" gap={1}>
-            <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"} textTransform="uppercase">
+            <SoftTypography variant="body2" color="text.secondary" textTransform="uppercase">
               Last Visit
             </SoftTypography>
-            <SoftTypography variant="body1" fontWeight="medium" color={darkMode ? "white" : "dark"}>
+            <SoftTypography variant="body1" fontWeight="medium" color="dark">
               {patient.lastVisit}
             </SoftTypography>
           </SoftBox>
@@ -140,31 +206,27 @@ PatientInfoCard.propTypes = {
     age: PropTypes.number.isRequired,
     lastVisit: PropTypes.string.isRequired,
   }).isRequired,
-  darkMode: PropTypes.bool.isRequired,
 };
 
 // Component for displaying lab metrics (chart)
-function LabMetricsCard({ trends, darkMode }) {
+function LabMetricsCard({ trends }) {
   return (
-    <Card
-      sx={{
-        borderRadius: "16px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        background: darkMode ? "#2c3e50" : "#fff",
-      }}
-    >
+    <Card sx={styles.card}>
       <CardContent>
-        <SoftTypography variant="h6" fontWeight="bold" mb={2} color={darkMode ? "white" : "dark"}>
-          Lab Result Trends
-        </SoftTypography>
+        <SoftBox sx={styles.sectionTitle}>
+          <Timeline sx={{ color: "#0077b6", fontSize: "1.8rem" }} />
+          <SoftTypography variant="h6" fontWeight="bold">
+            Lab Result Trends
+          </SoftTypography>
+        </SoftBox>
         <ResponsiveContainer width="100%" height={200}>
           <LineChart data={trends}>
-            <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? "#444" : "#e0e0e0"} />
-            <XAxis dataKey="date" stroke={darkMode ? "#e0e0e0" : "#333"} />
-            <YAxis stroke={darkMode ? "#e0e0e0" : "#333"} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <XAxis dataKey="date" stroke="#333" />
+            <YAxis stroke="#333" />
             <Tooltip
               contentStyle={{
-                backgroundColor: darkMode ? "#34495e" : "#fff",
+                backgroundColor: "#fff",
                 border: "none",
                 borderRadius: "8px",
                 boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
@@ -173,7 +235,7 @@ function LabMetricsCard({ trends, darkMode }) {
             <Line type="monotone" dataKey="value" stroke="#0077b6" strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
-        <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"} textAlign="center" mt={1}>
+        <SoftTypography variant="body2" color="text.secondary" textAlign="center" mt={1}>
           Recent Blood Glucose Levels (mmol/L)
         </SoftTypography>
       </CardContent>
@@ -188,52 +250,48 @@ LabMetricsCard.propTypes = {
       value: PropTypes.number.isRequired,
     })
   ).isRequired,
-  darkMode: PropTypes.bool.isRequired,
 };
 
 // Component for displaying lab stats and recent test types
-function LabStatsCard({ stats, testTypes, darkMode }) {
+function LabStatsCard({ stats, testTypes }) {
   return (
-    <Card
-      sx={{
-        borderRadius: "16px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        background: darkMode ? "#2c3e50" : "#fff",
-      }}
-    >
+    <Card sx={styles.card}>
       <CardContent>
-        <SoftTypography variant="h6" fontWeight="bold" mb={2} color={darkMode ? "white" : "dark"}>
-          Laboratory Stats
-        </SoftTypography>
+        <SoftBox sx={styles.sectionTitle}>
+          <Assignment sx={{ color: "#0077b6", fontSize: "1.8rem" }} />
+          <SoftTypography variant="h6" fontWeight="bold">
+            Laboratory Stats
+          </SoftTypography>
+        </SoftBox>
         <SoftBox display="flex" flexDirection="column" gap={2}>
           <SoftBox display="flex" alignItems="center" gap={1}>
-            <Science sx={{ color: darkMode ? "#e0e0e0" : "#0077b6", fontSize: "1.5rem" }} />
+            <Science sx={{ color: "#0077b6", fontSize: "1.5rem" }} />
             <SoftBox>
-              <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"} textTransform="uppercase">
+              <SoftTypography variant="body2" color="text.secondary" textTransform="uppercase">
                 Tests This Month
               </SoftTypography>
-              <SoftTypography variant="body1" fontWeight="medium" color={darkMode ? "white" : "dark"}>
+              <SoftTypography variant="body1" fontWeight="medium" color="dark">
                 {stats.testsThisMonth}
               </SoftTypography>
             </SoftBox>
           </SoftBox>
           <SoftBox display="flex" alignItems="center" gap={1}>
-            <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"} textTransform="uppercase">
+            <SoftTypography variant="body2" color="text.secondary" textTransform="uppercase">
               Avg Turnaround Time
             </SoftTypography>
-            <SoftTypography variant="body1" fontWeight="medium" color={darkMode ? "white" : "dark"}>
+            <SoftTypography variant="body1" fontWeight="medium" color="dark">
               {stats.avgTurnaroundTime}
             </SoftTypography>
           </SoftBox>
-          <Divider sx={{ borderColor: darkMode ? "#444" : "#e0e0e0" }} />
-          <SoftTypography variant="h6" fontWeight="bold" mt={1} color={darkMode ? "white" : "dark"}>
+          <Divider sx={{ borderColor: "#e0e0e0" }} />
+          <SoftTypography variant="h6" fontWeight="bold" mt={1} color="dark">
             Recent Test Types
           </SoftTypography>
           {testTypes.map((test, index) => (
             <SoftTypography
               key={index}
               variant="body1"
-              color={darkMode ? "white" : "dark"}
+              color="dark"
               ml={2}
             >
               • {test}
@@ -251,7 +309,6 @@ LabStatsCard.propTypes = {
     avgTurnaroundTime: PropTypes.string.isRequired,
   }).isRequired,
   testTypes: PropTypes.arrayOf(PropTypes.string).isRequired,
-  darkMode: PropTypes.bool.isRequired,
 };
 
 // Main Component
@@ -494,16 +551,16 @@ function LaboratoryWorkspace({ labName }) {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          background: darkMode
-            ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
-            : "url('https://via.placeholder.com/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
+          background: "url('https://via.placeholder.com/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
           backgroundSize: "cover",
           backgroundPosition: "center",
           padding: { xs: 2, md: 4 },
-          color: darkMode ? "#e0e0e0" : "#1a2a3a",
+          color: "#1a2a3a",
         }}
       >
-        <CircularProgress color="info" />
+        <SoftTypography variant="h6" color="dark">
+          Loading...
+        </SoftTypography>
       </SoftBox>
     );
   }
@@ -515,14 +572,12 @@ function LaboratoryWorkspace({ labName }) {
           minHeight: "100vh",
           display: "flex",
           justifyContent: "center",
-          alignItems:"center",
-          background: darkMode
-            ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
-            : "url('https://via.placeholder.com/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
+          alignItems: "center",
+          background: "url('https://via.placeholder.com/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
           backgroundSize: "cover",
           backgroundPosition: "center",
           padding: { xs: 2, md: 4 },
-          color: darkMode ? "#e0e0e0" : "#1a2a3a",
+          color: "#1a2a3a",
         }}
       >
         <SoftTypography variant="h6" color="error">
@@ -536,13 +591,11 @@ function LaboratoryWorkspace({ labName }) {
     <SoftBox
       sx={{
         minHeight: "100vh",
-        background: darkMode
-          ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
-          : "url('https://via.placeholder.com/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
+        background: "url('https://via.placeholder.com/1920x1080?text=Lab-Background'), linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        padding: { xs: 2, md: 4 },
-        color: darkMode ? "#e0e0e0" : "#1a2a3a",
+        padding: { xs: 3, md: 5 },
+        color: "#1a2a3a",
       }}
     >
       {/* Header */}
@@ -550,12 +603,12 @@ function LaboratoryWorkspace({ labName }) {
         display="flex"
         justifyContent="space-between"
         alignItems="center"
-        mb={4}
-        p={2}
+        mb={5}
+        p={3}
         sx={{
-          background: darkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.9)",
+          background: "rgba(255, 255, 255, 0.9)",
           borderRadius: "16px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
         }}
       >
         <SoftBox display="flex" alignItems="center" gap={2}>
@@ -566,46 +619,15 @@ function LaboratoryWorkspace({ labName }) {
             <SoftTypography
               variant="h6"
               fontWeight="medium"
-              color={darkMode ? "gray" : "text.secondary"}
+              color="text.secondary"
             >
               Laboratory
             </SoftTypography>
-            <SoftTypography variant="h5" fontWeight="bold" color={darkMode ? "white" : "dark"}>
+            <SoftTypography variant="h5" fontWeight="bold" color="dark">
               {labName}
             </SoftTypography>
           </SoftBox>
         </SoftBox>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={darkMode}
-              onChange={toggleDarkMode}
-              color="info"
-              sx={{
-                "& .MuiSwitch-thumb": {
-                  backgroundColor: darkMode ? "#e0e0e0" : "#0077b6",
-                },
-                "& .MuiSwitch-track": {
-                  backgroundColor: darkMode ? "#34495e" : "#b0bec5",
-                },
-              }}
-            />
-          }
-          label={
-            <SoftBox display="flex" alignItems="center" gap={1}>
-              {darkMode ? (
-                <DarkMode sx={{ color: "#e0e0e0" }} />
-              ) : (
-                <LightMode sx={{ color: "#f9a825" }} />
-              )}
-              <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-                Theme
-              </SoftTypography>
-            </SoftBox>
-          }
-          labelPlacement="start"
-          sx={{ margin: 0 }}
-        />
       </SoftBox>
 
       {/* Error Message (non-blocking) */}
@@ -626,97 +648,36 @@ function LaboratoryWorkspace({ labName }) {
         {/* Left Section: Patient Info, Report Upload, and Report History */}
         <SoftBox display="flex" flexDirection="column" gap={4}>
           {/* Patient Info Card */}
-          <PatientInfoCard patient={patient || patientData} darkMode={darkMode} />
+          <PatientInfoCard patient={patient || patientData} />
 
           {/* Report Upload Section */}
-          <Card
-            sx={{
-              borderRadius: "16px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              background: darkMode ? "#2c3e50" : "#fff",
-            }}
-          >
+          <Card sx={styles.card}>
             <CardContent>
-              <SoftTypography variant="h6" fontWeight="bold" mb={2} color={darkMode ? "white" : "dark"}>
-                Add Laboratory Report
-              </SoftTypography>
-              <Box sx={{ mb: 3 }}>
-                <FormControl
-                  fullWidth
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: "16px",
-                      height: "60px",
-                      fontSize: "1.25rem",
-                      padding: "10px 14px",
-                    },
-                  }}
-                >
-                  <Autocomplete
-                    options={autocompleteOptions}
-                    getOptionLabel={(option) => option.label}
-                    value={selectedDME && selectedLabTest ? autocompleteOptions.find(option => option.value === `${selectedDME.id}|${selectedLabTest}`) || autocompleteOptions[0] : autocompleteOptions[0]}
-                    onChange={handleDMEChange}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="--Select a choice--"
-                        sx={{
-                          "& .MuiInputBase-input": {
-                            color: darkMode ? "#e0e0e0" : "#333",
-                            fontSize: "1.25rem",
-                          },
-                          "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)",
-                          },
-                          "&:hover .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#0077b6",
-                          },
-                          "& .MuiSvgIcon-root": {
-                            color: darkMode ? "#e0e0e0" : "#333",
-                          },
-                        }}
-                      />
-                    )}
-                    renderOption={(props, option) => (
-                      <li {...props} style={{ color: "#000", fontSize: "1.1rem", padding: "12px 16px" }}>
-                        {option.label}
-                      </li>
-                    )}
-                    noOptionsText="No DMEs with valid lab tests available"
-                    sx={{
-                      borderRadius: "16px",
-                      backgroundColor: darkMode ? "#34495e" : "#fff",
-                      boxShadow: darkMode ? "0 4px 6px rgba(0, 0, 0, 0.1)" : "0 4px 6px rgba(0, 0, 0, 0.1)",
-                      "& .MuiAutocomplete-inputRoot": {
-                        height: "60px",
-                        padding: "0 14px",
-                      },
-                    }}
-                    disableClearable
-                    isOptionEqualToValue={(option, value) => option.value === value.value}
-                  />
-                </FormControl>
-              </Box>
+              <SoftBox sx={styles.sectionTitle}>
+                <CloudUpload sx={{ color: "#0077b6", fontSize: "1.8rem" }} />
+                <SoftTypography variant="h6" fontWeight="bold">
+                  Upload New Report
+                </SoftTypography>
+              </SoftBox>
               <SoftBox
                 component="label"
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
                 p={3}
-                mb={2}
+                mb={3}
                 sx={{
                   border: "2px dashed",
-                  borderColor: darkMode ? "#e0e0e0" : "#0077b6",
+                  borderColor: "#0077b6",
                   borderRadius: "12px",
                   cursor: "pointer",
                   "&:hover": {
-                    backgroundColor: darkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 119, 182, 0.1)",
+                    backgroundColor: "rgba(0, 119, 182, 0.1)",
                   },
                 }}
               >
-                <UploadFile sx={{ color: darkMode ? "#e0e0e0" : "#0077b6", fontSize: "2rem", mr: 1 }} />
-                <SoftTypography variant="body1" color={darkMode ? "gray" : "text.secondary"}>
+                <UploadFile sx={{ color: "#0077b6", fontSize: "2rem", mr: 1 }} />
+                <SoftTypography variant="body1" color="text.secondary">
                   {newReportFile ? newReportFile.name : "Click to upload a report (PDF)"}
                 </SoftTypography>
                 <input
@@ -727,39 +688,32 @@ function LaboratoryWorkspace({ labName }) {
                   aria-label="Upload laboratory report"
                 />
               </SoftBox>
-              <input
-                type="text"
+              <SoftTypography variant="body1" fontWeight="medium" mb={1} color="dark">
+                Report Description
+              </SoftTypography>
+              <TextField
+                fullWidth
+                label="Description"
                 placeholder="Add a description for the report..."
                 value={newReportDescription}
-                onChange={(e) => {
-                  setNewReportDescription(e.target.value);
-                  setError(null);
+                onChange={(e) => setNewReportDescription(e.target.value)}
+                sx={styles.textField}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Description sx={{ color: "#0077b6" }} />
+                    </InputAdornment>
+                  ),
                 }}
-                aria-label="Report description"
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  borderRadius: "12px",
-                  border: "1px solid",
-                  borderColor: darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)",
-                  backgroundColor: darkMode ? "#34495e" : "#fff",
-                  color: darkMode ? "#e0e0e0" : "#333",
-                  fontSize: "16px",
-                  outline: "none",
-                  transition: "border-color 0.3s ease",
+                inputProps={{
+                  "aria-label": "Add a description for the report",
                 }}
-                onFocus={(e) => (e.target.style.borderColor = "#0077b6")}
-                onBlur={(e) =>
-                  (e.target.style.borderColor = darkMode ? "#e0e0e0" : "rgba(0, 0, 0, 0.23)")
-                }
               />
               <SoftButton
-                variant="gradient"
-                color="info"
                 onClick={handleReportSubmit}
-                sx={{ borderRadius: "12px", mt: 2, px: 3 }}
-                startIcon={submitLoading ? <CircularProgress size={20} color="inherit" /> : <UploadFile />}
-                disabled={submitLoading || !newReportFile || !newReportDescription.trim() || !selectedLabTest || !selectedDME?.id}
+                sx={styles.submitButton}
+                startIcon={<CheckCircle />}
+                disabled={!newReportFile || !newReportDescription.trim()}
                 aria-label="Submit laboratory report"
               >
                 {submitLoading ? "Submitting..." : "Submit Report"}
@@ -768,17 +722,14 @@ function LaboratoryWorkspace({ labName }) {
           </Card>
 
           {/* Report History Section */}
-          <Card
-            sx={{
-              borderRadius: "16px",
-              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-              background: darkMode ? "#2c3e50" : "#fff",
-            }}
-          >
+          <Card sx={styles.card}>
             <CardContent>
-              <SoftTypography variant="h6" fontWeight="bold" mb={2} color={darkMode ? "white" : "dark"}>
-                Report History
-              </SoftTypography>
+              <SoftBox sx={styles.sectionTitle}>
+                <History sx={{ color: "#0077b6", fontSize: "1.8rem" }} />
+                <SoftTypography variant="h6" fontWeight="bold">
+                  Report History
+                </SoftTypography>
+              </SoftBox>
               <SoftBox maxHeight="300px" sx={{ overflowY: "auto" }}>
                 {reports.length > 0 ? (
                   reports.map((report) => {
@@ -786,31 +737,31 @@ function LaboratoryWorkspace({ labName }) {
                     return (
                       <SoftBox key={report.id} mb={2}>
                         <SoftBox display="flex" alignItems="center" gap={1}>
-                          <Description sx={{ color: darkMode ? "#e0e0e0" : "#0077b6" }} />
+                          <Description sx={{ color: "#0077b6" }} />
                           <SoftTypography
                             variant="body1"
                             fontWeight="medium"
-                            color={darkMode ? "white" : "dark"}
+                            color="dark"
                           >
                             {report.labTest || "Unnamed Report"}
                           </SoftTypography>
                         </SoftBox>
                         <SoftTypography
                           variant="body2"
-                          color={darkMode ? "gray" : "text.secondary"}
+                          color="text.secondary"
                           mt={0.5}
                         >
                           Test Creation's Date: {new Date(report.timestamp).toLocaleString()}
                         </SoftTypography>
-                        <SoftTypography variant="body1" color={darkMode ? "white" : "dark"} mt={0.5}>
+                        <SoftTypography variant="body1" color="dark" mt={0.5}>
                          Description: {report.description}
                         </SoftTypography>
-                        <Divider sx={{ my: 1, borderColor: darkMode ? "#444" : "#e0e0e0" }} />
+                        <Divider sx={{ my: 1, borderColor: "#e0e0e0" }} />
                       </SoftBox>
                     );
                   })
                 ) : (
-                  <SoftTypography variant="body1" color={darkMode ? "gray" : "text.secondary"} textAlign="center">
+                  <SoftTypography variant="body1" color="text.secondary" textAlign="center">
                     No reports available for this patient.
                   </SoftTypography>
                 )}
@@ -821,8 +772,8 @@ function LaboratoryWorkspace({ labName }) {
 
         {/* Right Section: Lab Metrics and Stats */}
         <SoftBox display="flex" flexDirection="column" gap={4}>
-          <LabMetricsCard trends={labTrendsData} darkMode={darkMode} />
-          <LabStatsCard stats={labStatsData} testTypes={testTypes} darkMode={darkMode} />
+          <LabMetricsCard trends={labTrendsData} />
+          <LabStatsCard stats={labStatsData} testTypes={testTypes} />
         </SoftBox>
       </SoftBox>
     </SoftBox>

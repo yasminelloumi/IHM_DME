@@ -38,7 +38,7 @@ const routes = [
   },
   ...(getUserRole() !== 'centreImagerie' && getUserRole() !== 'laboratoire' ?[{
     type: "collapse",
-    name: "Dashboard",
+    name: "Home",
     key: "dashboard",
     route: "/dashboard",
     icon: <MedicalServices size="12px" />,

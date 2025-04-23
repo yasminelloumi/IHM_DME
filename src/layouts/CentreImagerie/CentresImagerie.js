@@ -5,8 +5,6 @@ import SoftTypography from "components/SoftTypography";
 import SoftButton from "components/SoftButton";
 import {
   Avatar,
-  Switch,
-  FormControlLabel,
   TextField,
   Divider,
   Card,
@@ -23,9 +21,10 @@ import {
   Send,
   MonitorHeart,
   Person,
-  DarkMode,
-  LightMode,
   LocalHospital,
+  Image,
+  Comment,
+  AccessibilityNew,
 } from "@mui/icons-material";
 import { getImages, uploadImage } from "services/imagesService";
 import { getDMEByPatientId } from "services/dmeService";
@@ -35,11 +34,74 @@ const patientData = {
   heartRate: 76,
 };
 
+// Define global styles for consistency
+const styles = {
+  card: {
+    borderRadius: "16px",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+    background: "#fff",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      boxShadow: "0 6px 24px rgba(0, 0, 0, 0.15)",
+      transform: "translateY(-2px)",
+    },
+  },
+  sectionTitle: {
+    display: "flex",
+    alignItems: "center",
+    gap: 1,
+    mb: 2,
+    color: "dark",
+  },
+  textField: {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "12px",
+      backgroundColor: "#fff",
+      "& fieldset": {
+        borderColor: "rgba(0, 0, 0, 0.23)",
+      },
+      "&:hover fieldset": {
+        borderColor: "rgba(0, 0, 0, 0.87)",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "#0077b6",
+      },
+    },
+    "& .MuiInputBase-input": {
+      color: "#333",
+    },
+  },
+  sendButton: {
+    background: "linear-gradient(135deg, #0077b6 0%, #005f91 100%)",
+    color: "#fff",
+    borderRadius: "12px",
+    px: 3,
+    py: 1.5,
+    fontWeight: "bold",
+    "&:hover": {
+      background: "linear-gradient(135deg, #005f91 0%, #004b73 100%)",
+      transform: "translateY(-2px)",
+      boxShadow: "0 4px 12px rgba(0, 119, 182, 0.3)",
+    },
+    "&:disabled": {
+      background: "linear-gradient(135deg, #cccccc 0%, #b3b3b3 100%)",
+      color: "#666",
+    },
+    transition: "all 0.3s ease",
+  },
+};
+
 // Component for displaying vital stats
 function VitalsCard({ heartRate }) {
   return (
-    <Card sx={{ borderRadius: "16px", boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)" }}>
+    <Card sx={styles.card}>
       <CardContent>
+        <SoftBox sx={styles.sectionTitle}>
+          <MonitorHeart sx={{ color: "#0077b6", fontSize: "1.8rem" }} />
+          <SoftTypography variant="h6" fontWeight="bold">
+            Vitals
+          </SoftTypography>
+        </SoftBox>
         <SoftBox display="flex" alignItems="center" gap={2}>
           <MonitorHeart sx={{ color: "#0077b6", fontSize: "2rem" }} />
           <SoftBox>
@@ -61,20 +123,16 @@ VitalsCard.propTypes = {
 };
 
 // Component for displaying 3D human model
-function HumanModelCard({ darkMode }) {
+function HumanModelCard() {
   return (
-    <Card
-      sx={{
-        borderRadius: "16px",
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        background: darkMode ? "#2c3e50" : "#fff",
-        textAlign: "center",
-      }}
-    >
+    <Card sx={styles.card}>
       <CardContent>
-        <SoftTypography variant="h6" fontWeight="bold" mb={2} color={darkMode ? "white" : "dark"}>
-          3D Human Model
-        </SoftTypography>
+        <SoftBox sx={styles.sectionTitle}>
+          <AccessibilityNew sx={{ color: "#0077b6", fontSize: "1.8rem" }} />
+          <SoftTypography variant="h6" fontWeight="bold">
+            3D Human Model
+          </SoftTypography>
+        </SoftBox>
         <SoftBox
           component="img"
           src="https://png.pngtree.com/png-clipart/20240416/original/pngtree-full-human-body-x-ray-bone-png-image_14839089.png"
@@ -84,6 +142,8 @@ function HumanModelCard({ darkMode }) {
             maxWidth: "300px",
             borderRadius: "12px",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            display: "block",
+            margin: "0 auto",
           }}
         />
       </CardContent>
@@ -91,16 +151,11 @@ function HumanModelCard({ darkMode }) {
   );
 }
 
-HumanModelCard.propTypes = {
-  darkMode: PropTypes.bool.isRequired,
-};
-
 // Main Component
 function ImagingCenterWorkspace({ centerName }) {
   const [images, setImages] = useState([]);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
   const [userData, setUserData] = useState(null);
   const [dmeRecords, setDmeRecords] = useState([]);
   const [selectedDme, setSelectedDme] = useState("");
@@ -305,10 +360,9 @@ function ImagingCenterWorkspace({ centerName }) {
     <SoftBox
       sx={{
         minHeight: "100vh",
-        background: darkMode
-          ? "linear-gradient(135deg, #1a2a3a 0%, #2c3e50 100%)"
-          : "linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
+        background: "linear-gradient(135deg, #e6f0fa 0%, #b3cde0 100%)",
         padding: { xs: 2, md: 4 },
+        color: "#1a2a3a",
       }}
     >
       {/* Header */}
@@ -318,33 +372,29 @@ function ImagingCenterWorkspace({ centerName }) {
         alignItems="center"
         mb={4}
         p={2}
-        sx={{ background: darkMode ? "rgba(255, 255, 255, 0.1)" : "#fff", borderRadius: "16px" }}
+        sx={{
+          background: "rgba(255, 255, 255, 0.9)",
+          borderRadius: "16px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        }}
       >
         <SoftBox display="flex" alignItems="center" gap={2}>
           <Avatar sx={{ bgcolor: "#0077b6" }}>
             <LocalHospital />
           </Avatar>
           <SoftBox>
-            <SoftTypography variant="h6" color={darkMode ? "gray" : "text.secondary"}>
+            <SoftTypography
+              variant="h6"
+              fontWeight="bold"
+              color="text.secondary"
+            >
               Imaging Center
             </SoftTypography>
-            <SoftTypography variant="h5" color={darkMode ? "white" : "dark"}>
+            <SoftTypography variant="h2" fontWeight="bold" color="dark">
               {centerName}
             </SoftTypography>
           </SoftBox>
         </SoftBox>
-        <FormControlLabel
-          control={<Switch checked={darkMode} onChange={toggleDarkMode} color="info" />}
-          label={
-            <SoftBox display="flex" alignItems="center" gap={1}>
-              {darkMode ? <DarkMode /> : <LightMode sx={{ color: "#f9a825" }} />}
-              <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-                Theme
-              </SoftTypography>
-            </SoftBox>
-          }
-          labelPlacement="start"
-        />
       </SoftBox>
 
       {uploadError && (
@@ -359,19 +409,25 @@ function ImagingCenterWorkspace({ centerName }) {
       <SoftBox display="grid" gridTemplateColumns={{ xs: "1fr", md: "2fr 1fr" }} gap={4}>
         {/* Left Section */}
         <SoftBox display="flex" flexDirection="column" gap={4}>
-          {/* Patient Info */}
-          <Card sx={{ background: darkMode ? "#2c3e50" : "#fff" }}>
+          {/* Patient Info Card */}
+          <Card sx={styles.card}>
             <CardContent>
+              <SoftBox sx={styles.sectionTitle}>
+                <Person sx={{ color: "#0077b6", fontSize: "1.8rem" }} />
+                <SoftTypography variant="h6" fontWeight="bold">
+                  Patient Information
+                </SoftTypography>
+              </SoftBox>
               <SoftBox display="flex" alignItems="center" gap={2}>
                 <Avatar sx={{ bgcolor: "#0077b6" }}>
                   <Person />
                 </Avatar>
                 <SoftBox>
-                  <SoftTypography variant="h6" color={darkMode ? "white" : "dark"}>
+                  <SoftTypography variant="h6" fontWeight="bold" color="dark">
                     {userData?.name || "Loading..."}
                   </SoftTypography>
-                  <SoftTypography variant="body2" color={darkMode ? "gray" : "text.secondary"}>
-                    CIN: {userData?.CIN || "Not provided"}
+                  <SoftTypography variant="body2" color="text.secondary">
+                    CIN: {userData ? userData.id : "Loading..."}
                   </SoftTypography>
                 </SoftBox>
               </SoftBox>
@@ -379,41 +435,14 @@ function ImagingCenterWorkspace({ centerName }) {
           </Card>
 
           {/* Image Upload Section */}
-          <Card sx={{ background: darkMode ? "#2c3e50" : "#fff" }}>
+          <Card sx={styles.card}>
             <CardContent>
-              <SoftTypography variant="h6" color={darkMode ? "white" : "dark"} mb={2}>
-                Upload Medical Images
-              </SoftTypography>
-
-              {/* DME Dropdown */}
-              <FormControl fullWidth sx={{ mb: 3 }}>
-                <InputLabel sx={{ color: darkMode ? "#e0e0e0" : "text.secondary" }}>
-                  Select Test
-                </InputLabel>
-                <Select
-                  value={selectedDme && selectedImgTest ? `${selectedDme}|${selectedImgTest}` : ""}
-                  onChange={handleDmeChange}
-                  sx={{
-                    backgroundColor: darkMode ? "#34495e" : "#fff",
-                    color: darkMode ? "#e0e0e0" : "#333",
-                  }}
-                >
-                  {availableTests.length === 0 ? (
-                    <MenuItem disabled>No imaging tests available</MenuItem>
-                  ) : (
-                    availableTests.map((test) => (
-                      <MenuItem
-                        key={`${test.dmeId}|${test.imgTest}`}
-                        value={`${test.dmeId}|${test.imgTest}`}
-                      >
-                        {test.imgTest} - ({new Date(test.date).toLocaleDateString()})
-                      </MenuItem>
-                    ))
-                  )}
-                </Select>
-              </FormControl>
-
-              {/* Image Upload */}
+              <SoftBox sx={styles.sectionTitle}>
+                <Image sx={{ color: "#0077b6", fontSize: "1.8rem" }} />
+                <SoftTypography variant="h6" fontWeight="bold">
+                  Upload Medical Images
+                </SoftTypography>
+              </SoftBox>
               <SoftBox
                 component="label"
                 display="flex"
@@ -423,14 +452,17 @@ function ImagingCenterWorkspace({ centerName }) {
                 mb={2}
                 sx={{
                   border: "2px dashed",
-                  borderColor: darkMode ? "#e0e0e0" : "#0077b6",
+                  borderColor: "#0077b6",
                   borderRadius: "12px",
                   cursor: "pointer",
+                  "&:hover": {
+                    backgroundColor: "rgba(0, 119, 182, 0.1)",
+                  },
                 }}
               >
-                <AddAPhoto sx={{ color: darkMode ? "#e0e0e0" : "#0077b6", mr: 1 }} />
-                <SoftTypography variant="body1" color={darkMode ? "gray" : "text.secondary"}>
-                  {newImageFile ? newImageFile.name : "Click to upload an image"}
+                <AddAPhoto sx={{ color: "#0077b6", fontSize: "2rem", mr: 1 }} />
+                <SoftTypography variant="body1" color="text.secondary">
+                  Click to upload an image
                 </SoftTypography>
                 <input
                   type="file"
@@ -466,7 +498,15 @@ function ImagingCenterWorkspace({ centerName }) {
               {/* Image Previews */}
               <SoftBox display="flex" flexWrap="wrap" gap={2} mt={3}>
                 {images.map((image) => (
-                  <Card key={image.id} sx={{ width: 150, background: darkMode ? "#34495e" : "#f9f9f9" }}>
+                  <Card
+                    key={image.id}
+                    sx={{
+                      width: 150,
+                      borderRadius: "12px",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                      background: "#f9f9f9",
+                    }}
+                  >
                     <CardMedia
                       component="img"
                       height="100"
@@ -475,7 +515,11 @@ function ImagingCenterWorkspace({ centerName }) {
                       sx={{ borderRadius: "12px 12px 0 0" }}
                     />
                     <CardContent sx={{ p: 1 }}>
-                      <SoftTypography variant="caption" color={darkMode ? "gray" : "text.secondary"}>
+                      <SoftTypography
+                        variant="caption"
+                        color="text.secondary"
+                        textAlign="center"
+                      >
                         {image.description}
                       </SoftTypography>
                       <SoftTypography variant="caption" display="block" color={darkMode ? "gray" : "text.secondary"}>
@@ -483,6 +527,62 @@ function ImagingCenterWorkspace({ centerName }) {
                       </SoftTypography>
                     </CardContent>
                   </Card>
+                ))}
+              </SoftBox>
+            </CardContent>
+          </Card>
+
+          {/* Comments Section */}
+          <Card sx={styles.card}>
+            <CardContent>
+              <SoftBox sx={styles.sectionTitle}>
+                <Comment sx={{ color: "#0077b6", fontSize: "1.8rem" }} />
+                <SoftTypography variant="h6" fontWeight="bold">
+                  Comments & Notes
+                </SoftTypography>
+              </SoftBox>
+
+              {/* Comment Input */}
+              <SoftBox display="flex" alignItems="center" gap={2} mb={3}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={2}
+                  placeholder="Add a comment..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  sx={styles.textField}
+                  inputProps={{
+                    "aria-label": "Add a comment",
+                  }}
+                />
+                <SoftButton
+                  onClick={handleCommentSubmit}
+                  sx={styles.sendButton}
+                  startIcon={<Send />}
+                  disabled={!newComment.trim()}
+                  aria-label="Submit comment"
+                >
+                  Send
+                </SoftButton>
+              </SoftBox>
+
+              {/* Comment History */}
+              <SoftBox maxHeight="200px" sx={{ overflowY: "auto" }}>
+                {comments.map((comment) => (
+                  <SoftBox key={comment.id} mb={2}>
+                    <SoftTypography
+                      variant="body2"
+                      color="text.secondary"
+                      mb={0.5}
+                    >
+                      {comment.timestamp}
+                    </SoftTypography>
+                    <SoftTypography variant="body1" color="dark">
+                      {comment.text}
+                    </SoftTypography>
+                    <Divider sx={{ my: 1, borderColor: "#e0e0e0" }} />
+                  </SoftBox>
                 ))}
               </SoftBox>
             </CardContent>
