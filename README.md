@@ -21,7 +21,7 @@ L'application prend en charge **quatre types d'utilisateurs**, chacun avec ses p
 - **Mot de passe** : `imgpass`
 
 ### 🧑 Patient
-- **CIN** : `111741852`  
+- **CIN** : `2222`  
 - **Mot de passe** : `123`
 
 ---
