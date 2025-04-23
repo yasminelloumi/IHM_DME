@@ -84,41 +84,7 @@
       "password": "123",
       "role": "patient"
     },
-    {
-      "id": "54d8",
-      "CIN": "11111",
-      "lastName": "daiik",
-      "firstName": "sirine",
-      "phone": "51862200",
-      "birthDate": "2025-04-17",
-      "nationality": "tunisian",
-      "password": "123",
-      "role": "patient"
-    },
-    {
-      "id": "4024",
-      "CIN": "2222",
-      "nom": "Affes",
-      "prenom": "Zainab",
-      "tel": "26354111",
-      "dateNaissance": "2025-04-11",
-      "nationalite": "tunisian",
-      "password": "123",
-      "role": "patient",
-      "type": "patient",
-      "rememberMe": true
-    },
-    {
-      "id": "055b",
-      "CIN": "3333",
-      "nom": "Bradai",
-      "prenom": "Rahma",
-      "tel": "26354111",
-      "dateNaissance": "2025-04-30",
-      "nationalite": "tunisian",
-      "password": "123",
-      "role": "patient"
-    },
+
     {
       "id": "7a58",
       "CIN": "9999",
@@ -157,85 +123,9 @@
   ],
   "images": [
     {
-      "id": "1744729377913",
-      "patientId": "7434",
-      "description": "see.jpg - 4/15/2025",
-      "url": "blob:http://localhost:3000/da8dfdf4-b0f5-4987-9c60-2ce03b7516ca",
-      "dateCreated": "2025-04-15T15:02:57.913Z"
-    },
-    {
-      "id": "1744729420342",
-      "patientId": "7434",
-      "description": "img1.jpeg - 4/15/2025",
-      "url": "blob:http://localhost:3000/f5734152-ae56-4bfa-99c9-db73f305948e",
-      "dateCreated": "2025-04-15T15:03:40.342Z"
-    },
-    {
-      "id": "1744835394128",
-      "patientId": "3",
-      "description": "test3.png - 4/16/2025",
-      "url": "blob:http://localhost:3000/7d610334-3e79-45aa-94f1-369cd29708f9",
-      "dateCreated": "2025-04-16T20:29:54.128Z"
-    },
-    {
-      "id": "1745190856511",
-      "patientId": "2222",
-      "description": "img2.jpg - 21/04/2025",
-      "url": "blob:http://localhost:3000/b5688a4e-f951-4db5-869c-cf47ff660324",
-      "dateCreated": "2025-04-20T23:14:16.511Z"
-    },
-    {
-      "id": "1745225364174",
-      "patientId": "2222",
-      "description": "img2.jpg - 21/04/2025",
-      "url": "blob:http://localhost:3000/d594258b-ab07-41b1-88b0-5ddb877e9398",
-      "dateCreated": "2025-04-21T08:49:24.174Z"
-    },
-    {
-      "id": "1745223789665",
-      "patientId": "2222222222222",
-      "description": "458084451_837143228566340_4462744018878007248_n.jpeg - 4/21/2025",
-      "url": "blob:http://localhost:3000/8e67c76b-e33c-4f18-acd4-7d07c60c133a",
-      "dateCreated": "2025-04-21T08:23:09.665Z"
-    },
-    {
-      "id": "1745226263514",
-      "patientId": "2222222222222",
-      "description": "458084451_837143228566340_4462744018878007248_n.jpeg - 4/21/2025",
-      "fileName": "458084451_837143228566340_4462744018878007248_n.jpeg",
-      "url": "/uploads/images/image-1745226263491-484966141.jpeg",
-      "dateCreated": "2025-04-21T09:04:23.514Z"
-    },
-    {
-      "id": "1745270804643",
-      "patientId": "e3a2",
-      "description": "test test bla bla bla ",
-      "fileName": "Screenshot 2025-04-17 171038.png",
-      "url": "/uploads/images/image-1745270804627-602006415.png",
-      "dateCreated": "2025-04-21T21:26:44.643Z"
-    },
-    {
-      "id": "1745274317535",
-      "patientId": "e3a2",
-      "description": "testtest",
-      "fileName": "Screenshot 2024-09-03 210851.png",
-      "url": "/uploads/images/image-1745274317511-95396880.png",
-      "dateCreated": "2025-04-21T22:25:17.535Z"
-    },
-    {
-      "id": "1745329501999",
-      "patientId": "4024",
-      "description": "aaaaaaaaa",
-      "filename": "image-1745329501997-649038349.png",
-      "url": "/uploads/images/image-1745329501997-649038349.png",
-      "dateCreation": "2025-04-22T13:45:01.999Z",
-      "dmeId": "91af",
-      "imgTest": "Chest X-ray"
-    },
-    {
       "id": "1745351660503",
-      "patientId": "1a04",
-      "description": "plz work plz",
+      "patientId": "4024",
+      "description": "Abdominal ultrasound imaging to evaluate liver and kidney structures.",
       "fileName": "image-1745351660483-306199607.jpg",
       "url": "/uploads/images/image-1745351660483-306199607.jpg",
       "dateCreation": "2025-04-22T19:54:20.503Z",
@@ -244,8 +134,8 @@
     },
     {
       "id": "1745351966463",
-      "patientId": "1a04",
-      "description": "eye test successfully ",
+      "patientId": "4024",
+      "description": "Eye fundus examination to assess retinal health and optic nerve.",
       "fileName": "image-1745351966458-386457238.jpg",
       "url": "/uploads/images/image-1745351966458-386457238.jpg",
       "dateCreation": "2025-04-22T19:59:26.463Z",
@@ -254,8 +144,8 @@
     },
     {
       "id": "1745353620850",
-      "patientId": "1a04",
-      "description": "tyerqw",
+      "patientId": "4024",
+      "description": "Chest X-ray to evaluate lung fields and cardiac silhouette.",
       "fileName": "image-1745353620845-550551430.png",
       "url": "/uploads/images/image-1745353620845-550551430.png",
       "dateCreation": "2025-04-22T20:27:00.850Z",
@@ -265,17 +155,17 @@
     {
       "id": "1745361166784",
       "patientId": "4024",
-      "description": "fkkfkkkkkkk",
+      "description": "Chest X-ray to monitor pulmonary health and rule out abnormalities.",
       "fileName": "image-1745361166783-451181766.jpg",
       "url": "/uploads/images/image-1745361166783-451181766.jpg",
       "dateCreation": "2025-04-22T22:32:46.784Z",
-      "dmeId": "91af",
+      "dmeId": "4f17",
       "imgTest": "Chest X-ray"
     },
     {
       "id": "1745361341432",
       "patientId": "4024",
-      "description": "gmgmgmg^gùg!",
+      "description": "Chest X-ray to assess lung function and cardiac structures.",
       "fileName": "image-1745361341430-303895514.jpg",
       "url": "/uploads/images/image-1745361341430-303895514.jpg",
       "dateCreation": "2025-04-22T22:35:41.432Z",
@@ -285,30 +175,12 @@
     {
       "id": "1745365014137",
       "patientId": "4024",
-      "description": "kflgmgmgùg",
+      "description": "Chest X-ray for routine evaluation of thoracic structures.",
       "fileName": "image-1745365014135-278878825.png",
       "url": "/uploads/images/image-1745365014135-278878825.png",
       "dateCreation": "2025-04-22T23:36:54.137Z",
-      "dmeId": "91af",
+      "dmeId": "4f17",
       "imgTest": "Chest X-ray"
-    }
-  ],
-  "centreImagerie": [
-    {
-      "id": "3",
-      "matricule": "11223",
-      "password": "imgpass",
-      "nom": "Imaging Staff",
-      "role": "centreImagerie"
-    }
-  ],
-  "laboratoire": [
-    {
-      "id": "2",
-      "matricule": "67890",
-      "password": "labpass",
-      "nom": "Lab Tech",
-      "role": "laboratoire"
     }
   ],
   "conditions": [
@@ -692,73 +564,11 @@
       "notes": "Patient's glucose levels improving. Encouraged to maintain diet and activity plan. Will reassess in 3 months."
     }
   ],
-  "reports": [
-    {
-      "id": "1745240576044",
-      "patientId": "4024",
-      "description": "descr10",
-      "fileName": "Diagramme de classe DME.pdf",
-      "filePath": "/uploads/pdfFiles/report-1745240576042-292860217.pdf",
-      "timestamp": "2025-04-21T13:02:56.044Z"
-    },
-    {
-      "id": "1745241477147",
-      "patientId": "4024",
-      "description": "descr11",
-      "fileName": "Diagramme de classe DME.pdf",
-      "filePath": "/uploads/pdfFiles/report-1745241477147-352099027.pdf",
-      "timestamp": "2025-04-21T13:17:57.147Z"
-    },
-    {
-      "id": "1745241669771",
-      "patientId": "4024",
-      "description": "test1",
-      "fileName": "TP3 - 2.pdf",
-      "filePath": "/uploads/pdfFiles/report-1745241669756-611675805.pdf",
-      "timestamp": "2025-04-21T13:21:09.771Z"
-    },
-    {
-      "id": "1745241879790",
-      "patientId": "4024",
-      "description": "123",
-      "fileName": "DC_DME.pdf",
-      "filePath": "/uploads/pdfFiles/report-1745241879790-39518571.pdf",
-      "timestamp": "2025-04-21T13:24:39.790Z"
-    },
-    {
-      "id": "1745242191212",
-      "patientId": "4024",
-      "description": "test5",
-      "fileName": "Modal.pdf",
-      "filePath": "/uploads/pdfFiles/report-1745242191211-322266074.pdf",
-      "timestamp": "2025-04-21T13:29:51.212Z"
-    },
-    {
-      "id": "1745243717670",
-      "patientId": "4024",
-      "description": "test9",
-      "reportName": "Fasting blood glucose",
-      "fileName": "report-1745243717661-9543601.pdf",
-      "filePath": "/Uploads/pdfFiles/report-1745243717661-9543601.pdf",
-      "timestamp": "2025-04-21T13:55:17.670Z",
-      "dmeId": "4f17",
-      "labTest": "Fasting blood glucose"
-    },
-    {
-      "id": "1745245015454",
-      "patientId": "4024",
-      "description": "test 10",
-      "reportName": "Fasting blood glucose",
-      "fileName": "report-1745245015451-966181173.pdf",
-      "filePath": "/Uploads/pdfFiles/report-1745245015451-966181173.pdf",
-      "timestamp": "2025-04-21T14:16:55.454Z",
-      "dmeId": "4f17",
-      "labTest": "Fasting blood glucose"
-    },
+"reports": [
     {
       "id": "1745248024506",
       "patientId": "4024",
-      "description": "test final version",
+      "description": "Fasting blood glucose test results indicating stable glycemic control.",
       "labTest": "Fasting blood glucose",
       "fileName": "report-1745248024464-26575832.pdf",
       "filePath": "/Uploads/pdfFiles/report-1745248024464-26575832.pdf",
@@ -768,7 +578,7 @@
     {
       "id": "1745264458284",
       "patientId": "4024",
-      "description": "test200",
+      "description": "Kidney function test results showing normal creatinine and eGFR levels.",
       "labTest": "Kidney function test",
       "fileName": "report-1745264458277-460241925.pdf",
       "filePath": "/Uploads/pdfFiles/report-1745264458277-460241925.pdf",
@@ -776,18 +586,9 @@
       "dmeId": "e3fc"
     },
     {
-      "id": "1745326123354",
-      "patientId": "4024",
-      "description": "123",
-      "laboTest": "Kidney function test",
-      "url": "/Uploads/pdfFiles/report-1745326123326-680008596.pdf",
-      "dateCreated": "2025-04-22T12:48:43.354Z",
-      "dmeId": "4f17"
-    },
-    {
       "id": "1745327018888",
       "patientId": "4024",
-      "description": "jssss",
+      "description": "HbA1c test results reflecting long-term glucose control for diabetes management.",
       "labTest": "HbA1c",
       "filePath": "/Uploads/pdfFiles/report-1745327018874-729581358.pdf",
       "timestamp": "2025-04-22T13:03:38.888Z",
@@ -796,7 +597,7 @@
     {
       "id": "1745327423726",
       "patientId": "4024",
-      "description": "jssssssssssssssss",
+      "description": "Kidney function test results for monitoring renal health in diabetes care.",
       "labTest": "Kidney function test",
       "filePath": "/Uploads/pdfFiles/report-1745327423720-369980773.pdf",
       "timestamp": "2025-04-22T13:10:23.726Z",
@@ -805,7 +606,7 @@
     {
       "id": "1745328361918",
       "patientId": "4024",
-      "description": "fin",
+      "description": "HbA1c test results to evaluate glycemic control over the past 3 months.",
       "labTest": "HbA1c",
       "filePath": "/Uploads/pdfFiles/report-1745328361906-249039198.pdf",
       "timestamp": "2025-04-22T13:26:01.918Z",
@@ -814,7 +615,7 @@
     {
       "id": "1745329344622",
       "patientId": "4024",
-      "description": "1234",
+      "description": "Kidney function test results assessing renal function stability.",
       "labTest": "Kidney function test",
       "filePath": "/Uploads/pdfFiles/report-1745329344617-817015741.pdf",
       "timestamp": "2025-04-22T13:42:24.622Z",
@@ -823,34 +624,34 @@
     {
       "id": "1745337772795",
       "patientId": "4024",
-      "description": "fjfkfkfkflflfkf",
+      "description": "Fasting blood glucose test results to monitor daily glycemic levels.",
       "labTest": "Fasting blood glucose",
       "filePath": "/Uploads/pdfFiles/report-1745337772777-976063565.pdf",
       "timestamp": "2025-04-22T16:02:52.795Z",
-      "dmeId": "91af"
+      "dmeId": "4f17"
     },
     {
       "id": "1745349589402",
       "patientId": "4024",
-      "description": "fkflfmfmfmpffmfmmmfmfmf",
+      "description": "Kidney function test results indicating stable renal parameters.",
       "labTest": "Kidney function test",
       "filePath": "/Uploads/pdfFiles/report-1745349589387-449735766.pdf",
       "timestamp": "2025-04-22T19:19:49.402Z",
-      "dmeId": "91af"
+      "dmeId": "4f17"
     },
     {
       "id": "1745350052203",
       "patientId": "4024",
-      "description": "this is the desc of the report.",
+      "description": "Kidney function test results for routine renal health evaluation.",
       "labTest": "Kidney function test",
       "filePath": "/Uploads/pdfFiles/report-1745350052201-189926713.pdf",
       "timestamp": "2025-04-22T19:27:32.203Z",
-      "dmeId": "91af"
+      "dmeId": "4f17"
     },
     {
       "id": "1745350710198",
       "patientId": "4024",
-      "description": "final report",
+      "description": "Kidney function test results confirming stable kidney performance.",
       "labTest": "Kidney function test",
       "filePath": "/Uploads/pdfFiles/report-1745350710192-582724433.pdf",
       "timestamp": "2025-04-22T19:38:30.198Z",
@@ -859,7 +660,7 @@
     {
       "id": "1745350975154",
       "patientId": "4024",
-      "description": "final report",
+      "description": "Kidney function test results for follow-up renal assessment.",
       "labTest": "Kidney function test",
       "filePath": "/Uploads/pdfFiles/report-1745350975151-254929888.pdf",
       "timestamp": "2025-04-22T19:42:55.154Z",
@@ -868,7 +669,7 @@
     {
       "id": "1745352264674",
       "patientId": "4024",
-      "description": "final report",
+      "description": "Fasting blood glucose test results for ongoing diabetes monitoring.",
       "labTest": "Fasting blood glucose",
       "filePath": "/Uploads/pdfFiles/report-1745352264669-635797794.pdf",
       "timestamp": "2025-04-22T20:04:24.674Z",
@@ -877,32 +678,43 @@
     {
       "id": "1745352289153",
       "patientId": "4024",
-      "description": "fkfmflfki fifkflkflflflkfkgm",
+      "description": "Fasting blood glucose test results assessing short-term glycemic control.",
       "labTest": "Fasting blood glucose",
       "filePath": "/Uploads/pdfFiles/report-1745352289151-889294744.pdf",
       "timestamp": "2025-04-22T20:04:49.153Z",
-      "dmeId": "2"
+      "dmeId": "2a"
+    },
+    {
+      "id": "1745352933146",
+      "patientId": "4024",
+      "description": "HbA1c test results for long-term diabetes management evaluation.",
+      "labTest": "HbA1c",
+      "filePath": "/Uploads/pdfFiles/report-1745352933143-412077922.pdf",
+      "timestamp": "2025-04-22T20:15:33.146Z",
+      "dmeId": "2a"
+    },
+    {
+      "id": "1745353553809",
+      "patientId": "4024",
+      "description": "ECG report evaluating cardiac rhythm and function.",
+      "labTest": "ECG",
+      "filePath": "/Uploads/pdfFiles/report-1745353553797-309790945.pdf",
+      "timestamp": "2025-04-22T20:25:53.809Z",
+      "dmeId": "1"
     },
     {
       "id": "1745361390347",
       "patientId": "4024",
-      "description": "g;glgmgmgùg",
+      "description": "HbA1c test results monitoring long-term glucose levels.",
       "labTest": "HbA1c",
       "filePath": "/Uploads/pdfFiles/report-1745361390341-888442619.pdf",
       "timestamp": "2025-04-22T22:36:30.347Z",
-      "dmeId": "91af"
-    },
-    {
-      "id": "102a",
-      "patientId": "4024",
-      "description": "oooo",
-      "fileName": "DC_DME.pdf",
-      "timestamp": "2025-04-22T19:25:37.160Z"
+      "dmeId": "4f17"
     },
     {
       "id": "1745364602847",
       "patientId": "4024",
-      "description": "jgkgkgkglkglg",
+      "description": "Fasting blood glucose test results for routine diabetes check.",
       "labTest": "Fasting blood glucose",
       "filePath": "/Uploads/pdfFiles/report-1745364602841-505591296.pdf",
       "timestamp": "2025-04-22T23:30:02.847Z",

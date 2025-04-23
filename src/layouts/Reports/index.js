@@ -353,7 +353,7 @@ const Reports = () => {
             <SoftBox
               p={2}
               sx={{
-                maxHeight: "240px", // Larger height for 3 accordion items (~80px each)
+                maxHeight: "500px", // Increased from 240px to 500px
                 overflowY: "auto",
                 "&::-webkit-scrollbar": {
                   width: "8px",
@@ -474,7 +474,7 @@ const Reports = () => {
             <SoftBox
               p={2}
               sx={{
-                maxHeight: "240px", // Larger height for 3 accordion items (~80px each)
+                maxHeight: "500px", // Increased from 240px to 500px
                 overflowY: "auto",
                 "&::-webkit-scrollbar": {
                   width: "8px",

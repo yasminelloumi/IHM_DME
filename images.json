@@ -1,43 +1,9 @@
 {
   "images": [
     {
-      "id": "1745226263514",
-      "patientId": "2222222222222",
-      "description": "458084451_837143228566340_4462744018878007248_n.jpeg - 4/21/2025",
-      "fileName": "458084451_837143228566340_4462744018878007248_n.jpeg",
-      "url": "/uploads/images/image-1745226263491-484966141.jpeg",
-      "dateCreated": "2025-04-21T09:04:23.514Z"
-    },
-    {
-      "id": "1745270804643",
-      "patientId": "e3a2",
-      "description": "test test bla bla bla ",
-      "fileName": "Screenshot 2025-04-17 171038.png",
-      "url": "/uploads/images/image-1745270804627-602006415.png",
-      "dateCreated": "2025-04-21T21:26:44.643Z"
-    },
-    {
-      "id": "1745274317535",
-      "patientId": "e3a2",
-      "description": "testtest",
-      "fileName": "Screenshot 2024-09-03 210851.png",
-      "url": "/uploads/images/image-1745274317511-95396880.png",
-      "dateCreated": "2025-04-21T22:25:17.535Z"
-    },
-    {
-      "id": "1745329501999",
-      "patientId": "4024",
-      "description": "aaaaaaaaa",
-      "filename": "image-1745329501997-649038349.png",
-      "url": "/uploads/images/image-1745329501997-649038349.png",
-      "dateCreation": "2025-04-22T13:45:01.999Z",
-      "dmeId": "91af",
-      "imgTest": "Chest X-ray"
-    },
-    {
       "id": "1745351660503",
-      "patientId": "1a04",
-      "description": "plz work plz",
+      "patientId": "4024",
+      "description": "Abdominal ultrasound imaging to evaluate liver and kidney structures.",
       "fileName": "image-1745351660483-306199607.jpg",
       "url": "/uploads/images/image-1745351660483-306199607.jpg",
       "dateCreation": "2025-04-22T19:54:20.503Z",
@@ -46,8 +12,8 @@
     },
     {
       "id": "1745351966463",
-      "patientId": "1a04",
-      "description": "eye test successfully ",
+      "patientId": "4024",
+      "description": "Eye fundus examination to assess retinal health and optic nerve.",
       "fileName": "image-1745351966458-386457238.jpg",
       "url": "/uploads/images/image-1745351966458-386457238.jpg",
       "dateCreation": "2025-04-22T19:59:26.463Z",
@@ -55,29 +21,9 @@
       "imgTest": "Eye fundus examination"
     },
     {
-      "id": "1745329501999",
-      "patientId": "4024",
-      "description": "aaaaaaaaa",
-      "filename": "image-1745329501997-649038349.png",
-      "url": "/uploads/images/image-1745329501997-649038349.png",
-      "dateCreation": "2025-04-22T13:45:01.999Z",
-      "dmeId": "91af",
-      "imgTest": "Chest X-ray"
-    },
-    {
-      "id": "1745329501999",
-      "patientId": "4024",
-      "description": "aaaaaaaaa",
-      "filename": "image-1745329501997-649038349.png",
-      "url": "/uploads/images/image-1745329501997-649038349.png",
-      "dateCreation": "2025-04-22T13:45:01.999Z",
-      "dmeId": "91af",
-      "imgTest": "Chest X-ray"
-    },
-    {
       "id": "1745353620850",
-      "patientId": "1a04",
-      "description": "tyerqw",
+      "patientId": "4024",
+      "description": "Chest X-ray to evaluate lung fields and cardiac silhouette.",
       "fileName": "image-1745353620845-550551430.png",
       "url": "/uploads/images/image-1745353620845-550551430.png",
       "dateCreation": "2025-04-22T20:27:00.850Z",
@@ -87,17 +33,17 @@
     {
       "id": "1745361166784",
       "patientId": "4024",
-      "description": "fkkfkkkkkkk",
+      "description": "Chest X-ray to monitor pulmonary health and rule out abnormalities.",
       "fileName": "image-1745361166783-451181766.jpg",
       "url": "/uploads/images/image-1745361166783-451181766.jpg",
       "dateCreation": "2025-04-22T22:32:46.784Z",
-      "dmeId": "91af",
+      "dmeId": "4f17",
       "imgTest": "Chest X-ray"
     },
     {
       "id": "1745361341432",
       "patientId": "4024",
-      "description": "gmgmgmg^gùg!",
+      "description": "Chest X-ray to assess lung function and cardiac structures.",
       "fileName": "image-1745361341430-303895514.jpg",
       "url": "/uploads/images/image-1745361341430-303895514.jpg",
       "dateCreation": "2025-04-22T22:35:41.432Z",
@@ -107,11 +53,11 @@
     {
       "id": "1745365014137",
       "patientId": "4024",
-      "description": "kflgmgmgùg",
+      "description": "Chest X-ray for routine evaluation of thoracic structures.",
       "fileName": "image-1745365014135-278878825.png",
       "url": "/uploads/images/image-1745365014135-278878825.png",
       "dateCreation": "2025-04-22T23:36:54.137Z",
-      "dmeId": "91af",
+      "dmeId": "4f17",
       "imgTest": "Chest X-ray"
     }
   ]

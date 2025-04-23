@@ -1266,24 +1266,34 @@ const PatientConsultations = () => {
             </Box>
 
             <SoftBox mt={4} display="flex" justifyContent="flex-end">
-              <SoftButton
-                color="secondary"
-                variant="outlined"
-                onClick={handleCloseModal}
-                sx={{ mr: 2 }}
-                disabled={submitStatus === "submitting"}
-              >
-                Cancel
-              </SoftButton>
-              <SoftButton
-                color="primary"
-                variant="gradient"
-                type="submit"
-                disabled={submitStatus === "submitting"}
-              >
-                {submitStatus === "submitting" ? "Saving..." : "Save Consultation"}
-              </SoftButton>
-            </SoftBox>
+  <SoftButton
+    color="secondary"
+    variant="outlined"
+    onClick={handleCloseModal}
+    sx={{ mr: 2 }}
+    disabled={submitStatus === "submitting"}
+  >
+    Cancel
+  </SoftButton>
+            <SoftButton
+              color="#0077b6"
+              type="submit"
+              disabled={submitStatus === "submitting"}
+              sx={{
+                backgroundColor: "#0077b6",
+                color: "#ffffff", // White text for contrast
+                "&:hover": {
+                  backgroundColor: "#005f8c", // Slightly darker shade for hover effect
+                },
+                "&:disabled": {
+                  backgroundColor: "#b0c4de", // Light blue-gray for disabled state
+                  color: "#ffffff",
+                },
+              }}
+            >
+              {submitStatus === "submitting" ? "Saving..." : "Save Consultation"}
+            </SoftButton>
+          </SoftBox>
           </form>
         </Box>
       </Modal>
