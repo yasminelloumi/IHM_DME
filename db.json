@@ -108,7 +108,6 @@
       "password": "123",
       "role": "patient"
     },
-
     {
       "id": "7a58",
       "CIN": "9999",
@@ -143,6 +142,24 @@
       "adresse": "Sfax",
       "password": "nour456",
       "tel": "22233445"
+    }
+  ],
+  "centreImagerie": [
+    {
+      "id": "3",
+      "matricule": "11223",
+      "password": "imgpass",
+      "nom": "Imaging Staff",
+      "role": "centreImagerie"
+    }
+  ],
+  "laboratoire": [
+    {
+      "id": "2",
+      "matricule": "67890",
+      "password": "labpass",
+      "nom": "Lab Tech",
+      "role": "laboratoire"
     }
   ],
   "images": [
@@ -205,6 +222,16 @@
       "dateCreation": "2025-04-22T23:36:54.137Z",
       "dmeId": "4f17",
       "imgTest": "Chest X-ray"
+    },
+    {
+      "id": "1745397524642",
+      "patientId": "4024",
+      "description": "tiglglgmgmgmgmgmgm",
+      "fileName": "image-1745397524635-258956429.jpg",
+      "url": "/uploads/images/image-1745397524635-258956429.jpg",
+      "dateCreation": "2025-04-23T08:38:44.642Z",
+      "dmeId": "2",
+      "imgTest": "Retinal imaging"
     }
   ],
   "conditions": [
@@ -327,6 +354,36 @@
       "description": "Chronic hives triggered by heat or stress, causing itchy welts on skin. Diagnosed by allergist.",
       "treatment": "Daily antihistamines (e.g., loratadine), avoid triggers, topical creams for relief, consult doctor for flare-ups.",
       "patientId": "1a04"
+    },
+    {
+      "id": "f220",
+      "type": "allergy",
+      "name": "Penicillin Allergy",
+      "diagnosisDate": "",
+      "severity": "Severe",
+      "description": "Patient developed rash, itching, and mild swelling after taking penicillin-based antibiotics. No history of anaphylaxis.",
+      "treatment": "Avoid all penicillin-class antibiotics. Alternative antibiotics like azithromycin or doxycycline prescribed when needed. Antihistamines used to manage mild allergic reactions.",
+      "patientId": "4024"
+    },
+    {
+      "id": "f69b",
+      "type": "chronic",
+      "name": "Hypertension (High Blood Pressure)",
+      "diagnosisDate": "2025-04-24",
+      "severity": "Mild",
+      "description": "Patient consistently has elevated blood pressure readings (140/90 mmHg and above). No signs of organ damage. Monitored as part of routine checkups.",
+      "treatment": "Lifestyle changes including reduced salt intake, regular exercise, and weight loss. Prescribed Amlodipine 5mg once daily. Blood pressure monitored weekly. Annual cardiovascular risk assessment.",
+      "patientId": "4024"
+    },
+    {
+      "id": "7b28",
+      "type": "infectious",
+      "name": "Tuberculosis (Pulmonary TB)",
+      "diagnosisDate": "2025-04-09",
+      "severity": "Controlled",
+      "description": "Patient diagnosed with active pulmonary tuberculosis confirmed by chest X-ray and sputum test. Symptoms included persistent cough, night sweats, weight loss, and fatigue.",
+      "treatment": "Initiated 6-month anti-TB regimen: Isoniazid, Rifampin, Pyrazinamide, and Ethambutol for 2 months, followed by Isoniazid and Rifampin for 4 months. Monthly follow-ups and liver function tests conducted. Patient advised to follow isolation protocols during early treatment phase.",
+      "patientId": "4024"
     }
   ],
   "dme": [
@@ -588,7 +645,7 @@
       "notes": "Patient's glucose levels improving. Encouraged to maintain diet and activity plan. Will reassess in 3 months."
     }
   ],
-"reports": [
+  "reports": [
     {
       "id": "1745248024506",
       "patientId": "4024",
@@ -743,6 +800,15 @@
       "filePath": "/Uploads/pdfFiles/report-1745364602841-505591296.pdf",
       "timestamp": "2025-04-22T23:30:02.847Z",
       "dmeId": "e3fc"
+    },
+    {
+      "id": "1745397473237",
+      "patientId": "4024",
+      "description": "rikfkflgmlglhglkhlhlljljpjpjm",
+      "labTest": "Kidney function test",
+      "filePath": "/Uploads/pdfFiles/report-1745397473223-215594035.pdf",
+      "timestamp": "2025-04-23T08:37:53.237Z",
+      "dmeId": "91af"
     }
   ]
 }

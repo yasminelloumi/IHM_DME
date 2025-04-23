@@ -59,6 +59,16 @@
       "dateCreation": "2025-04-22T23:36:54.137Z",
       "dmeId": "4f17",
       "imgTest": "Chest X-ray"
+    },
+    {
+      "id": "1745397524642",
+      "patientId": "4024",
+      "description": "tiglglgmgmgmgmgmgm",
+      "fileName": "image-1745397524635-258956429.jpg",
+      "url": "/uploads/images/image-1745397524635-258956429.jpg",
+      "dateCreation": "2025-04-23T08:38:44.642Z",
+      "dmeId": "2",
+      "imgTest": "Retinal imaging"
     }
   ]
 }
