@@ -1,0 +1,724 @@
+{
+  "patients": [
+    {
+      "id": "1a04",
+      "CIN": "2222222222222",
+      "nom": "eloumi ",
+      "prenom": "yasmina",
+      "tel": "26354111",
+      "dateNaissance": "2004-04-02",
+      "nationalite": "tunisian",
+      "password": "yasmina123@",
+      "email": "bradairahma27@gmail.com",
+      "role": "patient"
+    },
+    {
+      "id": "e3a2",
+      "CIN": "333333",
+      "nom": "Bradai",
+      "prenom": "Rahma",
+      "tel": "26354222",
+      "dateNaissance": "1954-04-18",
+      "nationalite": "tunisian",
+      "password": "yasmina123@",
+      "email": "bradairahma@gmail.com",
+      "role": "patient"
+    },
+    {
+      "id": "8131",
+      "CIN": "444444",
+      "nom": "Bradai",
+      "prenom": "Rahma",
+      "tel": "26354111",
+      "dateNaissance": "2004-04-03",
+      "nationalite": "tunisian",
+      "password": "123",
+      "email": "bradairahma277@gmail.com",
+      "role": "patient",
+      "bloodType": "O+",
+      "lastVisit": "2002-04-10"
+    },
+    {
+      "id": "7434",
+      "CIN": "66666",
+      "nom": "Bradai",
+      "prenom": "Rahma",
+      "tel": "26354111",
+      "dateNaissance": "2003-04-19",
+      "nationalite": "tunisian",
+      "password": "123",
+      "role": "patient",
+      "bloodType": "O+",
+      "lastVisit": "2002-04-10"
+    },
+    {
+      "id": "02dc",
+      "CIN": "666666666666",
+      "nom": "Bradai",
+      "prenom": "Rahma",
+      "tel": "26354118",
+      "dateNaissance": "2025-04-20",
+      "nationalite": "tunisian",
+      "password": "123",
+      "role": "patient"
+    },
+    {
+      "id": "4ee4",
+      "CIN": "1199",
+      "nom": "test",
+      "prenom": "test",
+      "tel": "12344321",
+      "dateNaissance": "2020-06-22",
+      "nationalite": "france",
+      "password": "1212",
+      "role": "patient"
+    },
+    {
+      "id": "a19f",
+      "CIN": "111741852",
+      "nom": "zaineb",
+      "prenom": "affes",
+      "tel": "25896325",
+      "dateNaissance": "2011-10-16",
+      "nationalite": "tunisian",
+      "password": "123",
+      "role": "patient"
+    },
+
+    {
+      "id": "7a58",
+      "CIN": "9999",
+      "nom": "omran",
+      "prenom": "omar",
+      "tel": "51862200",
+      "dateNaissance": "2025-04-17",
+      "nationalite": "tunisian",
+      "password": "123",
+      "qrCode": "data:image/png;base64,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",
+      "role": "patient"
+    }
+  ],
+  "medecins": [
+    {
+      "id": "2",
+      "matricule": "test002",
+      "nom": "Salah",
+      "prenom": "Hedi",
+      "specialite": "Cardiologie",
+      "adresse": "Tunis",
+      "password": "med123",
+      "tel": "99887766",
+      "role": "medecins"
+    },
+    {
+      "id": "3",
+      "matricule": "0033482",
+      "nom": "Ben Ali",
+      "prenom": "Nour",
+      "specialite": "Neurologie",
+      "adresse": "Sfax",
+      "password": "nour456",
+      "tel": "22233445"
+    }
+  ],
+  "images": [
+    {
+      "id": "1745351660503",
+      "patientId": "4024",
+      "description": "Abdominal ultrasound imaging to evaluate liver and kidney structures.",
+      "fileName": "image-1745351660483-306199607.jpg",
+      "url": "/uploads/images/image-1745351660483-306199607.jpg",
+      "dateCreation": "2025-04-22T19:54:20.503Z",
+      "dmeId": "efc3",
+      "imgTest": "Abdominal ultrasound"
+    },
+    {
+      "id": "1745351966463",
+      "patientId": "4024",
+      "description": "Eye fundus examination to assess retinal health and optic nerve.",
+      "fileName": "image-1745351966458-386457238.jpg",
+      "url": "/uploads/images/image-1745351966458-386457238.jpg",
+      "dateCreation": "2025-04-22T19:59:26.463Z",
+      "dmeId": "efc3",
+      "imgTest": "Eye fundus examination"
+    },
+    {
+      "id": "1745353620850",
+      "patientId": "4024",
+      "description": "Chest X-ray to evaluate lung fields and cardiac silhouette.",
+      "fileName": "image-1745353620845-550551430.png",
+      "url": "/uploads/images/image-1745353620845-550551430.png",
+      "dateCreation": "2025-04-22T20:27:00.850Z",
+      "dmeId": "fb96",
+      "imgTest": "Chest X-ray"
+    },
+    {
+      "id": "1745361166784",
+      "patientId": "4024",
+      "description": "Chest X-ray to monitor pulmonary health and rule out abnormalities.",
+      "fileName": "image-1745361166783-451181766.jpg",
+      "url": "/uploads/images/image-1745361166783-451181766.jpg",
+      "dateCreation": "2025-04-22T22:32:46.784Z",
+      "dmeId": "4f17",
+      "imgTest": "Chest X-ray"
+    },
+    {
+      "id": "1745361341432",
+      "patientId": "4024",
+      "description": "Chest X-ray to assess lung function and cardiac structures.",
+      "fileName": "image-1745361341430-303895514.jpg",
+      "url": "/uploads/images/image-1745361341430-303895514.jpg",
+      "dateCreation": "2025-04-22T22:35:41.432Z",
+      "dmeId": "4f17",
+      "imgTest": "Chest X-ray"
+    },
+    {
+      "id": "1745365014137",
+      "patientId": "4024",
+      "description": "Chest X-ray for routine evaluation of thoracic structures.",
+      "fileName": "image-1745365014135-278878825.png",
+      "url": "/uploads/images/image-1745365014135-278878825.png",
+      "dateCreation": "2025-04-22T23:36:54.137Z",
+      "dmeId": "4f17",
+      "imgTest": "Chest X-ray"
+    }
+  ],
+  "conditions": [
+    {
+      "id": "1",
+      "type": "allergy",
+      "name": "Dust Mite Allergy",
+      "diagnosisDate": "2021-06-22",
+      "severity": "Mild",
+      "description": "Allergic reaction to dust mites, common indoor allergens",
+      "treatment": "Antihistamines, Nasal steroids",
+      "patientId": "1a04"
+    },
+    {
+      "id": "7",
+      "type": "allergy",
+      "name": "Peanut Allergy",
+      "diagnosisDate": "2020-03-15",
+      "severity": "Moderate",
+      "description": "Type I hypersensitivity reaction to peanuts",
+      "treatment": "Strict avoidance, Epinephrine auto-injector",
+      "patientId": "4024"
+    },
+    {
+      "id": "8",
+      "type": "chronic",
+      "name": "Hypertension",
+      "diagnosisDate": "2020-01-10",
+      "severity": "Moderate",
+      "description": "High blood pressure requiring medication",
+      "treatment": "Lisinopril 10mg daily, lifestyle modifications",
+      "patientId": "4024"
+    },
+    {
+      "id": "9",
+      "type": "infectious",
+      "name": "Type 2 Diabetes",
+      "diagnosisDate": "2020-02-20",
+      "severity": "Uncontrolled",
+      "description": "Insulin-resistant diabetes mellitus",
+      "treatment": "Metformin 1000mg twice daily, lifestyle changes",
+      "patientId": "4024"
+    },
+    {
+      "id": "10",
+      "type": "chronic",
+      "name": "Asthma",
+      "diagnosisDate": "2020-03-05",
+      "severity": "",
+      "description": "",
+      "treatment": "",
+      "patientId": ""
+    },
+    {
+      "id": "2",
+      "type": "chronic",
+      "name": "Type 2 Diabetes",
+      "diagnosisDate": "2019-01-10",
+      "severity": "Controlled",
+      "description": "Insulin-resistant diabetes mellitus",
+      "treatment": "Metformin 850mg twice daily",
+      "patientId": "1a04"
+    },
+    {
+      "id": "3",
+      "type": "infectious",
+      "name": "Type 2 Diabetes",
+      "diagnosisDate": "2019-02-10",
+      "severity": "Controlled",
+      "description": "Insulin-resistant diabetes mellitus",
+      "treatment": "Metformin 850mg twice daily",
+      "patientId": "1a04"
+    },
+    {
+      "id": "4",
+      "type": "allergy",
+      "name": "Hypertension",
+      "diagnosisDate": "2018-05-12",
+      "severity": "Mild",
+      "description": "Elevated blood pressure requiring medication",
+      "treatment": "Lisinopril 10mg daily, low sodium diet",
+      "patientId": "e3a2"
+    },
+    {
+      "id": "5",
+      "type": "chronic",
+      "name": "Penicillin Allergy",
+      "diagnosisDate": "2017-11-03",
+      "severity": "Severe",
+      "description": "Anaphylactic reaction to penicillin antibiotics",
+      "treatment": "Avoid all penicillin-class antibiotics, wear medical alert bracelet",
+      "patientId": "e3a2"
+    },
+    {
+      "id": "6",
+      "type": "infectious",
+      "name": "Asthma",
+      "diagnosisDate": "2015-08-20",
+      "severity": "Moderate",
+      "description": "Chronic inflammatory disease of the airways",
+      "treatment": "Albuterol inhaler as needed, Fluticasone daily",
+      "patientId": "e3a2"
+    },
+    {
+      "id": "ff4b",
+      "type": "allergy",
+      "name": "Peanut Allergy",
+      "diagnosisDate": "2025-04-18",
+      "severity": "",
+      "description": "Allergic to peanuts; causes hives, swelling, breathing issues. Confirmed by skin test. Avoid all peanut products.",
+      "treatment": "Carry EpiPen, use antihistamines for mild reactions, avoid peanuts, call 911 for severe reactions.",
+      "patientId": "1a04"
+    },
+    {
+      "id": "195e",
+      "type": "chronic",
+      "name": "Urticaria",
+      "diagnosisDate": "2018-10-23",
+      "severity": "",
+      "description": "Chronic hives triggered by heat or stress, causing itchy welts on skin. Diagnosed by allergist.",
+      "treatment": "Daily antihistamines (e.g., loratadine), avoid triggers, topical creams for relief, consult doctor for flare-ups.",
+      "patientId": "1a04"
+    }
+  ],
+  "dme": [
+    {
+      "id": "1",
+      "patientId": "1a04",
+      "medecinId": "2",
+      "dateConsultation": "2023-06-15T10:30:00",
+      "reason": "Chest pain evaluation",
+      "diagnostiques": [
+        "Hypertension (Stage 1)"
+      ],
+      "ordonnances": [
+        "Amlodipine 5mg As prescribed",
+        "Blood pressure monitoring N/A Daily"
+      ],
+      "laboTest": [
+        "ECG",
+        "Complete blood count",
+        "Cholesterol panel"
+      ],
+      "imgTest": [
+        "Chest X-ray"
+      ],
+      "notes": "Patient advised to reduce sodium intake and exercise regularly."
+    },
+    {
+      "id": "2",
+      "patientId": "1a04",
+      "medecinId": "2",
+      "dateConsultation": "2023-12-10T14:00:00",
+      "reason": "Follow-up for hypertension",
+      "diagnostiques": [
+        "Hypertension (Stable)",
+        "Mild hyperlipidemia"
+      ],
+      "ordonnances": [
+        "Amlodipine 5mg As prescribed",
+        "Atorvastatin 10mg N/A Daily"
+      ],
+      "laboTest": [
+        "Lipid panel",
+        "Kidney function test"
+      ],
+      "imgTest": [],
+      "notes": "Patient reports adherence to medication. Advised to continue low-sodium diet and schedule next visit in 3 months."
+    },
+    {
+      "id": "efc3",
+      "patientId": "1a04",
+      "medecinId": "1",
+      "dateConsultation": "2025-04-17T00:00:00.000Z",
+      "reason": "Diabetes management and follow-up",
+      "diagnostiques": [
+        "Type 2 Diabetes",
+        "Hypertension (Stage 2)"
+      ],
+      "ordonnances": [
+        "Metformin 500mg twice daily",
+        "Lisinopril 10mg once daily",
+        "Monitor blood sugar levels before meals"
+      ],
+      "laboTest": [
+        "Fasting blood glucose",
+        "HbA1c",
+        "Kidney function test"
+      ],
+      "imgTest": [
+        "Abdominal ultrasound",
+        "Eye fundus examination"
+      ],
+      "notes": "Patient instructed on the importance of controlling blood sugar levels and maintaining a healthy diet. Follow-up in 3 months."
+    },
+    {
+      "id": "fb96",
+      "patientId": "1a04",
+      "medecinId": "2",
+      "dateConsultation": "2025-04-18T00:00:00.000Z",
+      "reason": "Routine check-up",
+      "diagnostiques": [
+        "Hypertension",
+        "Diabetes"
+      ],
+      "ordonnances": [
+        "Lisinopril 10mg once daily",
+        "Metformin 500mg twice daily"
+      ],
+      "laboTest": [
+        "Blood glucose",
+        "Cholesterol panel"
+      ],
+      "imgTest": [
+        "Chest X-ray"
+      ],
+      "notes": "Patient advised to follow up in 6 months."
+    },
+    {
+      "id": "2",
+      "patientId": "4024",
+      "medecinId": "2",
+      "dateConsultation": "2024-02-10T14:00:00",
+      "reason": "Follow-up for type 2 diabetes",
+      "diagnostiques": [
+        "Type 2 Diabetes Mellitus"
+      ],
+      "ordonnances": [
+        "Metformin 500mg Twice daily",
+        "Lifestyle modifications N/A Ongoing"
+      ],
+      "laboTest": [
+        "HbA1c",
+        "Fasting blood glucose"
+      ],
+      "imgTest": [
+        "Retinal imaging"
+      ],
+      "notes": "Patient is stable. Recommended to continue medication and monitor glucose levels weekly."
+    },
+    {
+      "id": "4f17",
+      "patientId": "4024",
+      "medecinId": "2",
+      "dateConsultation": "2025-04-24T00:00:00.000Z",
+      "reason": "Persistent headache and dizziness",
+      "diagnostiques": [
+        "Migraine with aura"
+      ],
+      "ordonnances": [
+        "Sumatriptan 50mg Take at onset of symptoms",
+        "Hydration therapy As needed"
+      ],
+      "laboTest": [
+        "Fasting blood glucose",
+        "HbA1c",
+        "Kidney function test"
+      ],
+      "imgTest": [
+        "\"Chest X-ray\""
+      ],
+      "notes": "Patient advised to keep a headache diary and avoid known triggers like caffeine and stress."
+    },
+    {
+      "id": "91af",
+      "patientId": "4024",
+      "medecinId": "2",
+      "dateConsultation": "2025-04-24T00:00:00.000Z",
+      "reason": "kkèumllpmljtpk^luyùmkt^kutplk^kutûtpumyt$",
+      "diagnostiques": [
+        "jplkuku$kupku",
+        "hoikrpjypypjypy"
+      ],
+      "ordonnances": [
+        "lkkjyptljytpypy^yoykiyyypyyp",
+        "klylymymyumlupukrn"
+      ],
+      "laboTest": [
+        "Fasting blood glucose",
+        "HbA1c",
+        "Kidney function test"
+      ],
+      "imgTest": [
+        "\"Chest X-ray\""
+      ],
+      "notes": "kkèumllpmljtpk^luyùmkt^kutplk^kutûtpumyt$kkèumllpmljtpk^luyùmkt^kutplk^kutûtpumyt$kkèumllpmljtpk^luyùmkt^kutplk^kutûtpumyt$kkèumllpmljtpk^luyùmkt^kutplk^kutûtpumyt$kkèumllpmljtpk^luyùmkt^kutplk^kutûtpumyt$"
+    },
+    {
+      "id": "e3fc",
+      "patientId": "4024",
+      "medecinId": "2",
+      "dateConsultation": "2025-04-29T00:00:00.000Z",
+      "reason": "Follow-up for type 2 diabetes",
+      "diagnostiques": [
+        "Type 2 Diabetes Mellitus"
+      ],
+      "ordonnances": [
+        "Metformin 500mg Twice daily",
+        "Lifestyle counseling Weekly"
+      ],
+      "laboTest": [
+        "Fasting blood glucose",
+        "HbA1c",
+        "Kidney function test"
+      ],
+      "imgTest": [
+        "Abdominal ultrasound",
+        "Eye fundus examination"
+      ],
+      "notes": "Blood sugar levels have improved. Continue current medication and monitor diet. Next follow-up in 2 months."
+    },
+    {
+      "id": "e3s5",
+      "patientId": "e3a2",
+      "medecinId": "5",
+      "dateConsultation": "2023-09-22T14:45:00",
+      "reason": "Persistent headaches",
+      "diagnostiques": [
+        "Tension-type headache"
+      ],
+      "ordonnances": [
+        "Paracetamol 500mg Twice daily",
+        "Stress management techniques N/A Daily"
+      ],
+      "laboTest": [
+        "Thyroid function test",
+        "Vitamin B12 levels"
+      ],
+      "imgTest": [
+        "MRI Brain"
+      ],
+      "notes": "Patient was recommended to maintain a sleep diary and avoid caffeine in the evening."
+    },
+    {
+      "id": "9135",
+      "patientId": "e3a2",
+      "medecinId": "2",
+      "dateConsultation": "2025-04-19T00:00:00.000Z",
+      "reason": "Fatigue persistante et perte d’appétit",
+      "diagnostiques": [
+        "Anémie ferriprive",
+        "Carence en vitamine D"
+      ],
+      "ordonnances": [
+        "Ferograd 80mg Une fois par jour pendant 3 mois",
+        "Vitamine D3 1000 UI Une fois par jour",
+        "Alimentation riche en fer recommandée"
+      ],
+      "laboTest": [
+        "FSC",
+        "Ferritine sérique",
+        "Vitamine D"
+      ],
+      "imgTest": [
+        "X_ray"
+      ],
+      "notes": "La patiente présente des symptômes compatibles avec une anémie légère. Recommandé de suivre un régime équilibré, riche en légumes verts et en protéines animales. Un suivi est prévu dans 6 semaines pour réévaluer les taux de fer et de vitamine D."
+    },
+    {
+      "id": "a61b",
+      "patientId": "4024",
+      "medecinId": "2",
+      "dateConsultation": "2025-04-24T00:00:00.000Z",
+      "reason": "Persistent cough and shortness of breath",
+      "diagnostiques": [
+        "Acute Bronchitis",
+        "Mild Peripheral Neuropathy"
+      ],
+      "ordonnances": [
+        "Salbutamol inhaler 100mcg As needed",
+        "Rest and hydration",
+        "Paracetamol 500mg Every 6 hours if fever"
+      ],
+      "laboTest": [
+        "HbA1c",
+        "Fasting blood glucose"
+      ],
+      "imgTest": [
+        "Foot ultrasound"
+      ],
+      "notes": "Patient's glucose levels improving. Encouraged to maintain diet and activity plan. Will reassess in 3 months."
+    }
+  ],
+"reports": [
+    {
+      "id": "1745248024506",
+      "patientId": "4024",
+      "description": "Fasting blood glucose test results indicating stable glycemic control.",
+      "labTest": "Fasting blood glucose",
+      "fileName": "report-1745248024464-26575832.pdf",
+      "filePath": "/Uploads/pdfFiles/report-1745248024464-26575832.pdf",
+      "timestamp": "2025-04-21T15:07:04.506Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745264458284",
+      "patientId": "4024",
+      "description": "Kidney function test results showing normal creatinine and eGFR levels.",
+      "labTest": "Kidney function test",
+      "fileName": "report-1745264458277-460241925.pdf",
+      "filePath": "/Uploads/pdfFiles/report-1745264458277-460241925.pdf",
+      "timestamp": "2025-04-21T19:40:58.284Z",
+      "dmeId": "e3fc"
+    },
+    {
+      "id": "1745327018888",
+      "patientId": "4024",
+      "description": "HbA1c test results reflecting long-term glucose control for diabetes management.",
+      "labTest": "HbA1c",
+      "filePath": "/Uploads/pdfFiles/report-1745327018874-729581358.pdf",
+      "timestamp": "2025-04-22T13:03:38.888Z",
+      "dmeId": "e3fc"
+    },
+    {
+      "id": "1745327423726",
+      "patientId": "4024",
+      "description": "Kidney function test results for monitoring renal health in diabetes care.",
+      "labTest": "Kidney function test",
+      "filePath": "/Uploads/pdfFiles/report-1745327423720-369980773.pdf",
+      "timestamp": "2025-04-22T13:10:23.726Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745328361918",
+      "patientId": "4024",
+      "description": "HbA1c test results to evaluate glycemic control over the past 3 months.",
+      "labTest": "HbA1c",
+      "filePath": "/Uploads/pdfFiles/report-1745328361906-249039198.pdf",
+      "timestamp": "2025-04-22T13:26:01.918Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745329344622",
+      "patientId": "4024",
+      "description": "Kidney function test results assessing renal function stability.",
+      "labTest": "Kidney function test",
+      "filePath": "/Uploads/pdfFiles/report-1745329344617-817015741.pdf",
+      "timestamp": "2025-04-22T13:42:24.622Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745337772795",
+      "patientId": "4024",
+      "description": "Fasting blood glucose test results to monitor daily glycemic levels.",
+      "labTest": "Fasting blood glucose",
+      "filePath": "/Uploads/pdfFiles/report-1745337772777-976063565.pdf",
+      "timestamp": "2025-04-22T16:02:52.795Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745349589402",
+      "patientId": "4024",
+      "description": "Kidney function test results indicating stable renal parameters.",
+      "labTest": "Kidney function test",
+      "filePath": "/Uploads/pdfFiles/report-1745349589387-449735766.pdf",
+      "timestamp": "2025-04-22T19:19:49.402Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745350052203",
+      "patientId": "4024",
+      "description": "Kidney function test results for routine renal health evaluation.",
+      "labTest": "Kidney function test",
+      "filePath": "/Uploads/pdfFiles/report-1745350052201-189926713.pdf",
+      "timestamp": "2025-04-22T19:27:32.203Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745350710198",
+      "patientId": "4024",
+      "description": "Kidney function test results confirming stable kidney performance.",
+      "labTest": "Kidney function test",
+      "filePath": "/Uploads/pdfFiles/report-1745350710192-582724433.pdf",
+      "timestamp": "2025-04-22T19:38:30.198Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745350975154",
+      "patientId": "4024",
+      "description": "Kidney function test results for follow-up renal assessment.",
+      "labTest": "Kidney function test",
+      "filePath": "/Uploads/pdfFiles/report-1745350975151-254929888.pdf",
+      "timestamp": "2025-04-22T19:42:55.154Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745352264674",
+      "patientId": "4024",
+      "description": "Fasting blood glucose test results for ongoing diabetes monitoring.",
+      "labTest": "Fasting blood glucose",
+      "filePath": "/Uploads/pdfFiles/report-1745352264669-635797794.pdf",
+      "timestamp": "2025-04-22T20:04:24.674Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745352289153",
+      "patientId": "4024",
+      "description": "Fasting blood glucose test results assessing short-term glycemic control.",
+      "labTest": "Fasting blood glucose",
+      "filePath": "/Uploads/pdfFiles/report-1745352289151-889294744.pdf",
+      "timestamp": "2025-04-22T20:04:49.153Z",
+      "dmeId": "2a"
+    },
+    {
+      "id": "1745352933146",
+      "patientId": "4024",
+      "description": "HbA1c test results for long-term diabetes management evaluation.",
+      "labTest": "HbA1c",
+      "filePath": "/Uploads/pdfFiles/report-1745352933143-412077922.pdf",
+      "timestamp": "2025-04-22T20:15:33.146Z",
+      "dmeId": "2a"
+    },
+    {
+      "id": "1745353553809",
+      "patientId": "4024",
+      "description": "ECG report evaluating cardiac rhythm and function.",
+      "labTest": "ECG",
+      "filePath": "/Uploads/pdfFiles/report-1745353553797-309790945.pdf",
+      "timestamp": "2025-04-22T20:25:53.809Z",
+      "dmeId": "1"
+    },
+    {
+      "id": "1745361390347",
+      "patientId": "4024",
+      "description": "HbA1c test results monitoring long-term glucose levels.",
+      "labTest": "HbA1c",
+      "filePath": "/Uploads/pdfFiles/report-1745361390341-888442619.pdf",
+      "timestamp": "2025-04-22T22:36:30.347Z",
+      "dmeId": "4f17"
+    },
+    {
+      "id": "1745364602847",
+      "patientId": "4024",
+      "description": "Fasting blood glucose test results for routine diabetes check.",
+      "labTest": "Fasting blood glucose",
+      "filePath": "/Uploads/pdfFiles/report-1745364602841-505591296.pdf",
+      "timestamp": "2025-04-22T23:30:02.847Z",
+      "dmeId": "e3fc"
+    }
+  ]
+}

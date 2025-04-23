@@ -1,22 +1,4 @@
-/**
-=========================================================
-* Soft UI Dashboard React - v4.0.1
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/soft-ui-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-// react-routers components
 import { Link } from "react-router-dom";
-
-// prop-types is library for typechecking of props
 import PropTypes from "prop-types";
 
 // @mui material components
@@ -30,28 +12,25 @@ import SoftBox from "components/SoftBox";
 import SoftTypography from "components/SoftTypography";
 
 // Soft UI Dashboard React base styles
-import colors from "assets/theme/base/colors";
 import typography from "assets/theme/base/typography";
 
-function ProfileInfoCard({ title, description, info, social, action }) {
+function ProfileInfoCard({ title, description, info, action, children }) {
   const labels = [];
   const values = [];
-  const { socialMediaColors } = colors;
   const { size } = typography;
 
-  // Convert this form `objectKey` of the object key in to this `object key`
+  // Convert object keys to readable labels
   Object.keys(info).forEach((el) => {
     if (el.match(/[A-Z\s]+/)) {
       const uppercaseLetter = Array.from(el).find((i) => i.match(/[A-Z]+/));
       const newElement = el.replace(uppercaseLetter, ` ${uppercaseLetter.toLowerCase()}`);
-
       labels.push(newElement);
     } else {
       labels.push(el);
     }
   });
 
-  // Push the object values into the values array
+  // Push object values into the values array
   Object.values(info).forEach((el) => values.push(el));
 
   // Render the card info items
@@ -66,35 +45,23 @@ function ProfileInfoCard({ title, description, info, social, action }) {
     </SoftBox>
   ));
 
-  // Render the card social media icons
-  const renderSocial = social.map(({ link, icon, color }) => (
-    <SoftBox
-      key={color}
-      component="a"
-      href={link}
-      target="_blank"
-      rel="noreferrer"
-      fontSize={size.lg}
-      color={socialMediaColors[color].main}
-      pr={1}
-      pl={0.5}
-      lineHeight={1}
-    >
-      {icon}
-    </SoftBox>
-  ));
-
   return (
     <Card sx={{ height: "100%" }}>
       <SoftBox display="flex" justifyContent="space-between" alignItems="center" pt={2} px={2}>
         <SoftTypography variant="h6" fontWeight="medium" textTransform="capitalize">
           {title}
         </SoftTypography>
-        <SoftTypography component={Link} to={action.route} variant="body2" color="secondary">
+        {action && (
           <Tooltip title={action.tooltip} placement="top">
-            <Icon>edit</Icon>
+            <Icon
+              style={{ cursor: "pointer" }}
+              onClick={action.onClick}
+              color="action"
+            >
+              edit
+            </Icon>
           </Tooltip>
-        </SoftTypography>
+        )}
       </SoftBox>
       <SoftBox p={2}>
         <SoftBox mb={2} lineHeight={1}>
@@ -107,28 +74,30 @@ function ProfileInfoCard({ title, description, info, social, action }) {
         </SoftBox>
         <SoftBox>
           {renderItems}
-          <SoftBox display="flex" py={1} pr={2}>
-            <SoftTypography variant="button" fontWeight="bold" textTransform="capitalize">
-              social: &nbsp;
-            </SoftTypography>
-            {renderSocial}
-          </SoftBox>
         </SoftBox>
+
+        {/* ✅ Show children like QR code inside the card */}
+        {children && (
+          <SoftBox mt={3} display="flex" flexDirection="column" alignItems="center">
+            {children}
+          </SoftBox>
+        )}
       </SoftBox>
     </Card>
   );
 }
 
-// Typechecking props for the ProfileInfoCard
+// ✅ Updated propTypes to accept children
 ProfileInfoCard.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   info: PropTypes.objectOf(PropTypes.string).isRequired,
-  social: PropTypes.arrayOf(PropTypes.object).isRequired,
   action: PropTypes.shape({
-    route: PropTypes.string.isRequired,
+    route: PropTypes.string,
     tooltip: PropTypes.string.isRequired,
-  }).isRequired,
+    onClick: PropTypes.func,
+  }),
+  children: PropTypes.node,
 };
 
 export default ProfileInfoCard;
