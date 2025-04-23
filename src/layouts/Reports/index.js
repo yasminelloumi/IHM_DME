@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
@@ -105,6 +106,14 @@ const PopupModal = ({ open, onClose, children, title }) => {
       </Box>
     </SoftBox>
   );
+};
+
+// PropTypes for PopupModal
+PopupModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
+  title: PropTypes.string,
 };
 
 const Reports = () => {
@@ -246,17 +255,6 @@ const Reports = () => {
     });
   };
 
-  const handleDeleteImage = async (id) => {
-    try {
-      await deleteImage(id);
-      setRadiologyData(radiologyData.filter((image) => image.id !== id));
-      setFilteredRadiologyData(filteredRadiologyData.filter((image) => image.id !== id));
-    } catch (err) {
-      console.error("Error deleting image:", err);
-      alert("Failed to delete image");
-    }
-  };
-
   if (loading) {
     return (
       <DashboardLayout>
@@ -291,7 +289,11 @@ const Reports = () => {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <SoftBox p={2}>
+      <SoftBox
+        p={2}
+        pt={10} // Increased top padding for space below header
+        pb={10} // Increased bottom padding for space above footer
+      >
         {/* Search and Sort Controls */}
         <SoftBox display="flex" gap={2} mb={3} sx={{ flexWrap: "wrap" }}>
           <TextField

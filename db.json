@@ -281,6 +281,16 @@
       "dateCreation": "2025-04-22T22:35:41.432Z",
       "dmeId": "4f17",
       "imgTest": "Chest X-ray"
+    },
+    {
+      "id": "1745365014137",
+      "patientId": "4024",
+      "description": "kflgmgmgùg",
+      "fileName": "image-1745365014135-278878825.png",
+      "url": "/uploads/images/image-1745365014135-278878825.png",
+      "dateCreation": "2025-04-22T23:36:54.137Z",
+      "dmeId": "91af",
+      "imgTest": "Chest X-ray"
     }
   ],
   "centreImagerie": [
@@ -888,6 +898,15 @@
       "description": "oooo",
       "fileName": "DC_DME.pdf",
       "timestamp": "2025-04-22T19:25:37.160Z"
+    },
+    {
+      "id": "1745364602847",
+      "patientId": "4024",
+      "description": "jgkgkgkglkglg",
+      "labTest": "Fasting blood glucose",
+      "filePath": "/Uploads/pdfFiles/report-1745364602841-505591296.pdf",
+      "timestamp": "2025-04-22T23:30:02.847Z",
+      "dmeId": "e3fc"
     }
   ]
 }

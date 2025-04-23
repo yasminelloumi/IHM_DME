@@ -250,7 +250,7 @@ function ListPatientData() {
             startIcon={<QrCodeScanner />}
             sx={{ borderRadius: "12px", px: 3 }}
           >
-            {scannerOpen ? "Close Scanner" : "Scan QR Code"}
+            {scannerOpen ? "Fermer le Scanner" : "Scanner un QR Code"}
           </SoftButton>
         </SoftBox>
 
